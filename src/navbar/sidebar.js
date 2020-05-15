@@ -3,7 +3,7 @@ import { Menu } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import './sidebar.css'
 class SideBar extends Component {
-    state = { activeItem: null }
+    state = { activeItem: 'home' }
     handleItemClick = (e, { name }) => this.setState({ activeItem: name })
     render() {
         const { activeItem } = this.state
