@@ -26,3 +26,6 @@
   transform: scale(1.2);
   cursor: pointer;
 }
+.project-box .projectDescription {
+  cursor: pointer;
+}

@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-import { Container, Header, Breadcrumb, Icon, Divider, Card, Modal, Grid, Button, Dropdown } from 'semantic-ui-react'
+import { Container, Header, Breadcrumb,Segment,Label, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed,Transition } from 'semantic-ui-react'
+import moment from 'moment'
 import Pluralize from 'react-pluralize'
 import { Link } from 'react-router-dom'
+import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
 class ProjectDetail extends Component {
     constructor(props) {
@@ -12,7 +14,6 @@ class ProjectDetail extends Component {
             open: false
         }
         this.deleteCurrentProject = this.deleteCurrentProject.bind(this)
-        this.addMembers = this.addMembers.bind(this)
         this.onChange = this.onChange.bind(this)
     }
 
@@ -21,13 +22,14 @@ class ProjectDetail extends Component {
 
 
     componentWillMount() {
-        const url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
+        const project_detail_url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
+        const get_issues_url = project_detail_url+"bugs/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
-        fetch(url, { headers: headers }).then(res => res.json()).then((data) => {
-            this.setState({ data: data }, () => {
-                this.render()
-            })
-
+        fetch(project_detail_url, { headers: headers }).then(res => res.json()).then((data) => {
+            this.setState({ data: data, member_names: data.member_names, warning_text: "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?" })
+        })
+        fetch(get_issues_url,{headers:headers}).then(issue_res=>issue_res.json()).then((issue_data)=>{
+            this.setState({issue_data:issue_data})
         })
         this.stateOptions()
     }
@@ -61,9 +63,6 @@ class ProjectDetail extends Component {
             this.setState({ user_data_for_search: user_data })
         })
     }
-    addMembers() {
-        console.log(this.state.user_ids)
-    }
 
     onChange(event, data) {
         const user_id = data.value.map((element) => {
@@ -72,14 +71,18 @@ class ProjectDetail extends Component {
         })
         const body = JSON.stringify({ members: user_id })
         const url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/update_members/`
-        fetch(url, { method: 'PATCH', body: body, headers: { 'Content-Type': 'application/json', "Authorization": `Token ${sessionStorage.getItem("token")}` } }).then(res => res.json()).then((data) => {
-            console.log(data.data)
+        const params = { method: 'PATCH', body: body, headers: { 'Content-Type': 'application/json', "Authorization": `Token ${sessionStorage.getItem("token")}` } }
+        fetch(url, params).then(res => res.json()).then(res => res.user_ids).then((user_ids) => {
+            const user_names = user_ids.map((id) => {
+                return this.state.user_data_for_search.find(o => o.key === id.toString()).text
+            })
+            this.setState({ member_names: user_names })
         })
     }
 
     search_component() {
         const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
-        const {data} = this.state
+        const { data } = this.state
         const search = (user_id === data.creator) ? (
             <Dropdown
                 placeholder='Add Members'
@@ -88,7 +91,6 @@ class ProjectDetail extends Component {
                 onChange={this.onChange}
                 search
                 selection
-                onClose={this.addMembers}
                 options={this.state.user_data_for_search}
             />
         ) : (<Component>
@@ -96,7 +98,62 @@ class ProjectDetail extends Component {
         </Component>
             )
         return search
+
     }
+
+    DisPlayMembers() {
+        const { member_names } = this.state
+        if (member_names) {
+            const list = member_names.map(element =>
+                <Feed.Event>
+                    <Feed.Label>
+                        <Avatar name={element} size='40' />
+                    </Feed.Label>
+                    <Feed.Content>
+                        <Feed.Summary>
+                            {element}
+                        </Feed.Summary>
+                    </Feed.Content>
+                </Feed.Event>
+            )
+
+            const final_list = <Feed>{list}</Feed>
+            return final_list
+        }
+        else return <Feed.Event><Feed.Label>No members</Feed.Label></Feed.Event>
+
+    }
+
+    ListCards() {
+        let listCards = []
+        const { issue_data } = this.state
+        if (issue_data !==undefined) {
+            listCards = issue_data.map((bug) => {
+                return (
+                    <Card fluid color='red'>
+                        <Card.Content>
+                            <Card.Header>
+                                <Icon name='plus' color='red' />{bug.name}<Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
+                            </Card.Header>
+                        </Card.Content>
+                        <Transition.Group>
+                            <Card.Content>
+                                <Card.Description content={bug.description} />
+                            </Card.Content>
+                            <Card.Content extra >
+                                {moment(bug.issued_at).fromNow()}
+                            </Card.Content>
+                        </Transition.Group>
+                    </Card>
+                )
+            })
+        }
+        else {
+            listCards = <Segment>issues are not awailable</Segment>
+        }
+        return listCards
+    }
+
 
     render() {
         const { data } = this.state
@@ -112,7 +169,7 @@ class ProjectDetail extends Component {
                         </Breadcrumb>
                     </Header>
                     <Divider section />
-                    <Card fluid>
+                    <Card color='red' fluid>
                         <Card.Content className="CardTop" textAlign='center' >
                             <Card.Description>{data.wiki}</Card.Description>
                         </Card.Content>
@@ -131,32 +188,44 @@ class ProjectDetail extends Component {
                                         <Icon name='user' />
                                     </Grid.Column>
                                     <Grid.Column >
-                                        <Modal open={open} basic trigger={<Button className='delete' icon onClick={this.show}><Icon color='red' name='delete' />Delete</Button>} closeOnDimmerClick closeOnDocumentClick size='small'>
-                                            <Header icon='archive' content='Archive Old Messages' />
-                                            <Modal.Content>
-                                                <p>
-                                                    Your inbox is getting full, would you like us to enable automatic
-                                                    archiving of old messages?
-                                                </p>
-                                            </Modal.Content>
-                                            <Modal.Actions>
-                                                <Button basic color='red' onClick={this.close} inverted>
-                                                    <Icon name='remove' /> No
-                                            </Button>
-                                                <Button color='green' onClick={this.deleteCurrentProject} inverted>
-                                                    <Icon name='checkmark' /> Yes
-                                            </Button>
-                                            </Modal.Actions>
-                                        </Modal>
+                                        <Button className='delete' icon onClick={this.show}><Icon color='red' name='delete' />Delete</Button>
                                     </Grid.Column>
                                 </Grid.Row>
                             </Grid>
                         </Card.Content>
                     </Card>
-
-
-
-
+                    
+                    
+                    
+                    <Card color='red'>
+                        <Card.Content textAlign='center' >
+                            <Card.Header>Members</Card.Header>
+                        </Card.Content>
+                        <Card.Content>
+                            {this.DisPlayMembers()}
+                        </Card.Content>
+                    </Card>
+                    <Container className="issueCardGroup" >
+                        {this.ListCards()}
+                    </Container>
+                    <Modal open={open} basic closeOnDimmerClick closeOnDocumentClick size='small'>
+                        <Header icon='archive' content='Delete the Current Project' />
+                        <Modal.Content>
+                            <p>
+                                {this.state.warning_text.split('\n').map((item, key) => {
+                                    return <span key={key}>{item}<br /></span>
+                                })}
+                            </p>
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button basic color='red' onClick={this.close} inverted>
+                                <Icon name='remove' /> No
+                                            </Button>
+                            <Button color='green' onClick={this.deleteCurrentProject} inverted>
+                                <Icon name='checkmark' /> Yes
+                                            </Button>
+                        </Modal.Actions>
+                    </Modal>
 
                 </Container>
             )

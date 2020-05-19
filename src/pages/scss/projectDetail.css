@@ -16,3 +16,6 @@ body {
 .delete {
   background-color: inherit !important;
 }
+.issueCardGroup {
+  margin-bottom: 3em;
+}

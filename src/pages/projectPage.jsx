@@ -38,7 +38,7 @@ listProjects() {
         listCards = data.map(element =>
             <Card color='red' raised>
                 <Card.Content>
-                    <Card.Description onClick={() => { this.handleClickCardDescription(element.id) }} >
+                    <Card.Description className='projectDescription' onClick={() => { this.handleClickCardDescription(element.id) }} >
                         {element.wiki}
                         <Image floated='right' ><Icon name="github" size='big' /></Image>
                     </Card.Description>
