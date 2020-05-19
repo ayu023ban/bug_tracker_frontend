@@ -26,6 +26,7 @@ export default class NavBar extends Component {
         sessionStorage.removeItem("isLoggedIn")
         sessionStorage.removeItem("token")
         sessionStorage.removeItem("user_data")
+        sessionStorage.removeItem("header")
         this.props.onLogout()
         this.render()
       }

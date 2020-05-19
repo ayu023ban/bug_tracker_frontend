@@ -20,7 +20,7 @@ class LoginComp extends Component {
                         sessionStorage.setItem("token", res.data.token)
                         sessionStorage.setItem("isLoggedIn", true)
                         sessionStorage.setItem("user_data", JSON.stringify(res.data.user_data))
-                        sessionStorage.setItem("header",JSON.stringify({ headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } }))
+                        sessionStorage.setItem("header",JSON.stringify({ Authorization: `Token ${sessionStorage.getItem("token")}`}))
                         console.log(res.data.token)
                         console.log(res.data.user_data)
                         this.props.onLogin()

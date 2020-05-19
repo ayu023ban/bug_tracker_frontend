@@ -13,3 +13,6 @@ body {
   text-decoration: none;
   color: red !important;
 }
+.delete {
+  background-color: inherit !important;
+}
