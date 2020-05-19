@@ -1,0 +1,15 @@
+body {
+  font-size: 14px !important;
+}
+.ui .header {
+  margin-top: 20px !important;
+}
+.CardTop {
+  min-height: 15em !important;
+  background-color: #fafafa !important;
+  padding-top: 3em !important;
+}
+.previousSection {
+  text-decoration: none;
+  color: red !important;
+}

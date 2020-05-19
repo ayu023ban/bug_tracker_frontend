@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, Container, Header, Breadcrumb, Card, Icon, Transition } from 'semantic-ui-react';
+import { Segment, Button, Container, Header, Breadcrumb, Card, Icon, Transition, Label } from 'semantic-ui-react';
 import moment from 'moment'
 import './scss/homePage.scss'
 
@@ -40,14 +40,17 @@ class HomePage extends Component {
             case "imp":
                 base_url += "?important=true"
                 break
+            case "myissue":
+                base_url += "mybugs/"
+                break
             default:
                 base_url += ""
         }
         fetch(base_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
-            .then(res => res.json())
+            .then((res => res.json()))
             .then((data) => {
                 this.setState({ data: data })
-            });
+            })
     }
     updateIssue = (string) => {
         this.setState({
@@ -65,7 +68,8 @@ class HomePage extends Component {
                     <Card fluid color='red'>
                         <Card.Content>
                             <Card.Header>
-                                <Icon name='plus' color='red' />{bug.name}</Card.Header>
+                                <Icon name='plus' color='red' />{bug.name}<Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
+                            </Card.Header>
                         </Card.Content>
                         <Transition.Group>
                             <Card.Content>

@@ -1,0 +1,28 @@
+.project-box {
+  position: relative !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 40px !important;
+}
+.project-box .projects-header {
+  position: relative !important;
+}
+.project-box .projects-header .add-button {
+  position: absolute;
+  right: 20px;
+  top: -5px;
+  font-size: 10px;
+  background-color: white;
+  border: none;
+}
+.project-box .projects-header .add-button .plus {
+  color: red;
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  font-size: 30px;
+}
+.project-box .projects-header .add-button .plus:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}

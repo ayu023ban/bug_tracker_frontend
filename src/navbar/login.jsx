@@ -1,22 +1,33 @@
 import React, { Component } from 'react'
 // import {Button, Icon} from 'semantic-ui-react'
 import axios from 'axios'
+import { Redirect } from 'react-router'
 class LoginComp extends Component {
     // constructor(props){
     //     super(props)
     //     // this.handleClick = this.handleClick.bind(this)
     // }
-    componentDidMount() {
+    componentWillMount() {
         let url = window.location.href
         // window.location.assign()
         let code = (url.match(/code=([^&]+)/) || [])[1]
+        console.log(code)
         if (code !== undefined) {
-            axios.post("http://localhost:8000/bug_reporter/users/login/", { code: code }).then((res) => {
-                if (res.data.token !== undefined) {
-                    sessionStorage.setItem("token", res.data.token)
-                    sessionStorage.setItem("isLoggedIn",true)
-                    console.log(res.data.token)
-                    this.props.onLogin()
+            axios.post("http://localhost:8000/bug_reporter/users/login/",{ "code": code }).then((res) => {
+                console.log(res)
+                if (res.status === 202) {
+                    if (res.data.token !== undefined) {
+                        sessionStorage.setItem("token", res.data.token)
+                        sessionStorage.setItem("isLoggedIn", true)
+                        sessionStorage.setItem("user_data", JSON.stringify(res.data.user_data))
+                        sessionStorage.setItem("header",JSON.stringify({ headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } }))
+                        console.log(res.data.token)
+                        console.log(res.data.user_data)
+                        this.props.onLogin()
+                    }
+                    else {
+                        console.log(res)
+                    }
                 }
             })
         }
@@ -24,7 +35,8 @@ class LoginComp extends Component {
 
 
     render() {
-        return null
+        return <Redirect to='/' />
+        // return null
     }
 }
 export default LoginComp

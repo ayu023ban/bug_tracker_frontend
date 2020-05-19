@@ -28,7 +28,7 @@ class SideBar extends Component {
                     onClick={this.handleItemClick}
                 />
                 <Menu.Item as={Link}
-                    to='/issues'
+                    to='/home'
                     name='Issues'
                     active={activeItem === 'Issues'}
                     onClick={this.handleItemClick}
