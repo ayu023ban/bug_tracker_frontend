@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input, Menu, Icon, Button } from 'semantic-ui-react'
+import { Input, Menu, Icon,Popup, Button } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 export default class NavBar extends Component {
   constructor(props) {
@@ -38,7 +38,7 @@ export default class NavBar extends Component {
       return <Menu.Item
         name='login'
       ><a href="https://internet.channeli.in/oauth/authorise/?client_id=l1Wb17BXy5ZoQeJ1fzOtZutOObUrzSi9fW1xxLGR&redirect_url=http://localhost:8000/bug_reporter/login/&state=RANDOM_STATE_STRING&scope=Person">
-          <Icon size='large' name='sign-in' />
+          <Popup content='Sign In' position='bottom right' trigger={<Icon name='sign in' size='large'/>} />
         </a>
       </Menu.Item>
     }
@@ -47,7 +47,7 @@ export default class NavBar extends Component {
         as={Button}
         name='logout'
         onClick={this.logout}
-      ><Icon name='sign out' size='large' />
+      ><Popup content='Sign Out' position='bottom right' trigger={<Icon name='sign out' size='large' />} />
       </Menu.Item>
     }
   }
@@ -67,13 +67,13 @@ export default class NavBar extends Component {
           name='projects'
           active={activeItem === 'projects'}
           onClick={this.handleItemClick}
-        ><Icon name='bars' size='large' /></Menu.Item>
+        ><Popup content='Click to Close Sidebar' trigger={<Icon name='bars' size='large'/>} /></Menu.Item>
         <Menu.Item as={Link}
           name='home'
           to='/home'
           active={activeItem === 'home'}
           onClick={this.handleItemClick}
-        ><Icon name='home' size='large' />
+        ><Popup content='Home' trigger={<Icon name='home' size='large'/>} />
         </Menu.Item>
         <Menu.Item>
           <Input className="search" icon='search' placeholder='Search...' />

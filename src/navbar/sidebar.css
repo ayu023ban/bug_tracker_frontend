@@ -55,7 +55,8 @@ a:hover {
 .ui.menu.navbar .item {
   color: #fff !important;
 }
-.ui.menu.navbar a.item {
+.ui.menu.navbar a.item,
+.ui.menu.navbar .button {
   background-color: transparent !important;
   color: white !important;
 }

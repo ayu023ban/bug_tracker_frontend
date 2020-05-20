@@ -1,21 +1,38 @@
-body{
-    font-size: 14px !important;
+body {
+  font-size: 14px !important;
 }
-.ui .header{
-    margin-top: 20px !important ;
+.ui .header {
+  margin-top: 20px !important ;
 }
-.CardTop{
-    min-height: 15em !important;
-    background-color: #fafafa !important;
-    padding-top: 3em !important;
+.CardTop {
+  min-height: 15em !important;
+  background-color: #fafafa !important;
+  padding-top: 3em !important;
 }
-.previousSection{
-    text-decoration: none;
-    color:red !important;
+.previousSection {
+  text-decoration: none;
+  color: red !important;
 }
-.delete{
+.delete {
+  background-color: inherit !important;
+}
+.issueCardGroup {
+  margin-bottom: 3em;
+}
+.members {
+  float: right;
+}
+.memberContainer::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.addIssueButton{
+    float: right;
     background-color: inherit !important;
-}
-.issueCardGroup{
-    margin-bottom: 3em;
+    color:inherit !important;
+    &:hover{
+        transform: scale3d(1.1,1.1,1.1);
+        transition: transform ,ease-in 0.1s;
+    }
 }

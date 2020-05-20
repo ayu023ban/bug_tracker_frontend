@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Header, Breadcrumb,Segment,Label, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed,Transition } from 'semantic-ui-react'
+import { Container, Header, Breadcrumb, Segment, Label, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed, Transition, Form } from 'semantic-ui-react'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
 import { Link } from 'react-router-dom'
@@ -11,25 +11,29 @@ class ProjectDetail extends Component {
         this.state = {
             id: this.props.location.state.id,
             data: null,
-            open: false
+            openModal1: false,
+            openModal2: false
         }
         this.deleteCurrentProject = this.deleteCurrentProject.bind(this)
         this.onChange = this.onChange.bind(this)
     }
 
-    show = () => this.setState({ open: true })
-    close = () => this.setState({ open: false })
+    deleteProjectModalShow = () => this.setState({ openModal1: true })
+    deleteProjectModalClose = () => this.setState({ openModal1: false })
+    newIssueShow = () => this.setState({ openModal2: true })
+    newIssueClose = () => this.setState({ openModal2: false })
 
 
     componentWillMount() {
         const project_detail_url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
-        const get_issues_url = project_detail_url+"bugs/"
+        const get_issues_url = project_detail_url + "bugs/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
         fetch(project_detail_url, { headers: headers }).then(res => res.json()).then((data) => {
+            console.log(data)
             this.setState({ data: data, member_names: data.member_names, warning_text: "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?" })
         })
-        fetch(get_issues_url,{headers:headers}).then(issue_res=>issue_res.json()).then((issue_data)=>{
-            this.setState({issue_data:issue_data})
+        fetch(get_issues_url, { headers: headers }).then(issue_res => issue_res.json()).then((issue_data) => {
+            this.setState({ issue_data: issue_data })
         })
         this.stateOptions()
     }
@@ -127,7 +131,7 @@ class ProjectDetail extends Component {
     ListCards() {
         let listCards = []
         const { issue_data } = this.state
-        if (issue_data !==undefined) {
+        if (issue_data !== undefined) {
             listCards = issue_data.map((bug) => {
                 return (
                     <Card fluid color='red'>
@@ -154,10 +158,19 @@ class ProjectDetail extends Component {
         return listCards
     }
 
+    creator() {
+
+        if (this.state.data !== null && this.state.user_data_for_search !== undefined) {
+            return this.state.user_data_for_search.find(o => Number(o.key) === this.state.data.creator).text
+        }
+        return "anonymous"
+    }
+
 
     render() {
         const { data } = this.state
-        const { open } = this.state
+        const { openModal1 } = this.state
+        const { openModal2 } = this.state
         if (data !== null) {
             return (
                 <Container >
@@ -169,15 +182,18 @@ class ProjectDetail extends Component {
                         </Breadcrumb>
                     </Header>
                     <Divider section />
+
+                    
                     <Card color='red' fluid>
                         <Card.Content className="CardTop" textAlign='center' >
                             <Card.Description>{data.wiki}</Card.Description>
                         </Card.Content>
-                        <Card.Content>
-                            <Header as='h2' textAlign='center'>
+                        <Card.Content textAlign='center'>
+                            <Header as='h2'>
                                 {data.name}
                             </Header>
                         </Card.Content>
+                        <Card.Content extra>created by {this.creator()} {moment(data.created_at).fromNow()}</Card.Content>
                         <Card.Content>
                             <Grid columns={3} divided >
                                 <Grid.Row textAlign='center'>
@@ -188,27 +204,33 @@ class ProjectDetail extends Component {
                                         <Icon name='user' />
                                     </Grid.Column>
                                     <Grid.Column >
-                                        <Button className='delete' icon onClick={this.show}><Icon color='red' name='delete' />Delete</Button>
+                                        <Button className='delete' icon onClick={this.deleteProjectModalShow}><Icon color='red' name='delete' />Delete</Button>
                                     </Grid.Column>
                                 </Grid.Row>
                             </Grid>
                         </Card.Content>
                     </Card>
-                    
-                    
-                    
-                    <Card color='red'>
-                        <Card.Content textAlign='center' >
-                            <Card.Header>Members</Card.Header>
-                        </Card.Content>
-                        <Card.Content>
-                            {this.DisPlayMembers()}
-                        </Card.Content>
-                    </Card>
+
+
+                    <Container fluid className="memberContainer">
+                        <Card color='red' className="members">
+                            <Card.Content textAlign='center' >
+                                <Card.Header>Members</Card.Header>
+                            </Card.Content>
+                            <Card.Content>
+                                {this.DisPlayMembers()}
+                            </Card.Content>
+                        </Card>
+                    </Container>
+
+                    <Header size='large' color='red'>Issues<Button className='addIssueButton' onClick={this.newIssueShow} icon='plus' size='large' /></Header>
+                    <Divider section />
+
                     <Container className="issueCardGroup" >
                         {this.ListCards()}
                     </Container>
-                    <Modal open={open} basic closeOnDimmerClick closeOnDocumentClick size='small'>
+
+                    <Modal open={openModal1} basic onClose={this.deleteProjectModalClose} size='small'>
                         <Header icon='archive' content='Delete the Current Project' />
                         <Modal.Content>
                             <p>
@@ -218,7 +240,7 @@ class ProjectDetail extends Component {
                             </p>
                         </Modal.Content>
                         <Modal.Actions>
-                            <Button basic color='red' onClick={this.close} inverted>
+                            <Button basic color='red' onClick={this.deleteProjectModalClose} inverted>
                                 <Icon name='remove' /> No
                                             </Button>
                             <Button color='green' onClick={this.deleteCurrentProject} inverted>
@@ -226,6 +248,34 @@ class ProjectDetail extends Component {
                                             </Button>
                         </Modal.Actions>
                     </Modal>
+
+                    <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnDocumentClick closeOnDimmerClick closeOnEscape >
+                        <Modal.Header>Create New Project</Modal.Header>
+                        <Modal.Content image>
+                            <Modal.Description>
+                                <Form>
+                                    <Form.Input label='Name' placeholder='Title' />
+                                    <Form.TextArea label='Descrpition' onChange={this.onChange} name='wiki' value={this.state.wiki} placeholder='Write short description about the project  ' />
+                                    <Form.Field>
+                                        <label>Git Link</label>
+                                        <input placeholder='Git Link' name='githublink' onChange={this.onChange} value={this.state.githublink} />
+                                    </Form.Field>
+                                    <Button
+                                        positive
+                                        type='submit'
+                                        icon='checkmark'
+                                        content="Create"
+                                        onClick={(event) => this.onSubmit()}
+                                    />
+                                </Form>
+
+                            </Modal.Description>
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button color='black' onClick={this.newIssueClose} content = 'Cancel' />
+                        </Modal.Actions>
+                    </Modal>
+
 
                 </Container>
             )

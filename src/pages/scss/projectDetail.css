@@ -19,3 +19,20 @@ body {
 .issueCardGroup {
   margin-bottom: 3em;
 }
+.members {
+  float: right;
+}
+.memberContainer::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.addIssueButton {
+  float: right;
+  background-color: inherit !important;
+  color: inherit !important;
+}
+.addIssueButton:hover {
+  transform: scale3d(1.1, 1.1, 1.1);
+  transition: transform, ease-in 0.1s;
+}
