@@ -5,6 +5,8 @@ import Pluralize from 'react-pluralize'
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
+import axios from 'axios'
+import {IssueCard} from './homePage'
 class ProjectDetail extends Component {
     constructor(props) {
         super(props)
@@ -12,7 +14,9 @@ class ProjectDetail extends Component {
             id: this.props.location.state.id,
             data: null,
             openModal1: false,
-            openModal2: false
+            openModal2: false,
+            activeDomain: "f",
+            values:{name:"",description:""}
         }
         this.deleteCurrentProject = this.deleteCurrentProject.bind(this)
         this.onChange = this.onChange.bind(this)
@@ -23,13 +27,14 @@ class ProjectDetail extends Component {
     newIssueShow = () => this.setState({ openModal2: true })
     newIssueClose = () => this.setState({ openModal2: false })
 
+    handleDomainClick = (name) => this.setState({ activeDomain: name })
+
 
     componentWillMount() {
         const project_detail_url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
         const get_issues_url = project_detail_url + "bugs/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
         fetch(project_detail_url, { headers: headers }).then(res => res.json()).then((data) => {
-            console.log(data)
             this.setState({ data: data, member_names: data.member_names, warning_text: "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?" })
         })
         fetch(get_issues_url, { headers: headers }).then(issue_res => issue_res.json()).then((issue_data) => {
@@ -134,21 +139,7 @@ class ProjectDetail extends Component {
         if (issue_data !== undefined) {
             listCards = issue_data.map((bug) => {
                 return (
-                    <Card fluid color='red'>
-                        <Card.Content>
-                            <Card.Header>
-                                <Icon name='plus' color='red' />{bug.name}<Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
-                            </Card.Header>
-                        </Card.Content>
-                        <Transition.Group>
-                            <Card.Content>
-                                <Card.Description content={bug.description} />
-                            </Card.Content>
-                            <Card.Content extra >
-                                {moment(bug.issued_at).fromNow()}
-                            </Card.Content>
-                        </Transition.Group>
-                    </Card>
+                  <IssueCard bug={bug} />
                 )
             })
         }
@@ -166,11 +157,47 @@ class ProjectDetail extends Component {
         return "anonymous"
     }
 
+    onModal2Change = e => {
+        const { name, value } = e.target
+        this.setState({
+            values: { ...this.state.values, [name]: value }
+        })
+    }
+
+    createIssue(data){
+        console.log(data)
+        const url = 'http://localhost:8000/bug_reporter/bugs/'
+        const header = {
+            "Content-Type": "application/json",
+            // 'Accept':"application/json; charset=UTF-8",
+            "Authorization": `Token ${sessionStorage.getItem("token")}`
+        }
+        axios.post(url,data,{headers:header}).then((res)=>{
+            if(res.status===201){
+                this.newIssueClose()
+            }
+            else{
+                console.log(res)
+            }
+        }).catch((res)=>{
+            console.log(res)
+        }
+        )
+    }
+
+    onSubmit = e => {
+        let data = this.state.values
+        data.domain = this.state.activeDomain
+        data.project = this.state.id
+        data = JSON.stringify(data)
+        this.createIssue(data)
+    }
 
     render() {
         const { data } = this.state
         const { openModal1 } = this.state
         const { openModal2 } = this.state
+        const { activeDomain } = this.state
         if (data !== null) {
             return (
                 <Container >
@@ -183,7 +210,7 @@ class ProjectDetail extends Component {
                     </Header>
                     <Divider section />
 
-                    
+
                     <Card color='red' fluid>
                         <Card.Content className="CardTop" textAlign='center' >
                             <Card.Description>{data.wiki}</Card.Description>
@@ -250,15 +277,18 @@ class ProjectDetail extends Component {
                     </Modal>
 
                     <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnDocumentClick closeOnDimmerClick closeOnEscape >
-                        <Modal.Header>Create New Project</Modal.Header>
+                        <Modal.Header>Create New Issue</Modal.Header>
                         <Modal.Content image>
                             <Modal.Description>
                                 <Form>
-                                    <Form.Input label='Name' placeholder='Title' />
-                                    <Form.TextArea label='Descrpition' onChange={this.onChange} name='wiki' value={this.state.wiki} placeholder='Write short description about the project  ' />
+                                    <Form.Input label='Name' name='name' onChange={this.onModal2Change} value = {this.state.name} placeholder='Title' />
+                                    <Form.TextArea label='Descrpition' onChange={this.onModal2Change} name='description' value={this.state.description} placeholder='Write short description about the Issue  ' />
                                     <Form.Field>
-                                        <label>Git Link</label>
-                                        <input placeholder='Git Link' name='githublink' onChange={this.onChange} value={this.state.githublink} />
+                                        <Button.Group>
+                                            <Button content='Front End' basic={activeDomain !== "f"} onClick={() => { this.handleDomainClick("f") }} color='olive' />
+                                            <Button content='Back End' basic={activeDomain !== "b"} onClick={() => { this.handleDomainClick("b") }} color='blue' />
+                                            <Button content='Other' basic={activeDomain !== "o"} onClick={() => { this.handleDomainClick("o") }} color='purple' />
+                                        </Button.Group>
                                     </Form.Field>
                                     <Button
                                         positive
@@ -272,7 +302,7 @@ class ProjectDetail extends Component {
                             </Modal.Description>
                         </Modal.Content>
                         <Modal.Actions>
-                            <Button color='black' onClick={this.newIssueClose} content = 'Cancel' />
+                            <Button color='black' onClick={this.newIssueClose} content='Cancel' />
                         </Modal.Actions>
                     </Modal>
 

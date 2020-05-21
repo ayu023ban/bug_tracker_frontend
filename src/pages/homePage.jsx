@@ -4,6 +4,32 @@ import moment from 'moment'
 import './scss/homePage.scss'
 
 
+class IssueCard extends Component {
+    render() {
+        const { bug } = this.props
+        return (
+            <Card fluid color='red'>
+                <Card.Content>
+                    <Card.Header>
+                        <Icon name='plus' color='red' />{bug.name}<Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
+                    </Card.Header>
+                </Card.Content>
+                <Transition.Group>
+                    <Card.Content>
+                        <Card.Description content={bug.description} />
+                    </Card.Content>
+                    <Card.Content extra >
+                        {moment(bug.issued_at).fromNow()}
+                    </Card.Content>
+                </Transition.Group>
+            </Card>
+        )
+    }
+}
+
+
+
+
 class HomePage extends Component {
     constructor(props) {
         super(props)
@@ -65,21 +91,7 @@ class HomePage extends Component {
         if (this.state.isLoggedIn) {
             listCards = data.map((bug) => {
                 return (
-                    <Card fluid color='red'>
-                        <Card.Content>
-                            <Card.Header>
-                                <Icon name='plus' color='red' />{bug.name}<Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
-                            </Card.Header>
-                        </Card.Content>
-                        <Transition.Group>
-                            <Card.Content>
-                                <Card.Description content={bug.description} />
-                            </Card.Content>
-                            <Card.Content extra >
-                                {moment(bug.issued_at).fromNow()}
-                            </Card.Content>
-                        </Transition.Group>
-                    </Card>
+                 <IssueCard bug={bug} />   
                 )
             })
         }
@@ -124,7 +136,5 @@ class HomePage extends Component {
     }
 }
 
-
-
-
+export {IssueCard}
 export default HomePage
