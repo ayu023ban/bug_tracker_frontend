@@ -8,6 +8,7 @@ import SideBar from './navbar/sidebar'
 import EditorPage from './pages/editor'
 import LoginComp from './navbar/login'
 import ProjectDetail from './pages/projectDetail'
+import IssueDetail from './pages/issueDetail'
 class Router extends Component {
   constructor(props) {
     super(props)
@@ -35,6 +36,7 @@ class Router extends Component {
           <Route exact path='/login' render={(props) => <LoginComp {...props} onLogin={this.handleLogIn} />} />
           <Route exact path='/project' render={(props) => <ProjectDetail {...props} isLoggedIn={isLoggedIn} />} />
           <Route exact path='/projects' render={(props) => <ProjectPage {...props} isLoggedIn={isLoggedIn} />} />
+          <Route exact path='/issue' render={(props) => <IssueDetail {...props} isLoggedIn={isLoggedIn} />} />
           <Route exact path='/editor' component={EditorPage} />
           <Route exact path='/home' render={(props)=><HomePage {...props} isLoggedIn={isLoggedIn} />} />
           <Route component={PageNotFound} />

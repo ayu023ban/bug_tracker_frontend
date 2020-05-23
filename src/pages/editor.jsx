@@ -1,70 +1,57 @@
-import React, { Component } from 'react'
-// import { Editor, EditorState, RichUtils } from 'draft-js';
+import React from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-// class MyInput extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = { value: '' };
-//         this.onChange = evt => this.setState({ value: evt.target.value });
-//     }
-//     render() {
-//         return <input value={this.state.value} onChange={this.onChange} />;
-//     }
-// }
+import { Container } from 'semantic-ui-react'
 
+class EditorPage extends React.Component {
+  constructor() {
+    super();
+    this.state = { editor: null };
+    this.handleEditorChange = this.handleEditorChange.bind(this);
+  }
+  handleEditorChange = (content, editor) => {
+    this.props.onEditorChange(content)
+  }
 
-class EditorPage extends Component {
-    // constructor(props) {
-    //     super(props);
-    //     this.state = { editorState: EditorState.createEmpty() };
-    //     this.onChange = editorState => this.setState({ editorState });
-    // }
-    // handleKeyCommand = (command) => {
-    //     const newState = RichUtils.handleKeyCommand(this.state.editorState, command)
-    //     if (newState) {
-    //         this.onChange(newState);
-    //         return 'handled';
-    //     } return 'not-handled';
-    // }
-    // onChange = (editorState) => {
-    //     this.setState({
-    //         editorState
-    //     })
-    // }
-    // onUnderlineClick = () => {
-    //     this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, 'UNDERLINE'));
-    // }
+  render() {
+    // const height = (this.props.height != null)?this.props.height:"400"
+    return (
+      <Container>
+        <Editor
+          apiKey="81jvj4ftt29hdio9oky5wnvlxtugicmawfi048fvjjf2dlg8"
+          init={{
+            // selector: 'textarea',
+            placeholder: 'write your comment',
+            plugins: 'a11ychecker placeholder code advcode casechange formatpainter linkchecker autolink lists checklist media permanentpen powerpaste quickbars codesample table advtable tinycomments tinymcespellchecker autoresize',
+            toolbar: 'a11ycheck emoticons quickimage addcomment showcomments casechange checklist  formatpainter pageembed permanentpen table',
+            toolbar_mode: 'floating',
+            // skin: 'oxide-dark',
+            // content_css: 'dark',
+            // plugins: 'quickbars emoticons quickbars quicklink blockquote codesample advcode',
+            // toolbar:'emoticons codesample quickimage hr pagebreak ',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Ayush Bansal',
+            autoresize_bottom_margin: 0,
+            autoresize_overflow_padding: 0,
+            // toolbar:false,
+            menubar: false,
+            // height: 400,
+            // width: 400,
+            // inline: true,
+            quickbars_insert_toolbar: 'emoticons quickimage hr pagebreak codesample',
+            quickbars_selection_toolbar: 'bold italic underline | formatselect | quicklink blockquote',
+            contextmenu: 'undo redo ',
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+            content_css: '//www.tiny.cloud/css/codepen.min.css',
+            statusbar: false,
 
-    // onBoldClick = () => {
-    //     this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, 'BOLD'))
-    // }
-
-    // onItalicClick = () => {
-    //     this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, 'ITALIC'))
-    // }
-    // handleEditorChange = (content, editor) => {
-    //     console.log('Content was updated:', content);
-    //   }
-
-    render() {
-        return (
-            <Editor
-            initialValue="<p>This is the initial content of the editor</p>"
-            init={{
-              height: 500,
-              menubar: false,
-              plugins: [
-                'advlist autolink lists link image charmap print preview anchor',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media table paste code help wordcount'
-              ],
-              toolbar:
-                'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help'
-            }}
-            onEditorChange={this.handleEditorChange}
-          />
-        );
-    }
-
+          }}
+          onEditorChange={this.handleEditorChange}
+        />
+      </Container>
+    );
+  }
 }
+
+
 export default EditorPage

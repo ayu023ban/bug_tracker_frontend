@@ -2,26 +2,53 @@ import React, { Component } from 'react';
 import { Segment, Button, Container, Header, Breadcrumb, Card, Icon, Transition, Label } from 'semantic-ui-react';
 import moment from 'moment'
 import './scss/homePage.scss'
-
+import './scss/tinymce.css'
+import { Editor } from '@tinymce/tinymce-react';
 
 class IssueCard extends Component {
+    constructor(props) {
+        super(props)
+        this.handleClickCardDescription = this.handleClickCardDescription.bind(this)
+        this.state = {
+            large: false
+        }
+    }
+
+    toggle = () => this.setState({ large: !this.state.large })
+
+    handleClickCardDescription(bug) {
+        this.props.history.push({
+            pathname: '/issue',
+            state: {bug:bug }
+        })
+    }
+
     render() {
         const { bug } = this.props
+        const { large } = this.state
+        // console.log(bug)
         return (
-            <Card fluid color='red'>
-                <Card.Content>
+            <Card fluid color='red' raised  >
+                <Card.Content  >
                     <Card.Header>
-                        <Icon name='plus' color='red' />{bug.name}<Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
+                        <Icon name={(large) ? ("minus") : ("plus")} size='large' onClick={this.toggle} color='red' />
+                        {bug.name}
+                        <Icon name='reply' className='add-button' color='red'size='large' onClick={() => { this.handleClickCardDescription(bug) }}  />
+                        <Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
                     </Card.Header>
                 </Card.Content>
-                <Transition.Group>
-                    <Card.Content>
-                        <Card.Description content={bug.description} />
-                    </Card.Content>
-                    <Card.Content extra >
-                        {moment(bug.issued_at).fromNow()}
-                    </Card.Content>
-                </Transition.Group>
+                {large &&
+                    <Transition.Group >
+                        <Card.Content   >
+                            <Card.Description >
+                            <div dangerouslySetInnerHTML={{ __html: bug.description }} />
+                            </Card.Description>
+                        </Card.Content>
+                        <Card.Content extra >
+                            {moment(bug.issued_at).fromNow()}
+                        </Card.Content>
+                    </Transition.Group>
+                }
             </Card>
         )
     }
@@ -91,15 +118,18 @@ class HomePage extends Component {
         if (this.state.isLoggedIn) {
             listCards = data.map((bug) => {
                 return (
-                 <IssueCard bug={bug} />   
+                    <IssueCard bug={bug} history={this.props.history} />
                 )
             })
         }
         else {
-            listCards = <Segment>issues are not awailable</Segment>
+            listCards = <Segment>issues are not available</Segment>
         }
         return listCards
     }
+
+    
+
 
     render() {
         return (
@@ -136,5 +166,5 @@ class HomePage extends Component {
     }
 }
 
-export {IssueCard}
+export { IssueCard }
 export default HomePage

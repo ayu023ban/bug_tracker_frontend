@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Header, Breadcrumb, Segment, Label, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed, Transition, Form } from 'semantic-ui-react'
+import { Container, Header, Breadcrumb, Segment, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed, Form } from 'semantic-ui-react'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
 import { Link } from 'react-router-dom'
@@ -139,7 +139,7 @@ class ProjectDetail extends Component {
         if (issue_data !== undefined) {
             listCards = issue_data.map((bug) => {
                 return (
-                  <IssueCard bug={bug} />
+                  <IssueCard bug={bug} history={this.props.history} />
                 )
             })
         }

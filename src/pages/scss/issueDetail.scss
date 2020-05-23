@@ -1,0 +1,216 @@
+.IssueTop {
+  min-height: 3em;
+}
+#issueDetailCardTime {
+  float: right;
+}
+.add-button {
+  float: right;
+  background-color: inherit !important;
+  color: inherit !important;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.2);
+  }
+  transition: transform linear 0.2s;
+}
+.tox-tinymce {
+  border: 0 !important;
+}
+
+.settings {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: 100%;
+  
+  .close {
+    position: absolute;
+    top: 20%;
+    left: 70%;
+    .icon {
+      font-size: 50px;
+      color: white;
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .setting-box {
+    height: 200px;
+    width: 800px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    position: absolute;
+    top: 35%;
+    margin-top: -70px;
+    left: 50%;
+    margin-left: -400px;
+    .delete {
+      position: relative;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      background-color: #cd5c5c;
+      align-self: center;
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+      }
+      .icon {
+        font-size: 40px;
+        position: absolute;
+        top: 50%;
+        margin-top: -20px;
+        left: 50%;
+        margin-left: -16px;
+        color: white;
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.1);
+        }
+      }
+    }
+    .update {
+      position: relative;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      background-color: #cd5c5c;
+      align-self: center;
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+      }
+      .icon {
+        font-size: 40px;
+        position: absolute;
+        top: 50%;
+        margin-top: -20px;
+        left: 50%;
+        margin-left: -16px;
+        color: white;
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.1);
+        }
+      }
+    }
+    .important {
+      position: relative;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      background-color: white;
+      align-self: center;
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+      }
+      .icon {
+        font-size: 40px;
+        position: absolute;
+        top: 50%;
+        margin-top: -20px;
+        left: 50%;
+        margin-left: -16px;
+        color: #cd5c5c;
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.1);
+        }
+      }
+    }
+    .project {
+      position: relative;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      background-color: #cd5c5c;
+      align-self: center;
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+      }
+      .icon {
+        font-size: 40px;
+        position: absolute;
+        top: 50%;
+        margin-top: -20px;
+        left: 50%;
+        margin-left: -16px;
+        color: white;
+        &:hover {
+          cursor: pointer;
+          transform: scale(1.1);
+        }
+      }
+    }
+    .line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background-color: #cd5c5c;
+      bottom: 0;
+    }
+  }
+  .second-box {
+    height: 300px;
+    width: 800px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 35%;
+    margin-top: 120px;
+    left: 50%;
+    margin-left: -400px;
+    .type {
+      margin-left: 120px;
+      width: 70%;
+      height: 50%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      button {
+        align-self: center;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: white;
+        color: red;
+        &:hover {
+          transform: scale(1.1);
+          cursor: pointer;
+        }
+      }
+    }
+    .status {
+      width: 100%;
+      height: 50%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      button {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        align-self: center;
+        background-color: white;
+        color: red;
+        &:hover {
+          transform: scale(1.1);
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .selected {
+    background-color: #cd5c5c !important;
+    color: white !important;
+  }
+}

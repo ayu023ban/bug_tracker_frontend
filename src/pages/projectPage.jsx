@@ -3,9 +3,6 @@ import { Segment, Container, Modal, Header, Button, Card, Icon, Image, Divider, 
 import Pluralize from 'react-pluralize'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
-import { Redirect } from 'react-router'
-import ProjectDetail from './projectDetail'
-
 class ProjectPage extends Component {
     constructor(props) {
         super(props)
@@ -28,17 +25,16 @@ class ProjectPage extends Component {
         this.props.history.push({
             pathname:'/project',
             state:{id:id}
-        })
-        
+        })  
     }
 listProjects() {
     let listCards = []
     let { data } = this.state
     if (this.state.isLoggedIn) {
         listCards = data.map(element =>
-            <Card color='red' raised>
+            <Card color='red' raised onClick={() => { this.handleClickCardDescription(element.id) }}  >
                 <Card.Content>
-                    <Card.Description className='projectDescription' onClick={() => { this.handleClickCardDescription(element.id) }} >
+                    <Card.Description className='projectDescription' >
                         {element.wiki}
                         <Image floated='right' ><Icon name="github" size='big' /></Image>
                     </Card.Description>
