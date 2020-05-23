@@ -19,7 +19,6 @@ class IssueDetail extends Component {
         this.settingToggle = this.settingToggle.bind(this)
         this.state = {
             id: this.props.location.state.bug,
-            // bug: this.props.location.state.bug,
             comments: null,
             commentOpen: false,
             settingsOpen: false,
@@ -38,8 +37,8 @@ class IssueDetail extends Component {
         })
 
         let issueurl = `http://localhost:8000/bug_reporter/bugs/${this.state.id}/`
-        fetch(issueurl,{headers:header}).then(res=>res.json()).then((data)=>{
-            this.setState({bug:data})
+        fetch(issueurl, { headers: header }).then(res => res.json()).then((data) => {
+            this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
         })
     }
 
@@ -92,6 +91,7 @@ class IssueDetail extends Component {
 
     onUpdate = e => {
         const { name, value } = e.target
+        console.log(this.state.update)
         this.setState({
             update: { ...this.state.update, [name]: value }
         })
@@ -145,16 +145,50 @@ class IssueDetail extends Component {
                 console.log(res)
             }
         }).then((data) => {
-            // this.setState({ bug: data })
-            // this.formToggle()
-            // this.props.history.push({
-            //     pathname: '/issue',
-            //     state: {bug:data }
-            // })
+            this.setState({ bug: data })
             this.formToggle()
-            this.componentWillMount()
         })
     }
+
+    domainUpdate(string) {
+        let { id } = this.state
+        fetch(`http://127.0.0.1:8000/bug_reporter/bugs/${id}/`, {
+            method: 'PUT',
+            body: JSON.stringify({ domain: string }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                'Authorization': `Token ${sessionStorage.getItem('token')}`,
+            },
+        }).then((res) => {
+            if (res.status === 200) {
+                this.setState({ activeDomain: string })
+            }
+            else {
+                console.log(res)
+            }
+        })
+    }
+
+    statusUpdate(string) {
+        let { id } = this.state
+        fetch(`http://localhost:8000/bug_reporter/bugs/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: string }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                'Authorization': `Token ${sessionStorage.getItem('token')}`,
+            },
+        }).then((res) => {
+            if (res.status === 200) {
+                this.setState({ activeStatus: string })
+            }
+            else {
+                console.log(res)
+            }
+        })
+    }
+
+
 
     // commentShow = () => this.setState({ commentOpen: true })
     // commentClose = () => this.setState({ commentOpen: false })
@@ -166,7 +200,7 @@ class IssueDetail extends Component {
         const { bug } = this.state
         const { commentOpen } = this.state
         const { updateForm } = this.state
-        if (this.state.bug !== undefined){
+        if (this.state.bug !== undefined) {
             return (
                 <Container>
                     <Header>
@@ -197,7 +231,7 @@ class IssueDetail extends Component {
                                     <EditorPage onEditorChange={this.handleUpdateEditorChange} placeholder="Description" />
                                     <Button positive type='submit' icon='checkmark' content="Update" onClick={(event) => this.updateIssue()} className='form-submit' />
                                     <div className='close'>
-                                        <Icon name="times" onClick={(event) => this.formClose()} />
+                                        <Icon name="times" onClick={(event) => this.formToggle()} />
                                     </div>
                                 </Form>
                             </Segment>
@@ -221,7 +255,7 @@ class IssueDetail extends Component {
                     <Container>
                         {this.listComments()}
                     </Container>
-    
+
                     {/* <Modal open={commentOpen} closeIcon closeOnDocumentClick closeOnDimmerClick closeOnEscape onClose={this.commentClose} >
                         <Header icon='comment' content='Write your Comment' />
                         <Modal.Content>
@@ -267,13 +301,13 @@ class IssueDetail extends Component {
                             </div>
                             <div className="second-box">
                                 <div className="type">
-                                    <Button color='white' className={this.state.active1 === 'front' ? 'selected' : ''} onClick={(event) => this.typeUpdate('front')} >Frontend</Button>
-                                    <Button color='white' className={this.state.active1 === 'back' ? 'selected' : ''} onClick={(event) => this.typeUpdate('back')} >Backend</Button>
+                                    <Button color='white' className={this.state.active1 === 'f' ? 'selected' : ''} onClick={(event) => this.domainUpdate('f')} >Frontend</Button>
+                                    <Button color='white' className={this.state.active1 === 'b' ? 'selected' : ''} onClick={(event) => this.domainUpdate('b')} >Backend</Button>
                                 </div>
                                 <div className="status">
-                                    <Button color='white' className={this.state.active2 === 'pending' ? 'selected' : ''} onClick={(event) => this.statusUpdate('pending')} >pending</Button>
-                                    <Button color='white' className={this.state.active2 === 'resolved' ? 'selected' : ''} onClick={(event) => this.statusUpdate('resolved')} >resolved</Button>
-                                    <Button color='white ' className={this.state.active2 === 'to be discussed' ? 'selected' : ''} onClick={(event) => this.statusUpdate('to be discussed')} >to be discussed</Button>
+                                    <Button color='white' className={this.state.activeStatus === 'P' ? 'selected' : ''} onClick={(event) => this.statusUpdate('P')} >pending</Button>
+                                    <Button color='white' className={this.state.activeStatus === 'R' ? 'selected' : ''} onClick={(event) => this.statusUpdate('R')} >resolved</Button>
+                                    <Button color='white ' className={this.state.activeStatus === 'T' ? 'selected' : ''} onClick={(event) => this.statusUpdate('T')} >to be discussed</Button>
                                 </div>
                             </div>
                         </div>
@@ -281,14 +315,14 @@ class IssueDetail extends Component {
                 </Container>
             )
         }
-        else{
-            return(
+        else {
+            return (
                 <div>
                     bug not found
                 </div>
             )
         }
-        
+
     }
 
 }
