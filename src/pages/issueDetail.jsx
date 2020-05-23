@@ -5,8 +5,6 @@ import { Editor } from '@tinymce/tinymce-react';
 import './scss/tinymce.css'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
-// import Avatar from 'react-avatar'
-// import { Editor } from '@tinymce/tinymce-react';
 import EditorPage from './editor'
 import Background from '../images/options.jpg'
 import './scss/issueDetail.scss'
@@ -16,11 +14,11 @@ class IssueDetail extends Component {
         super(props)
         this.handleEditorChange = this.handleEditorChange.bind(this)
         this.handleUpdateEditorChange = this.handleUpdateEditorChange.bind(this)
+        this.goToCorrespondingProject = this.goToCorrespondingProject.bind(this)
         this.settingToggle = this.settingToggle.bind(this)
         this.state = {
             id: this.props.location.state.bug,
             comments: null,
-            commentOpen: false,
             settingsOpen: false,
             updateForm: false,
             update: [],
@@ -153,7 +151,7 @@ class IssueDetail extends Component {
     domainUpdate(string) {
         let { id } = this.state
         fetch(`http://127.0.0.1:8000/bug_reporter/bugs/${id}/`, {
-            method: 'PUT',
+            method: 'PATCH',
             body: JSON.stringify({ domain: string }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
@@ -188,10 +186,33 @@ class IssueDetail extends Component {
         })
     }
 
+    goToCorrespondingProject() {
+        this.props.history.push({
+            pathname: '/project',
+            state: { id: this.state.bug.project }
+        })
+    }
+    setImportant() {
+        const { id } = this.state
+        const imp = this.state.bug.important 
+        fetch(`http://127.0.0.1:8000/bug_reporter/bugs/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify({ important: !imp }),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                'Authorization': `Token ${sessionStorage.getItem('token')}`,
+            },
+        }).then(res => {
+            if(res.status===200){
+                this.setState({bug: { ...this.state.bug, important: !imp}})
+            }
+            else{
+                console.log(res)
+            }
+        })
+    }
 
 
-    // commentShow = () => this.setState({ commentOpen: true })
-    // commentClose = () => this.setState({ commentOpen: false })
     commentToggle = () => this.setState({ commentOpen: !this.state.commentOpen })
     settingToggle = () => this.setState({ settingsOpen: !this.state.settingsOpen })
     formToggle = () => this.setState({ updateForm: !this.state.updateForm })
@@ -255,24 +276,11 @@ class IssueDetail extends Component {
                     <Container>
                         {this.listComments()}
                     </Container>
-
-                    {/* <Modal open={commentOpen} closeIcon closeOnDocumentClick closeOnDimmerClick closeOnEscape onClose={this.commentClose} >
-                        <Header icon='comment' content='Write your Comment' />
-                        <Modal.Content>
-                            <EditorPage onEditorChange={this.handleEditorChange} />
-                            <Button
-                                positive
-                                icon='checkmark'
-                                content="Send"
-                                onClick={(event) => this.onCommentSubmit()}
-                            />
-                        </Modal.Content>
-                    </Modal> */}
                     {this.state.settingsOpen &&
                         <div className='settings' style={{ backgroundImage: `url("${Background}")` }} >
                             <div className="close"><Icon name="times" size='large' onClick={this.settingToggle} /></div>
                             <div className="setting-box">
-                                <div className="delete">
+                                <div className="icon-back">
                                     <Modal basic trigger={<Icon name='trash' size='large' />} closeIcon>
                                         <Header icon='archive' content='Delete This Issue' />
                                         <Modal.Actions >
@@ -281,28 +289,21 @@ class IssueDetail extends Component {
                                         </Modal.Actions>
                                     </Modal>
                                 </div>
-                                <div className="update">
+                                <div className="icon-back">
                                     <Icon name='edit' size='large' onClick={(event) => { this.settingToggle(); this.formToggle() }} />
                                 </div>
-                                <div className="important">
-                                    <Icon name="check square" onClick={(event) => this.important()} />
+                                <div className="icon-back">
+                                    <Icon name="check square" onClick={(event) => this.setImportant()} />
                                 </div>
-                                <div className="project">
-                                    <Link to={{
-                                        pathname: '/project/',
-                                        state: {
-                                            ProjectId: bug.project
-                                        }
-                                    }}>
-                                        <Icon name="arrow right" />
-                                    </Link>
+                                <div className="icon-back">
+                                    <Icon name="arrow right" onClick={this.goToCorrespondingProject} />
                                 </div>
                                 <div className="line"></div>
                             </div>
                             <div className="second-box">
                                 <div className="type">
-                                    <Button color='white' className={this.state.active1 === 'f' ? 'selected' : ''} onClick={(event) => this.domainUpdate('f')} >Frontend</Button>
-                                    <Button color='white' className={this.state.active1 === 'b' ? 'selected' : ''} onClick={(event) => this.domainUpdate('b')} >Backend</Button>
+                                    <Button color='white' className={this.state.activeDomain === 'f' ? 'selected' : ''} onClick={(event) => this.domainUpdate('f')} >Frontend</Button>
+                                    <Button color='white' className={this.state.activeDomain === 'b' ? 'selected' : ''} onClick={(event) => this.domainUpdate('b')} >Backend</Button>
                                 </div>
                                 <div className="status">
                                     <Button color='white' className={this.state.activeStatus === 'P' ? 'selected' : ''} onClick={(event) => this.statusUpdate('P')} >pending</Button>

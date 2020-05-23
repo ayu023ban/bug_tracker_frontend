@@ -22,15 +22,10 @@
 }
 .main-issue-box {
   .editor {
-    border: 1px solid rgba(34,36,38,.15) !important;
-    border-radius: .28571429rem !important;
+    border: 1px solid rgba(34, 36, 38, 0.15) !important;
+    border-radius: 0.28571429rem !important;
   }
   .update-segment {
-    // position: absolute;
-    // height: 220px !important;
-    // display: flex;
-    // border: 3px solid red;
-    // top: -30px !important;
     .update-form {
       width: 100% !important;
       position: relative !important;
@@ -100,104 +95,26 @@
     margin-top: -70px;
     left: 50%;
     margin-left: -400px;
-    .delete {
-      position: relative;
+    .icon-back {
       border-radius: 50%;
       width: 100px;
       height: 100px;
-      background-color: #cd5c5c;
+      background-color: #cd5c5c !important;
       align-self: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       &:hover {
         cursor: pointer;
         transform: scale(1.1);
       }
-      .icon {
+      .icon{
         font-size: 40px;
-        position: absolute;
-        top: 50%;
-        margin-top: -20px;
-        left: 50%;
-        margin-left: -16px;
         color: white;
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.1);
-        }
-      }
-    }
-    .update {
-      position: relative;
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      background-color: #cd5c5c;
-      align-self: center;
-      &:hover {
-        cursor: pointer;
-        transform: scale(1.1);
-      }
-      .icon {
-        font-size: 40px;
-        position: absolute;
-        top: 50%;
-        margin-top: -20px;
-        left: 50%;
-        margin-left: -16px;
-        color: white;
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.1);
-        }
-      }
-    }
-    .important {
-      position: relative;
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      background-color: white;
-      align-self: center;
-      &:hover {
-        cursor: pointer;
-        transform: scale(1.1);
-      }
-      .icon {
-        font-size: 40px;
-        position: absolute;
-        top: 50%;
-        margin-top: -20px;
-        left: 50%;
-        margin-left: -16px;
-        color: #cd5c5c;
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.1);
-        }
-      }
-    }
-    .project {
-      position: relative;
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      background-color: #cd5c5c;
-      align-self: center;
-      &:hover {
-        cursor: pointer;
-        transform: scale(1.1);
-      }
-      .icon {
-        font-size: 40px;
-        position: absolute;
-        top: 50%;
-        margin-top: -20px;
-        left: 50%;
-        margin-left: -16px;
-        color: white;
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.1);
-        }
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 !important;
       }
     }
     .line {

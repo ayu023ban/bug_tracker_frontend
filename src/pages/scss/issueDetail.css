@@ -90,105 +90,27 @@
   left: 50%;
   margin-left: -400px;
 }
-.settings .setting-box .delete {
-  position: relative;
+.settings .setting-box .icon-back {
   border-radius: 50%;
   width: 100px;
   height: 100px;
-  background-color: #cd5c5c;
+  background-color: #cd5c5c !important;
   align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.settings .setting-box .delete:hover {
+.settings .setting-box .icon-back:hover {
   cursor: pointer;
   transform: scale(1.1);
 }
-.settings .setting-box .delete .icon {
+.settings .setting-box .icon-back .icon {
   font-size: 40px;
-  position: absolute;
-  top: 50%;
-  margin-top: -20px;
-  left: 50%;
-  margin-left: -16px;
   color: white;
-}
-.settings .setting-box .delete .icon:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-.settings .setting-box .update {
-  position: relative;
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  background-color: #cd5c5c;
-  align-self: center;
-}
-.settings .setting-box .update:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-.settings .setting-box .update .icon {
-  font-size: 40px;
-  position: absolute;
-  top: 50%;
-  margin-top: -20px;
-  left: 50%;
-  margin-left: -16px;
-  color: white;
-}
-.settings .setting-box .update .icon:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-.settings .setting-box .important {
-  position: relative;
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  background-color: white;
-  align-self: center;
-}
-.settings .setting-box .important:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-.settings .setting-box .important .icon {
-  font-size: 40px;
-  position: absolute;
-  top: 50%;
-  margin-top: -20px;
-  left: 50%;
-  margin-left: -16px;
-  color: #cd5c5c;
-}
-.settings .setting-box .important .icon:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-.settings .setting-box .project {
-  position: relative;
-  border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  background-color: #cd5c5c;
-  align-self: center;
-}
-.settings .setting-box .project:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-.settings .setting-box .project .icon {
-  font-size: 40px;
-  position: absolute;
-  top: 50%;
-  margin-top: -20px;
-  left: 50%;
-  margin-left: -16px;
-  color: white;
-}
-.settings .setting-box .project .icon:hover {
-  cursor: pointer;
-  transform: scale(1.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 !important;
 }
 .settings .setting-box .line {
   position: absolute;
