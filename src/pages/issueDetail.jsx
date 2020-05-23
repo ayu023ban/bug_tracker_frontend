@@ -43,23 +43,12 @@ class IssueDetail extends Component {
     listComments() {
         const { comments } = this.state
         let list;
+        console.log(comments)
         if (comments != null) {
             list = comments.map(comment =>
-
                 <Card raised fluid color='red'>
                     <Card.Content>
                         <Card.Description>
-                            {/* <Editor value={comment.description}
-                            disabled={true}
-                            apiKey="81jvj4ftt29hdio9oky5wnvlxtugicmawfi048fvjjf2dlg8"
-                            init={{
-                                menubar: false,
-                                plugins:'a11ychecker placeholder code advcode casechange formatpainter linkchecker autolink lists checklist media  permanentpen powerpaste quickbars codesample table advtable tinymcespellchecker autoresize',
-                                toolbar: false,
-                                statusbar: false,
-                                autoresize_bottom_margin: 0,
-                                autoresize_overflow_padding: 0,
-                            }} /> */}
                             <div dangerouslySetInnerHTML={{ __html: comment.description }} />
                         </Card.Description>
                     </Card.Content>
@@ -89,7 +78,7 @@ class IssueDetail extends Component {
 
     onUpdate = e => {
         const { name, value } = e.target
-        console.log(this.state.update)
+        // console.log(this.state.update)
         this.setState({
             update: { ...this.state.update, [name]: value }
         })
@@ -108,7 +97,10 @@ class IssueDetail extends Component {
         }
         data = JSON.stringify(data)
         fetch(url, { method: "POST", body: data, headers: header }).then(res => res.json()).then((data) => {
-            console.log(data)
+            // console.log(data)
+            // if()
+            this.componentWillMount()
+            this.commentToggle()
         })
     }
 
@@ -292,7 +284,7 @@ class IssueDetail extends Component {
                                 <div className="icon-back">
                                     <Icon name='edit' size='large' onClick={(event) => { this.settingToggle(); this.formToggle() }} />
                                 </div>
-                                <div className="icon-back">
+                                <div className={`icon-back ${(this.state.bug.important)?"selected":""}`}>
                                     <Icon name="check square" onClick={(event) => this.setImportant()} />
                                 </div>
                                 <div className="icon-back">

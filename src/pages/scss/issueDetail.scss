@@ -99,7 +99,7 @@
       border-radius: 50%;
       width: 100px;
       height: 100px;
-      background-color: #cd5c5c !important;
+      background-color: #fff !important;
       align-self: center;
       display: flex;
       justify-content: center;
@@ -110,11 +110,17 @@
       }
       .icon{
         font-size: 40px;
-        color: white;
+        color: #cd5c5c;
         display: flex;
         justify-content: center;
         align-items: center;
         margin: 0 !important;
+      }
+    }
+    .selected{
+      background-color: #cd5c5c !important;
+      .icon{
+        color:#fff;
       }
     }
     .line {

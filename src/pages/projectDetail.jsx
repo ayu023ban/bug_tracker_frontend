@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
 import axios from 'axios'
-import {IssueCard} from './homePage'
+import EditorPage from './editor'
+import { IssueCard } from './homePage'
 class ProjectDetail extends Component {
     constructor(props) {
         super(props)
@@ -16,17 +17,22 @@ class ProjectDetail extends Component {
             openModal1: false,
             openModal2: false,
             activeDomain: "f",
-            values:{name:"",description:""}
+            values: { name: "", description: "" },
+            updatingForm: false,
+            updateProjectValues: {}
         }
         this.deleteCurrentProject = this.deleteCurrentProject.bind(this)
         this.onChange = this.onChange.bind(this)
+        this.onUpdate = this.onUpdate.bind(this)
+        this.updateFormToggle = this.updateFormToggle.bind(this)
+        this.handleUpdateEditorChange = this.handleUpdateEditorChange.bind(this)
     }
 
     deleteProjectModalShow = () => this.setState({ openModal1: true })
     deleteProjectModalClose = () => this.setState({ openModal1: false })
     newIssueShow = () => this.setState({ openModal2: true })
     newIssueClose = () => this.setState({ openModal2: false })
-
+    updateFormToggle = () => this.setState({ updatingForm: !this.state.updatingForm })
     handleDomainClick = (name) => this.setState({ activeDomain: name })
 
 
@@ -139,7 +145,7 @@ class ProjectDetail extends Component {
         if (issue_data !== undefined) {
             listCards = issue_data.map((bug) => {
                 return (
-                  <IssueCard bug={bug} history={this.props.history} />
+                    <IssueCard bug={bug} history={this.props.history} />
                 )
             })
         }
@@ -164,7 +170,7 @@ class ProjectDetail extends Component {
         })
     }
 
-    createIssue(data){
+    createIssue(data) {
         console.log(data)
         const url = 'http://localhost:8000/bug_reporter/bugs/'
         const header = {
@@ -172,14 +178,14 @@ class ProjectDetail extends Component {
             // 'Accept':"application/json; charset=UTF-8",
             "Authorization": `Token ${sessionStorage.getItem("token")}`
         }
-        axios.post(url,data,{headers:header}).then((res)=>{
-            if(res.status===201){
+        axios.post(url, data, { headers: header }).then((res) => {
+            if (res.status === 201) {
                 this.newIssueClose()
             }
-            else{
+            else {
                 console.log(res)
             }
-        }).catch((res)=>{
+        }).catch((res) => {
             console.log(res)
         }
         )
@@ -193,11 +199,47 @@ class ProjectDetail extends Component {
         this.createIssue(data)
     }
 
+    onUpdate = e => {
+        const { name, value } = e.target
+        console.log(this.state.updateProjectValues)
+        this.setState({
+            updateProjectValues: { ...this.state.updateProjectValues, [name]: value }
+        })
+    }
+    updateProject() {
+        let data = JSON.stringify(this.state.updateProjectValues)
+        let ProjectId = this.state.id
+        fetch(`http://localhost:8000/bug_reporter/projects/${ProjectId}/`, {
+            method: 'PATCH', body: data,
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                'Authorization': `Token ${sessionStorage.getItem('token')}`,
+            },
+        }).then((res) => {
+            if (res.status === 200) {
+                return res.json()
+            }
+            else {
+                console.log(res)
+            }
+        }).then((data) => {
+            this.setState({ data: data })
+            this.updateFormToggle()
+        })
+    }
+    handleUpdateEditorChange(content) {
+        console.log(this.state.updateProjectValues)
+        this.setState({
+            updateProjectValues: { ...this.state.updateProjectValues, "wiki": content }
+        })
+    }
+
     render() {
         const { data } = this.state
         const { openModal1 } = this.state
         const { openModal2 } = this.state
         const { activeDomain } = this.state
+        const { updatingForm } = this.state
         if (data !== null) {
             return (
                 <Container >
@@ -209,35 +251,47 @@ class ProjectDetail extends Component {
                         </Breadcrumb>
                     </Header>
                     <Divider section />
+                    {!updatingForm &&
+                        <Card color='red' fluid>
+                            <Card.Content className="CardTop"  >
+                                <Card.Description><div dangerouslySetInnerHTML={{ __html: data.wiki }} /></Card.Description>
+                            </Card.Content>
+                            <Card.Content textAlign='center'>
+                                <Header as='h2'>
+                                    {data.name}
+                                </Header>
+                            </Card.Content>
+                            <Card.Content extra>created by {this.creator()} {moment(data.created_at).fromNow()}</Card.Content>
+                            <Card.Content>
+                                <Grid columns={3} divided >
+                                    <Grid.Row textAlign='center'>
+                                        <Grid.Column >
+                                            {this.search_component()}
+                                        </Grid.Column>
+                                        <Grid.Column >
+                                            <Icon name='edit' onClick={this.updateFormToggle} />
+                                        </Grid.Column>
+                                        <Grid.Column >
+                                            <Button className='delete' icon onClick={this.deleteProjectModalShow}><Icon color='red' name='delete' />Delete</Button>
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                </Grid>
+                            </Card.Content>
+                        </Card>
+                    }
+                    {updatingForm &&
+                        <Card fluid color='red'>
+                            <Card.Content>
+                                <Form>
+                                    <Form.Input name='name' placeholder='name' label='name' value={this.state.updateProjectValues.name} onChange={this.onUpdate} />
+                                    <EditorPage onEditorChange={this.handleUpdateEditorChange} placeholder="Wiki" />
+                                    <Button icon='cross' content='Cancel' onClick={this.updateFormToggle} />
+                                    <Button positive type='submit' icon='checkmark' content="Update" onClick={(event) => this.updateProject()} />
+                                </Form>
+                            </Card.Content>
+                        </Card>
 
-
-                    <Card color='red' fluid>
-                        <Card.Content className="CardTop" textAlign='center' >
-                            <Card.Description>{data.wiki}</Card.Description>
-                        </Card.Content>
-                        <Card.Content textAlign='center'>
-                            <Header as='h2'>
-                                {data.name}
-                            </Header>
-                        </Card.Content>
-                        <Card.Content extra>created by {this.creator()} {moment(data.created_at).fromNow()}</Card.Content>
-                        <Card.Content>
-                            <Grid columns={3} divided >
-                                <Grid.Row textAlign='center'>
-                                    <Grid.Column >
-                                        {this.search_component()}
-                                    </Grid.Column>
-                                    <Grid.Column >
-                                        <Icon name='user' />
-                                    </Grid.Column>
-                                    <Grid.Column >
-                                        <Button className='delete' icon onClick={this.deleteProjectModalShow}><Icon color='red' name='delete' />Delete</Button>
-                                    </Grid.Column>
-                                </Grid.Row>
-                            </Grid>
-                        </Card.Content>
-                    </Card>
-
+                    }
 
                     <Container fluid className="memberContainer">
                         <Card color='red' className="members">
@@ -281,7 +335,7 @@ class ProjectDetail extends Component {
                         <Modal.Content image>
                             <Modal.Description>
                                 <Form>
-                                    <Form.Input label='Name' name='name' onChange={this.onModal2Change} value = {this.state.name} placeholder='Title' />
+                                    <Form.Input label='Name' name='name' onChange={this.onModal2Change} value={this.state.name} placeholder='Title' />
                                     <Form.TextArea label='Descrpition' onChange={this.onModal2Change} name='description' value={this.state.description} placeholder='Write short description about the Issue  ' />
                                     <Form.Field>
                                         <Button.Group>
