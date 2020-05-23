@@ -17,6 +17,46 @@
 .tox-tinymce {
   border: 0 !important;
 }
+.tox .tox-editor-header {
+  z-index: unset !important;
+}
+.main-issue-box .editor {
+  border: 1px solid rgba(34, 36, 38, 0.15) !important;
+  border-radius: 0.28571429rem !important;
+}
+.main-issue-box .update-segment .update-form {
+  width: 100% !important;
+  position: relative !important;
+}
+.main-issue-box .update-segment .update-form .form-submit {
+  position: absolute !important;
+  top: -60px !important;
+  right: 10px !important;
+  background-color: red !important;
+}
+.main-issue-box .update-segment .update-form .form-submit:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+.main-issue-box .update-segment .update-form .close {
+  height: 36px;
+  width: 36px;
+  border-radius: 5px;
+  background-color: black;
+  position: absolute;
+  top: -60px !important;
+  right: 140px !important;
+  display: flex;
+}
+.main-issue-box .update-segment .update-form .close .icon {
+  font-size: 24px;
+  color: white;
+  margin: auto;
+}
+.main-issue-box .update-segment .update-form .close:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
 .settings {
   position: absolute !important;
   top: 0;

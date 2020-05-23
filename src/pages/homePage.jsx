@@ -19,7 +19,7 @@ class IssueCard extends Component {
     handleClickCardDescription(bug) {
         this.props.history.push({
             pathname: '/issue',
-            state: {bug:bug }
+            state: {bug:bug.id }
         })
     }
 

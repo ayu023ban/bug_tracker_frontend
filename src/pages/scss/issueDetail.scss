@@ -17,6 +17,55 @@
 .tox-tinymce {
   border: 0 !important;
 }
+.tox .tox-editor-header {
+  z-index: unset !important;
+}
+.main-issue-box {
+  .editor {
+    border: 1px solid rgba(34,36,38,.15) !important;
+    border-radius: .28571429rem !important;
+  }
+  .update-segment {
+    // position: absolute;
+    // height: 220px !important;
+    // display: flex;
+    // border: 3px solid red;
+    // top: -30px !important;
+    .update-form {
+      width: 100% !important;
+      position: relative !important;
+      .form-submit {
+        position: absolute !important;
+        top: -60px !important;
+        right: 10px !important;
+        background-color: red !important;
+        &:hover {
+          transform: scale(1.1);
+          cursor: pointer;
+        }
+      }
+      .close {
+        height: 36px;
+        width: 36px;
+        border-radius: 5px;
+        background-color: black;
+        position: absolute;
+        top: -60px !important;
+        right: 140px !important;
+        display: flex;
+        .icon {
+          font-size: 24px;
+          color: white;
+          margin: auto;
+        }
+        &:hover {
+          transform: scale(1.1);
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
 
 .settings {
   position: absolute !important;
@@ -25,7 +74,7 @@
   width: 100vw;
   height: 100vh;
   background-size: 100%;
-  
+
   .close {
     position: absolute;
     top: 20%;
