@@ -9,6 +9,7 @@ import EditorPage from './pages/editor'
 import LoginComp from './navbar/login'
 import ProjectDetail from './pages/projectDetail'
 import IssueDetail from './pages/issueDetail'
+import loginPage from './pages/loginPage'
 class Router extends Component {
   constructor(props) {
     super(props)
@@ -32,6 +33,7 @@ class Router extends Component {
         <NavBar isLoggedIn={isLoggedIn} onLogout = {this.handleLogOut} />
         <SideBar />
         <Switch>
+        <Route exact path='/product' component={loginPage} />
           <Route exact path='/' render={(props)=><HomePage {...props} isLoggedIn={isLoggedIn} />} />
           <Route exact path='/login' render={(props) => <LoginComp {...props} onLogin={this.handleLogIn} />} />
           <Route exact path='/project' render={(props) => <ProjectDetail {...props} isLoggedIn={isLoggedIn} />} />

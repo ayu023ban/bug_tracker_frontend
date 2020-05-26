@@ -3,6 +3,7 @@ import { Container, Card, Header, Breadcrumb, Form, Segment, Button, Icon, Divid
 import { Link } from 'react-router-dom'
 import { Editor } from '@tinymce/tinymce-react';
 import './scss/tinymce.css'
+import WebSocketInstance from './websocket'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
 import EditorPage from './editor'
@@ -13,9 +14,13 @@ class IssueDetail extends Component {
     constructor(props) {
         super(props)
         this.handleEditorChange = this.handleEditorChange.bind(this)
+        this.commentsLoderFromWebsocket =this.commentsLoderFromWebsocket.bind(this)
+        this.newCommentFromWebsocket = this.newCommentFromWebsocket.bind(this)
         this.handleUpdateEditorChange = this.handleUpdateEditorChange.bind(this)
         this.goToCorrespondingProject = this.goToCorrespondingProject.bind(this)
         this.settingToggle = this.settingToggle.bind(this)
+        this.newCommentFromWebsocket = this.newCommentFromWebsocket.bind(this)
+        this.fetchCommentFromWebSocket = this.fetchCommentFromWebSocket.bind(this)
         this.state = {
             id: this.props.location.state.bug,
             comments: null,
@@ -26,24 +31,44 @@ class IssueDetail extends Component {
         }
     }
 
-    componentWillMount() {
-        let url = `http://localhost:8000/bug_reporter/comments/?bug=${this.state.id}&ordering=-created_at`
+    componentDidMount() {
+        // let url = `http://localhost:8000/bug_reporter/comments/?bug=${this.state.id}&ordering=-created_at`
         let header = JSON.parse(sessionStorage.getItem("header"))
-        fetch(url, { headers: header }).then(res => res.json()).then((data) => {
-            // console.log(data)
-            this.setState({ comments: data })
-        })
-
+        // fetch(url, { headers: header }).then(res => res.json()).then((data) => {
+        //     // console.log(data)
+        //     this.setState({ comments: data })
+        // })
+        this.ma = setInterval(this.fetchCommentFromWebSocket,3000)
+        WebSocketInstance.connect()
+        WebSocketInstance.addCallbacks(this.commentsLoderFromWebsocket,this.newCommentFromWebsocket)
+        this.fetchCommentFromWebSocket()
+        // WebSocketInstance.fetchMessages()
+        // setTimeout(()=>{console.log(WebSocketInstance.state())},3000)
         let issueurl = `http://localhost:8000/bug_reporter/bugs/${this.state.id}/`
         fetch(issueurl, { headers: header }).then(res => res.json()).then((data) => {
             this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
         })
+        
+    }
+    fetchCommentFromWebSocket(){
+        
+        if(WebSocketInstance.state()===1){
+            clearInterval(this.ma)
+            WebSocketInstance.fetchMessages()
+        }
+    }
+    commentsLoderFromWebsocket(data){
+        const comments = data["data"]
+        this.setState({comments:comments})
+    }
+    newCommentFromWebsocket(data){
+        const comment = data.data
+         this.setState({comments:[comment,...this.state.comments]}) 
     }
 
     listComments() {
         const { comments } = this.state
         let list;
-        console.log(comments)
         if (comments != null) {
             list = comments.map(comment =>
                 <Card raised fluid color='red'>
@@ -86,22 +111,23 @@ class IssueDetail extends Component {
 
 
     onCommentSubmit() {
-        let data = {}
-        data.description = this.state.commentDescription
-        data.bug = this.state.id
-        console.log(data)
-        const url = 'http://localhost:8000/bug_reporter/comments/'
-        const header = {
-            "Content-Type": "application/json",
-            "Authorization": `Token ${sessionStorage.getItem("token")}`
-        }
-        data = JSON.stringify(data)
-        fetch(url, { method: "POST", body: data, headers: header }).then(res => res.json()).then((data) => {
-            // console.log(data)
-            // if()
-            this.componentWillMount()
-            this.commentToggle()
-        })
+        // let data = {}
+        // data.description = this.state.commentDescription
+        // data.bug = this.state.id
+        // console.log(data)
+        // const url = 'http://localhost:8000/bug_reporter/comments/'
+        // const header = {
+        //     "Content-Type": "application/json",
+        //     "Authorization": `Token ${sessionStorage.getItem("token")}`
+        // }
+        // data = JSON.stringify(data)
+        // fetch(url, { method: "POST", body: data, headers: header }).then(res => res.json()).then((data) => {
+        //     // console.log(data)
+        //     // if()
+        //     this.componentWillMount()
+        //     this.commentToggle()
+        // })
+        WebSocketInstance.newComment(this.state.commentDescription)
     }
 
     deleteIssue() {
