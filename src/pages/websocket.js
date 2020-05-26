@@ -51,14 +51,11 @@ class WebSocketService {
     if (Object.keys(this.callbacks).length === 0) {
       return;
     }
-    // if (command === "messages") {
-    //   this.callbacks[command](parsedData.messages);
-    // }
-    // if (command === "new_message") {
-    //   this.callbacks[command](parsedData.message);
-    // }
-    this.callbacks[command](parsedData)
-    // console.log(this.callbacks[command])
+    if(command ==="messages" || command==="new_message"){
+          this.callbacks[command](parsedData)
+    }
+    else{console.log(parsedData)}
+
   }
 
   fetchMessages() {

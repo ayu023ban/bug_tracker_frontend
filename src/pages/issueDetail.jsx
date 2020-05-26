@@ -38,7 +38,7 @@ class IssueDetail extends Component {
         //     // console.log(data)
         //     this.setState({ comments: data })
         // })
-        this.ma = setInterval(this.fetchCommentFromWebSocket,3000)
+        this.ma = setInterval(this.fetchCommentFromWebSocket,500)
         WebSocketInstance.connect()
         WebSocketInstance.addCallbacks(this.commentsLoderFromWebsocket,this.newCommentFromWebsocket)
         this.fetchCommentFromWebSocket()
