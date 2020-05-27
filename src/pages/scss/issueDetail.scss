@@ -186,3 +186,9 @@
     color: white !important;
   }
 }
+
+.commentCardDescription{
+  display:grid;
+  grid-template-columns:auto max-content;
+  justify-content:space-between;
+}

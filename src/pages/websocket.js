@@ -4,12 +4,9 @@
 class WebSocketService {
   constructor() {
     this.socketRef = null
-    // this.bug_id = 1
   }
   static instance = null;
   callbacks = {};
-  // bug_id = 1
-  SOCKET_URL = 'ws' + '://' + 'localhost:8000/' + 'bug_reporter/ws/comments/'+3
 
 
   static getInstance() {
@@ -21,7 +18,7 @@ class WebSocketService {
 
 
   connect(chatUrl) {
-    const path = this.SOCKET_URL
+    const path = chatUrl
     this.socketRef = new WebSocket(path);
     this.socketRef.onopen = () => {
       console.log("WebSocket open");
@@ -40,14 +37,13 @@ class WebSocketService {
     
   }
 
-  disconnect() {
-    this.socketRef.close();
-  }
+  // disconnect() {
+  //   this.socketRef.close();
+  // }
 
   socketNewMessage(data) {
     const parsedData = JSON.parse(data);
     const command = parsedData.command;
-    // console.log(command)
     if (Object.keys(this.callbacks).length === 0) {
       return;
     }

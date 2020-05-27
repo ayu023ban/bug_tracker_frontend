@@ -1,0 +1,17 @@
+.user-card-content {
+  display: grid;
+  grid-template-columns: max-content auto;
+  margin-bottom: 1.5rem;
+  .user-content {
+    margin-left: 1.5rem;
+    display: grid;
+    span:nth-child(2) {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+    span:first-child {
+      font-weight: 700;
+      font-size: 15px;
+    }
+  }
+}

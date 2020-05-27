@@ -3,9 +3,11 @@ import { Segment, Container, Modal, Header, Button, Card, Icon, Image, Divider, 
 import Pluralize from 'react-pluralize'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
+import EditorPage from './editor'
 class ProjectPage extends Component {
     constructor(props) {
         super(props)
+        this.handleProjectDescriptionEditorChange = this.handleProjectDescriptionEditorChange.bind(this)
         this.state = {
             data: [],
             isLoggedIn: false,
@@ -36,7 +38,7 @@ class ProjectPage extends Component {
                     <Card.Content>
                         <Card.Description className='projectDescription' >
                             <div dangerouslySetInnerHTML={{ __html: element.wiki }} />
-                            <Image floated='right' ><Icon name="github" size='big' /></Image>
+                            <Image floated='right'><a href={element.githublink} target="_blank"><Icon name="github" size='big' /></a></Image>
                         </Card.Description>
                     </Card.Content>
                     <Card.Content>
@@ -89,6 +91,13 @@ class ProjectPage extends Component {
         })
     }
 
+    handleProjectDescriptionEditorChange(content){
+        this.setState({
+            values: { ...this.state.values, "wiki": content }
+        })
+
+    }
+
     onSubmit = e => {
         let data = JSON.stringify(this.state.values)
         this.createProject(data);
@@ -130,7 +139,7 @@ class ProjectPage extends Component {
         const { open, dimmer } = this.state
         return (
             <Container className='project-box'>
-                <Header as="h2" className='projects-header'>Projects<Button className='add-button' onClick={this.show('blurring')}><Icon name='plus' size='big' /></Button></Header>
+                <Header as="h2" color='red' className='projects-header'>Projects<Icon className='add-button' onClick={this.show('blurring')} name='plus' size='large' /></Header>
                 <Divider section />
                 <Segment horizontal textAlign='center' children={Button} >
                     <Button basic color='teal' onClick={(event) => { this.updateIssue("latest") }} > Latest</Button>
@@ -146,21 +155,15 @@ class ProjectPage extends Component {
 
                 </Container>
 
-                <Modal dimmer={dimmer} open={open} onClose={this.close}>
+                <Modal open={open} onClose={this.close} closeOnDocumentClick closeOnDimmerClick closeOnEscape size='large' >
                     <Modal.Header>Create New Project</Modal.Header>
-                    <Modal.Content image>
+                    <Modal.Content scrolling size='large'>
                         <Modal.Description>
 
                             <Form>
-                                <Form.Field>
-                                    <label>Title</label>
-                                    <input placeholder='Title' name='name' value={this.state.name} onChange={this.onChange} />
-                                </Form.Field>
-                                <Form.TextArea label='Descrpition' onChange={this.onChange} name='wiki' value={this.state.wiki} placeholder='Write short description about the project  ' />
-                                <Form.Field>
-                                    <label>Git Link</label>
-                                    <input placeholder='Git Link' name='githublink' onChange={this.onChange} value={this.state.githublink} />
-                                </Form.Field>
+                            <Form.Input label="Title" name="name" value={this.state.name} onChange={this.onChange} placeholder="Title" />
+                            <EditorPage onEditorChange={this.handleProjectDescriptionEditorChange} placeholder="Descrpition" />
+                            <Form.Input label="Git Link" name="githublink" onChange={this.onChange} value={this.state.githublink} />
                                 <Button
                                     positive
                                     type='submit'
@@ -175,7 +178,7 @@ class ProjectPage extends Component {
                     <Modal.Actions>
                         <Button color='black' onClick={this.close}>
                             Cancel
-            </Button>
+                    </Button>
                     </Modal.Actions>
                 </Modal>
             </Container>

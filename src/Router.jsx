@@ -7,6 +7,7 @@ import PageNotFound from './pages/pageNotFound'
 import SideBar from './navbar/sidebar'
 import EditorPage from './pages/editor'
 import LoginComp from './navbar/login'
+import UserList from './pages/users'
 import ProjectDetail from './pages/projectDetail'
 import IssueDetail from './pages/issueDetail'
 import loginPage from './pages/loginPage'
@@ -40,6 +41,7 @@ class Router extends Component {
           <Route exact path='/projects' render={(props) => <ProjectPage {...props} isLoggedIn={isLoggedIn} />} />
           <Route exact path='/issue' render={(props) => <IssueDetail {...props} isLoggedIn={isLoggedIn} />} />
           <Route exact path='/editor' component={EditorPage} />
+          <Route exact path='/users' component={UserList} />
           <Route exact path='/home' render={(props)=><HomePage {...props} isLoggedIn={isLoggedIn} />} />
           <Route component={PageNotFound} />
         </Switch>

@@ -28,22 +28,15 @@ class IssueDetail extends Component {
             updateForm: false,
             update: [],
             updateFormDescription: null,
+            deleteCommentModalOpen: false,
         }
     }
 
     componentDidMount() {
-        // let url = `http://localhost:8000/bug_reporter/comments/?bug=${this.state.id}&ordering=-created_at`
         let header = JSON.parse(sessionStorage.getItem("header"))
-        // fetch(url, { headers: header }).then(res => res.json()).then((data) => {
-        //     // console.log(data)
-        //     this.setState({ comments: data })
-        // })
-        this.ma = setInterval(this.fetchCommentFromWebSocket,500)
-        WebSocketInstance.connect()
+        WebSocketInstance.connect(`ws://localhost:8000/bug_reporter/ws/comments/${this.state.id}`)
         WebSocketInstance.addCallbacks(this.commentsLoderFromWebsocket,this.newCommentFromWebsocket)
-        this.fetchCommentFromWebSocket()
-        // WebSocketInstance.fetchMessages()
-        // setTimeout(()=>{console.log(WebSocketInstance.state())},3000)
+        this.ma = setInterval(this.fetchCommentFromWebSocket,500)
         let issueurl = `http://localhost:8000/bug_reporter/bugs/${this.state.id}/`
         fetch(issueurl, { headers: header }).then(res => res.json()).then((data) => {
             this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
@@ -51,17 +44,18 @@ class IssueDetail extends Component {
         
     }
     fetchCommentFromWebSocket(){
-        
         if(WebSocketInstance.state()===1){
             clearInterval(this.ma)
             WebSocketInstance.fetchMessages()
         }
     }
     commentsLoderFromWebsocket(data){
+        console.log("test1")
         const comments = data["data"]
         this.setState({comments:comments})
     }
     newCommentFromWebsocket(data){
+        console.log("test2")
         const comment = data.data
          this.setState({comments:[comment,...this.state.comments]}) 
     }
@@ -73,21 +67,45 @@ class IssueDetail extends Component {
             list = comments.map(comment =>
                 <Card raised fluid color='red'>
                     <Card.Content>
-                        <Card.Description>
+                        <Card.Description className="commentCardDescription">
                             <div dangerouslySetInnerHTML={{ __html: comment.description }} />
+                            <Icon name='trash' size='large' color='red' onClick={()=>{
+                                this.setState({commentToBeDelete:comment.id})
+                                this.toggleDeleteComment()
+                            }}  />
                         </Card.Description>
                     </Card.Content>
                     <Card.Content extra >
                         {moment(comment.created_at).fromNow()}
                         <span id='issueDetailCardTime' ><Icon name='user' />by {comment.creator_name}</span>
                     </Card.Content>
-                </Card>
-            )
+                    
+                </Card>            )
         }
         else {
             list = "no comments available"
         }
         return list
+    }
+
+    deleteComment(){
+        const url = `http://localhost:8000/bug_reporter/comments/${this.state.commentToBeDelete}/`
+        fetch(url,{
+            method: 'DELETE',
+            headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                'Authorization': `Token ${sessionStorage.getItem('token')}`,
+            }
+        }).then((res)=>{
+            if(res.status === 204){
+                WebSocketInstance.fetchMessages()
+                this.toggleDeleteComment()
+            }
+            else{
+                console.log(res)
+            }
+        })
+        
     }
 
     handleEditorChange(content) {
@@ -111,22 +129,6 @@ class IssueDetail extends Component {
 
 
     onCommentSubmit() {
-        // let data = {}
-        // data.description = this.state.commentDescription
-        // data.bug = this.state.id
-        // console.log(data)
-        // const url = 'http://localhost:8000/bug_reporter/comments/'
-        // const header = {
-        //     "Content-Type": "application/json",
-        //     "Authorization": `Token ${sessionStorage.getItem("token")}`
-        // }
-        // data = JSON.stringify(data)
-        // fetch(url, { method: "POST", body: data, headers: header }).then(res => res.json()).then((data) => {
-        //     // console.log(data)
-        //     // if()
-        //     this.componentWillMount()
-        //     this.commentToggle()
-        // })
         WebSocketInstance.newComment(this.state.commentDescription)
     }
 
@@ -234,7 +236,7 @@ class IssueDetail extends Component {
     commentToggle = () => this.setState({ commentOpen: !this.state.commentOpen })
     settingToggle = () => this.setState({ settingsOpen: !this.state.settingsOpen })
     formToggle = () => this.setState({ updateForm: !this.state.updateForm })
-
+    toggleDeleteComment = () => this.setState({deleteCommentModalOpen:!this.state.deleteCommentModalOpen})
     render() {
         const { bug } = this.state
         const { commentOpen } = this.state
@@ -331,6 +333,23 @@ class IssueDetail extends Component {
                             </div>
                         </div>
                     }
+
+                    <Modal open = {this.state.deleteCommentModalOpen} dimmer onClose={()=>{this.toggleDeleteComment()}} basic size='small'>
+                        <Header icon='archive'  content='Delete this Comment' />
+                        <Modal.Content>
+                          <p>
+                            Do you really want to remove this comment? This action is not reversible.
+                          </p>
+                        </Modal.Content>
+                        <Modal.Actions>
+                          <Button basic color='red' inverted onClick={()=>{this.toggleDeleteComment()}}>
+                            <Icon name='remove' /> No
+                          </Button>
+                          <Button color='green' inverted onClick={()=>{this.deleteComment()}}>
+                            <Icon name='checkmark' /> Yes
+                          </Button>
+                        </Modal.Actions>
+                      </Modal>
                 </Container>
             )
         }

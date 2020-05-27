@@ -22,6 +22,7 @@ class ProjectDetail extends Component {
             updateProjectValues: {}
         }
         this.deleteCurrentProject = this.deleteCurrentProject.bind(this)
+        this.handleIssueDescriptionEditorChange = this.handleIssueDescriptionEditorChange.bind(this)
         this.onChange = this.onChange.bind(this)
         this.onUpdate = this.onUpdate.bind(this)
         this.updateFormToggle = this.updateFormToggle.bind(this)
@@ -168,6 +169,7 @@ class ProjectDetail extends Component {
         this.setState({
             values: { ...this.state.values, [name]: value }
         })
+        console.log(this.state.values)
     }
 
     createIssue(data) {
@@ -194,6 +196,7 @@ class ProjectDetail extends Component {
     onSubmit = e => {
         let data = this.state.values
         data.domain = this.state.activeDomain
+        data.status="P"
         data.project = this.state.id
         data = JSON.stringify(data)
         this.createIssue(data)
@@ -232,6 +235,13 @@ class ProjectDetail extends Component {
         this.setState({
             updateProjectValues: { ...this.state.updateProjectValues, "wiki": content }
         })
+    }
+
+    handleIssueDescriptionEditorChange(content){
+        this.setState({
+            values: { ...this.state.values, "description": content }
+        })
+        // console.log(this.state.values)
     }
 
     render() {
@@ -330,13 +340,15 @@ class ProjectDetail extends Component {
                         </Modal.Actions>
                     </Modal>
 
-                    <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnDocumentClick closeOnDimmerClick closeOnEscape >
+                    <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnDocumentClick closeOnDimmerClick closeOnEscape size='large' >
                         <Modal.Header>Create New Issue</Modal.Header>
-                        <Modal.Content image>
+                        <Modal.Content scrolling>
                             <Modal.Description>
                                 <Form>
                                     <Form.Input label='Name' name='name' onChange={this.onModal2Change} value={this.state.name} placeholder='Title' />
-                                    <Form.TextArea label='Descrpition' onChange={this.onModal2Change} name='description' value={this.state.description} placeholder='Write short description about the Issue  ' />
+                                    {/*<Form.TextArea label='Descrpition' onChange={this.onModal2Change} name='description' value={this.state.description} placeholder='Write short description about the Issue  ' />*/}
+                                    <EditorPage onEditorChange={this.handleIssueDescriptionEditorChange} placeholder="Descrpition" />
+
                                     <Form.Field>
                                         <Button.Group>
                                             <Button content='Front End' basic={activeDomain !== "f"} onClick={() => { this.handleDomainClick("f") }} color='olive' />
@@ -366,7 +378,7 @@ class ProjectDetail extends Component {
         }
         else {
             return (
-                <div>fdaklm</div>
+                <div>This issue is currently not available</div>
             )
         }
     }
