@@ -16,6 +16,8 @@ class ProjectDetail extends Component {
             data: null,
             openModal1: false,
             openModal2: false,
+            isUserATeamMember: false,
+            isUserACreator: false,
             activeDomain: "f",
             values: { name: "", description: "" },
             updatingForm: false,
@@ -37,17 +39,24 @@ class ProjectDetail extends Component {
     handleDomainClick = (name) => this.setState({ activeDomain: name })
 
 
-    componentWillMount() {
+    componentDidMount() {
         const project_detail_url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
         const get_issues_url = project_detail_url + "bugs/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
+
         fetch(project_detail_url, { headers: headers }).then(res => res.json()).then((data) => {
+            console.log(Date.now())
             this.setState({ data: data, member_names: data.member_names, warning_text: "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?" })
+            
         })
+
+
         fetch(get_issues_url, { headers: headers }).then(issue_res => issue_res.json()).then((issue_data) => {
             this.setState({ issue_data: issue_data })
         })
+
         this.stateOptions()
+     
     }
 
 
@@ -99,6 +108,7 @@ class ProjectDetail extends Component {
     search_component() {
         const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
         const { data } = this.state
+
         const search = (user_id === data.creator) ? (
             <Dropdown
                 placeholder='Add Members'
@@ -116,7 +126,14 @@ class ProjectDetail extends Component {
         return search
 
     }
-
+    setPermissions() {
+        const username = JSON.parse(sessionStorage.getItem("user_data")).username
+        const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
+        const isCreator = this.state.data.creator === user_id
+        const isMember = this.state.member_names.includes(username)
+        console.log(isCreator, isMember)
+        this.setState({ isUserATeamMember: true, isUserACreator: true })
+    }
     DisPlayMembers() {
         const { member_names } = this.state
         if (member_names) {
@@ -196,7 +213,7 @@ class ProjectDetail extends Component {
     onSubmit = e => {
         let data = this.state.values
         data.domain = this.state.activeDomain
-        data.status="P"
+        data.status = "P"
         data.project = this.state.id
         data = JSON.stringify(data)
         this.createIssue(data)
@@ -237,7 +254,7 @@ class ProjectDetail extends Component {
         })
     }
 
-    handleIssueDescriptionEditorChange(content){
+    handleIssueDescriptionEditorChange(content) {
         this.setState({
             values: { ...this.state.values, "description": content }
         })
@@ -250,6 +267,8 @@ class ProjectDetail extends Component {
         const { openModal2 } = this.state
         const { activeDomain } = this.state
         const { updatingForm } = this.state
+        const { isUserATeamMember } = this.state
+        // const { isUserACreator } = this.state
         if (data !== null) {
             return (
                 <Container >
@@ -272,24 +291,26 @@ class ProjectDetail extends Component {
                                 </Header>
                             </Card.Content>
                             <Card.Content extra>created by {this.creator()} {moment(data.created_at).fromNow()}</Card.Content>
-                            <Card.Content>
-                                <Grid columns={3} divided >
-                                    <Grid.Row textAlign='center'>
-                                        <Grid.Column >
-                                            {this.search_component()}
-                                        </Grid.Column>
-                                        <Grid.Column >
-                                            <Icon name='edit' onClick={this.updateFormToggle} />
-                                        </Grid.Column>
-                                        <Grid.Column >
-                                            <Button className='delete' icon onClick={this.deleteProjectModalShow}><Icon color='red' name='delete' />Delete</Button>
-                                        </Grid.Column>
-                                    </Grid.Row>
-                                </Grid>
-                            </Card.Content>
+                            {isUserATeamMember &&
+                                <Card.Content>
+                                    <Grid columns={3} divided >
+                                        <Grid.Row textAlign='center'>
+                                            <Grid.Column >
+                                                {this.search_component()}
+                                            </Grid.Column>
+                                            <Grid.Column >
+                                                <Icon name='edit' onClick={this.updateFormToggle} />
+                                            </Grid.Column>
+                                            <Grid.Column >
+                                                <Button className='delete' icon onClick={this.deleteProjectModalShow}><Icon color='red' name='delete' />Delete</Button>
+                                            </Grid.Column>
+                                        </Grid.Row>
+                                    </Grid>
+                                </Card.Content>
+                            }
                         </Card>
                     }
-                    {updatingForm &&
+                    {updatingForm && isUserATeamMember &&
                         <Card fluid color='red'>
                             <Card.Content>
                                 <Form>
@@ -346,7 +367,6 @@ class ProjectDetail extends Component {
                             <Modal.Description>
                                 <Form>
                                     <Form.Input label='Name' name='name' onChange={this.onModal2Change} value={this.state.name} placeholder='Title' />
-                                    {/*<Form.TextArea label='Descrpition' onChange={this.onModal2Change} name='description' value={this.state.description} placeholder='Write short description about the Issue  ' />*/}
                                     <EditorPage onEditorChange={this.handleIssueDescriptionEditorChange} placeholder="Descrpition" />
 
                                     <Form.Field>
