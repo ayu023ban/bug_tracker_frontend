@@ -58,21 +58,21 @@ class UserDetail extends Component {
                 array = ["facebookLink", "socialEmail", "instagramLink", "linkedinLink"]
                 break
             default:
-                array=null
+                array = null
         }
-        const data = JSON.stringify(this.filter(this.state.update,array))
+        const data = JSON.stringify(this.filter(this.state.update, array))
         // console.log(data)
         const url = `http://localhost:8000/bug_reporter/users/${this.state.id}/`
-        const headers={
+        const headers = {
             "Content-type": "application/json; charset=UTF-8",
             'Authorization': `Token ${sessionStorage.getItem('token')}`,
         }
-        let response = await fetch(url,{method:"PATCH",body:data,headers:headers})
-        if(response.status === 200){
+        let response = await fetch(url, { method: "PATCH", body: data, headers: headers })
+        if (response.status === 200) {
             let updated_data = await response.json()
-            let updated_user_data = Object.assign(this.state.userData,updated_data)
+            let updated_user_data = Object.assign(this.state.userData, updated_data)
             this.setState({
-                userData:updated_user_data
+                userData: updated_user_data
             })
         }
     }
@@ -85,7 +85,6 @@ class UserDetail extends Component {
         const isLinkedin = userData != null && userData.linkedinLink !== "" && userData.linkedinLink !== null && userData.linkedinLink !== undefined
         const isSocialEmail = userData != null && userData.socialEmail !== "" && userData.socialEmail !== null && userData.socialEmail !== undefined
 
-        // console.log(isGithub, isFacebook, isInstagram)
         if (userData != null) {
             return (
                 <Container>
@@ -146,6 +145,7 @@ class UserDetail extends Component {
                             </List>
                         </Card.Content>
                     </Card>
+                    <Divider hidden section />
                     <Menu attached="top" tabular>
                         <Menu.Item
                             name="Email"
@@ -250,6 +250,21 @@ class UserDetail extends Component {
                             </Form>
                         }
                     </Segment>
+                    <Divider hidden section />
+                    <div style={{display:"grid",gridTemplateColumns:"auto auto",justifyContent:"space-evenly" }} >
+                        <Segment circular style={{ width: 175, height: 175,margin:"0" }}>
+                            <Header as='h2'>
+                                Projects
+                                <Header.Subheader>{userData.no_of_projects}</Header.Subheader>
+                            </Header>
+                        </Segment>
+                        <Segment circular inverted style={{ width: 175, height: 175,margin:"0" }}>
+                            <Header inverted as='h2'>
+                                Issues
+                            <Header.Subheader>{userData.no_of_issues}</Header.Subheader>
+                            </Header>
+                        </Segment>
+                    </div>
                 </Container>
             )
         }
