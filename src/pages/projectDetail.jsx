@@ -5,18 +5,21 @@ import Pluralize from 'react-pluralize'
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
-import {project_url,user_url,issue_url} from '../routes'
+import { project_url, user_url, issue_url } from '../routes'
 import axios from 'axios'
 import EditorPage from './editor'
 import { IssueCard } from './homePage'
 class ProjectDetail extends Component {
     constructor(props) {
         super(props)
+        const warning_text = "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?"
         this.state = {
             id: this.props.location.state.id,
             data: null,
+            member_names: [],
             openModal1: false,
             openModal2: false,
+            warning_text: warning_text,
             isUserATeamMember: false,
             isUserACreator: false,
             activeDomain: "f",
@@ -40,19 +43,16 @@ class ProjectDetail extends Component {
     handleDomainClick = (name) => this.setState({ activeDomain: name })
 
 
-    async componentDidMount() {
-        const project_detail_url = project_url+this.state.id.toString()+"/"
+    async componentWillMount() {
+        const project_detail_url = project_url + this.state.id.toString() + "/"
         const get_issues_url = project_detail_url + "bugs/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
-        const warning_text = "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?"
         let project_res = await fetch(project_detail_url, { headers: headers })
         let data = await project_res.json()
-        this.setState({ data: data, member_names: data.member_names, warning_text: warning_text })
-
+        this.setState({ data: data, member_names: data.member_names })
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
         this.setState({ issue_data: issue_data })
-
         this.setPermissions()
         this.stateOptions()
 
@@ -61,7 +61,7 @@ class ProjectDetail extends Component {
 
     deleteCurrentProject() {
         console.log(this.state.id)
-        const url = project_url+this.state.id.toString()+"/"
+        const url = project_url + this.state.id.toString() + "/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
         fetch(url, { method: 'DELETE', headers: headers }).then((res) => {
             if (res.status === 204) {
@@ -94,7 +94,7 @@ class ProjectDetail extends Component {
         })
         const body = JSON.stringify({ members: user_id })
         // const url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/update_members/`
-        const url = project_url+this.state.id.toString()+"/update_members/"
+        const url = project_url + this.state.id.toString() + "/update_members/"
         const params = { method: 'PATCH', body: body, headers: { 'Content-Type': 'application/json', "Authorization": `Token ${sessionStorage.getItem("token")}` } }
         fetch(url, params).then(res => res.json()).then(res => res.user_ids).then((user_ids) => {
             const user_names = user_ids.map((id) => {
@@ -105,33 +105,30 @@ class ProjectDetail extends Component {
     }
 
     search_component() {
-        const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
-        const { data } = this.state
+        const search = <Dropdown
+            placeholder='Add Members'
+            fluid
+            multiple
+            onChange={this.onChange}
+            search
+            selection
+            options={this.state.user_data_for_search}
+        />
+        // ) : (<div>
+        //     <Icon name='users' /><Pluralize singular={'member'} count={data.members.length} />
+        // </div>
+        //     )
 
-        const search = (user_id === data.creator) ? (
-            <Dropdown
-                placeholder='Add Members'
-                fluid
-                multiple
-                onChange={this.onChange}
-                search
-                selection
-                options={this.state.user_data_for_search}
-            />
-        ) : (<Component>
-            <Icon name='users' /><Pluralize singular={'member'} count={data.members.length} />
-        </Component>
-            )
         return search
 
     }
     setPermissions() {
-        // const username = JSON.parse(sessionStorage.getItem("user_data")).username
-        // const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
-        // const isCreator = this.state.data.creator === user_id
-        // const isMember = this.state.member_names.includes(username)
-        // console.log(isCreator, isMember)
-        // this.setState({ isUserATeamMember: true, isUserACreator: true })
+        const username = JSON.parse(sessionStorage.getItem("user_data")).username
+        const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
+        const isCreator = this.state.data.creator === user_id
+        const isMember = this.state.member_names.includes(username)
+        console.log(isCreator, isMember)
+        this.setState({ isUserATeamMember: isMember, isUserACreator: isCreator })
     }
     DisPlayMembers() {
         const { member_names } = this.state
@@ -227,7 +224,7 @@ class ProjectDetail extends Component {
     }
     updateProject() {
         let data = JSON.stringify(this.state.updateProjectValues)
-        const project_detail_url = project_url+this.state.id.toString()+"/"
+        const project_detail_url = project_url + this.state.id.toString() + "/"
         fetch(project_detail_url, {
             method: 'PATCH', body: data,
             headers: {
@@ -267,7 +264,7 @@ class ProjectDetail extends Component {
         const { activeDomain } = this.state
         const { updatingForm } = this.state
         const { isUserATeamMember } = this.state
-        // const { isUserACreator } = this.state
+        const { isUserACreator } = this.state
         if (data !== null) {
             return (
                 <Container >
@@ -301,15 +298,15 @@ class ProjectDetail extends Component {
                                                 <Icon name='edit' onClick={this.updateFormToggle} />
                                             </Grid.Column>
                                             <Grid.Column >
-                                                <Button className='delete' icon onClick={this.deleteProjectModalShow}><Icon color='red' name='delete' />Delete</Button>
+                                                <Button disabled={!isUserACreator} style={{ margin: "0", padding: "0" }} className='delete' icon onClick={this.deleteProjectModalShow}><Icon color='red' name='delete' />Delete</Button>
                                             </Grid.Column>
                                         </Grid.Row>
                                     </Grid>
                                 </Card.Content>
-                            }
+                            } 
                         </Card>
                     }
-                    {updatingForm && isUserATeamMember &&
+                    {updatingForm &&
                         <Card fluid color='red'>
                             <Card.Content>
                                 <Form>
