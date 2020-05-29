@@ -3,7 +3,7 @@ import { Container, Card, Header, Breadcrumb, Form, Segment, Button, Icon, Divid
 import { Link } from 'react-router-dom'
 import { Editor } from '@tinymce/tinymce-react';
 import './scss/tinymce.css'
-import {issue_url,comment_url} from "../routes"
+import { issue_url, comment_url, project_url } from "../routes"
 import WebSocketInstance from './websocket'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
@@ -15,7 +15,7 @@ class IssueDetail extends Component {
     constructor(props) {
         super(props)
         this.handleEditorChange = this.handleEditorChange.bind(this)
-        this.commentsLoderFromWebsocket =this.commentsLoderFromWebsocket.bind(this)
+        this.commentsLoderFromWebsocket = this.commentsLoderFromWebsocket.bind(this)
         this.newCommentFromWebsocket = this.newCommentFromWebsocket.bind(this)
         this.handleUpdateEditorChange = this.handleUpdateEditorChange.bind(this)
         this.goToCorrespondingProject = this.goToCorrespondingProject.bind(this)
@@ -33,35 +33,51 @@ class IssueDetail extends Component {
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         let header = JSON.parse(sessionStorage.getItem("header"))
         WebSocketInstance.connect(`ws://localhost:8000/bug_reporter/ws/comments/${this.state.id}`)
-        WebSocketInstance.addCallbacks(this.commentsLoderFromWebsocket,this.newCommentFromWebsocket)
-        this.ma = setInterval(this.fetchCommentFromWebSocket,500)
-        const issueurl = issue_url+this.state.id.toString()+"/"
-        fetch(issueurl, { headers: header }).then(res => res.json()).then((data) => {
-            this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
-        })
-        
+        WebSocketInstance.addCallbacks(this.commentsLoderFromWebsocket, this.newCommentFromWebsocket)
+        this.ma = setInterval(this.fetchCommentFromWebSocket, 500)
+        const issueurl = issue_url + this.state.id.toString() + "/"
+        const res = await fetch(issueurl, { headers: header })
+        const data = await res.json()
+        this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
+        this.setPermissions()
+
     }
-    fetchCommentFromWebSocket(){
-        if(WebSocketInstance.state()===1){
+    fetchCommentFromWebSocket() {
+        if (WebSocketInstance.state() === 1) {
             clearInterval(this.ma)
             WebSocketInstance.fetchMessages()
         }
     }
-    commentsLoderFromWebsocket(data){
+    commentsLoderFromWebsocket(data) {
         const comments = data["data"]
-        this.setState({comments:comments})
+        this.setState({ comments: comments })
     }
-    newCommentFromWebsocket(data){
+    newCommentFromWebsocket(data) {
         console.log("test2")
         const comment = data.data
-         this.setState({comments:[comment,...this.state.comments]}) 
+        this.setState({ comments: [comment, ...this.state.comments] })
     }
 
+    async setPermissions() {
+        const projectId = this.state.bug.project
+        const url = project_url + projectId.toString() + "/"
+        const header = JSON.parse(sessionStorage.getItem("header"))
+        const res = await fetch(url, { method: "GET", headers: header })
+        let members = await res.json()
+        members = members.members
+        const user = JSON.parse(sessionStorage.getItem("user_data"))
+        const userId = user.id
+        const isMaster = user.isMaster
+        const isuserACreator = this.state.bug.creator === userId || isMaster
+        const isUserAMember = members.includes(userId) || isMaster
+        this.setState({ isUserAMember: isUserAMember, isuserACreator: isuserACreator })
+    }
     listComments() {
         const { comments } = this.state
+        const userId = JSON.parse(sessionStorage.getItem("user_data")).id
         let list;
         if (comments != null) {
             list = comments.map(comment =>
@@ -69,18 +85,20 @@ class IssueDetail extends Component {
                     <Card.Content>
                         <Card.Description className="commentCardDescription">
                             <div dangerouslySetInnerHTML={{ __html: comment.description }} />
-                            <Icon name='trash' size='large' color='red' onClick={()=>{
-                                this.setState({commentToBeDelete:comment.id})
-                                this.toggleDeleteComment()
-                            }}  />
+                            { userId === comment.creator &&
+                                <Icon name='trash' size='large' color='red' onClick={() => {
+                                    this.setState({ commentToBeDelete: comment.id })
+                                    this.toggleDeleteComment()
+                                }} />
+                            }
                         </Card.Description>
                     </Card.Content>
                     <Card.Content extra >
                         {moment(comment.created_at).fromNow()}
                         <span id='issueDetailCardTime' ><Icon name='user' />by {comment.creator_name}</span>
                     </Card.Content>
-                    
-                </Card>            )
+
+                </Card>)
         }
         else {
             list = "no comments available"
@@ -88,25 +106,25 @@ class IssueDetail extends Component {
         return list
     }
 
-    deleteComment(){
+    deleteComment() {
         // const url = `http://localhost:8000/bug_reporter/comments/${this.state.commentToBeDelete}/`
-        const url = comment_url+this.state.commentToBeDelete.toString()+"/"
-        fetch(url,{
+        const url = comment_url + this.state.commentToBeDelete.toString() + "/"
+        fetch(url, {
             method: 'DELETE',
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
                 'Authorization': `Token ${sessionStorage.getItem('token')}`,
             }
-        }).then((res)=>{
-            if(res.status === 204){
+        }).then((res) => {
+            if (res.status === 204) {
                 WebSocketInstance.fetchMessages()
                 this.toggleDeleteComment()
             }
-            else{
+            else {
                 console.log(res)
             }
         })
-        
+
     }
 
     handleEditorChange(content) {
@@ -131,7 +149,7 @@ class IssueDetail extends Component {
     }
 
     deleteIssue() {
-        const url = issue_url+this.state.id.toString()+"/"
+        const url = issue_url + this.state.id.toString() + "/"
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -147,7 +165,7 @@ class IssueDetail extends Component {
     updateIssue() {
         let data = JSON.stringify(this.state.update)
         let IssueId = this.state.id
-        const url = issue_url+this.state.id.toString()+"/"
+        const url = issue_url + this.state.id.toString() + "/"
         fetch(url, {
             method: 'PATCH', body: data,
             headers: {
@@ -169,7 +187,7 @@ class IssueDetail extends Component {
 
     domainUpdate(string) {
         let { id } = this.state
-        const url = issue_url+this.state.id.toString()+"/"
+        const url = issue_url + this.state.id.toString() + "/"
         fetch(url, {
             method: 'PATCH',
             body: JSON.stringify({ domain: string }),
@@ -188,7 +206,7 @@ class IssueDetail extends Component {
     }
 
     statusUpdate(string) {
-        const url = issue_url+this.state.id.toString()+"/"
+        const url = issue_url + this.state.id.toString() + "/"
         fetch(url, {
             method: 'PATCH',
             body: JSON.stringify({ status: string }),
@@ -213,8 +231,8 @@ class IssueDetail extends Component {
         })
     }
     setImportant() {
-        const url = issue_url+this.state.id.toString()+"/"
-        const imp = this.state.bug.important 
+        const url = issue_url + this.state.id.toString() + "/"
+        const imp = this.state.bug.important
         fetch(url, {
             method: 'PATCH',
             body: JSON.stringify({ important: !imp }),
@@ -223,10 +241,10 @@ class IssueDetail extends Component {
                 'Authorization': `Token ${sessionStorage.getItem('token')}`,
             },
         }).then(res => {
-            if(res.status===200){
-                this.setState({bug: { ...this.state.bug, important: !imp}})
+            if (res.status === 200) {
+                this.setState({ bug: { ...this.state.bug, important: !imp } })
             }
-            else{
+            else {
                 console.log(res)
             }
         })
@@ -236,11 +254,9 @@ class IssueDetail extends Component {
     commentToggle = () => this.setState({ commentOpen: !this.state.commentOpen })
     settingToggle = () => this.setState({ settingsOpen: !this.state.settingsOpen })
     formToggle = () => this.setState({ updateForm: !this.state.updateForm })
-    toggleDeleteComment = () => this.setState({deleteCommentModalOpen:!this.state.deleteCommentModalOpen})
+    toggleDeleteComment = () => this.setState({ deleteCommentModalOpen: !this.state.deleteCommentModalOpen })
     render() {
-        const { bug } = this.state
-        const { commentOpen } = this.state
-        const { updateForm } = this.state
+        const { bug, commentOpen, updateForm, isUserAMember, isuserACreator } = this.state
         if (this.state.bug !== undefined) {
             return (
                 <Container>
@@ -256,7 +272,11 @@ class IssueDetail extends Component {
                         {!updateForm &&
                             <Card fluid color='red' className='IssueTop issue-head'>
                                 <Card.Content>
-                                    <Card.Header as='h2'>{bug.name} <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} /></Card.Header>
+                                    <Card.Header as='h2'>{bug.name}
+                                        {(isUserAMember || isuserACreator) &&
+                                            <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
+                                        }
+                                    </Card.Header>
                                     <Card.Meta>reported by {bug.creator_name}</Card.Meta>
                                 </Card.Content>
                                 <Card.Content>
@@ -265,7 +285,7 @@ class IssueDetail extends Component {
                                 <Card.Content extra><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /> <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span> </Card.Content>
                             </Card>
                         }
-                        {updateForm &&
+                        {updateForm && (isUserAMember || isuserACreator) &&
                             <Segment className='update-segment'>
                                 <Form className='update-form'>
                                     <Form.Input label='Title' placeholder='Title' name='name' value={this.state.update.title} onChange={this.onUpdate} />
@@ -286,7 +306,7 @@ class IssueDetail extends Component {
                                 <Button
                                     positive
                                     icon='checkmark'
-                                    content="Send"
+                                    content="Create"
                                     onClick={(event) => this.onCommentSubmit()}
                                 />
                             </Card.Content>
@@ -296,23 +316,25 @@ class IssueDetail extends Component {
                     <Container>
                         {this.listComments()}
                     </Container>
-                    {this.state.settingsOpen &&
+                    {this.state.settingsOpen && (isUserAMember || isuserACreator) &&
                         <div className='settings' style={{ backgroundImage: `url("${Background}")` }} >
                             <div className="close"><Icon name="times" size='large' onClick={this.settingToggle} /></div>
                             <div className="setting-box">
-                                <div className="icon-back">
-                                    <Modal basic trigger={<Icon name='trash' size='large' />} closeIcon>
-                                        <Header icon='archive' content='Delete This Issue' />
-                                        <Modal.Actions >
-                                            {/* <Button color='red'onClick={} icon='remove'  content='No' /> */}
-                                            <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
-                                        </Modal.Actions>
-                                    </Modal>
-                                </div>
+                                {isuserACreator &&
+                                    <div className="icon-back">
+                                        <Modal basic trigger={<Icon name='trash' size='large' />} closeIcon>
+                                            <Header icon='archive' content='Delete This Issue' />
+                                            <Modal.Actions >
+                                                {/* <Button color='red'onClick={} icon='remove'  content='No' /> */}
+                                                <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
+                                            </Modal.Actions>
+                                        </Modal>
+                                    </div>
+                                }
                                 <div className="icon-back">
                                     <Icon name='edit' size='large' onClick={(event) => { this.settingToggle(); this.formToggle() }} />
                                 </div>
-                                <div className={`icon-back ${(this.state.bug.important)?"selected":""}`}>
+                                <div className={`icon-back ${(this.state.bug.important) ? "selected" : ""}`}>
                                     <Icon name="check square" onClick={(event) => this.setImportant()} />
                                 </div>
                                 <div className="icon-back">
@@ -334,22 +356,22 @@ class IssueDetail extends Component {
                         </div>
                     }
 
-                    <Modal open = {this.state.deleteCommentModalOpen} dimmer onClose={()=>{this.toggleDeleteComment()}} basic size='small'>
-                        <Header icon='archive'  content='Delete this Comment' />
+                    <Modal open={this.state.deleteCommentModalOpen} dimmer onClose={() => { this.toggleDeleteComment() }} basic size='small'>
+                        <Header icon='archive' content='Delete this Comment' />
                         <Modal.Content>
-                          <p>
-                            Do you really want to remove this comment? This action is not reversible.
+                            <p>
+                                Do you really want to remove this comment? This action is not reversible.
                           </p>
                         </Modal.Content>
                         <Modal.Actions>
-                          <Button basic color='red' inverted onClick={()=>{this.toggleDeleteComment()}}>
-                            <Icon name='remove' /> No
+                            <Button basic color='red' inverted onClick={() => { this.toggleDeleteComment() }}>
+                                <Icon name='remove' /> No
                           </Button>
-                          <Button color='green' inverted onClick={()=>{this.deleteComment()}}>
-                            <Icon name='checkmark' /> Yes
+                            <Button color='green' inverted onClick={() => { this.deleteComment() }}>
+                                <Icon name='checkmark' /> Yes
                           </Button>
                         </Modal.Actions>
-                      </Modal>
+                    </Modal>
                 </Container>
             )
         }
