@@ -159,7 +159,7 @@ class HomePage extends Component {
         let base_url = issue_url
         let x = []
         if (this.state.activeDomain != null) {
-            x.push(`status=${this.state.activeDomain}`)
+            x.push(`domain=${this.state.activeDomain}`)
         }
         if (this.state.activeStatus != null) {
             x.push(`status=${this.state.activeStatus}`)
@@ -171,11 +171,20 @@ class HomePage extends Component {
             x.push(`creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`)
         }
         let params = x.join("&")
-        let url = base_url+"?"+params+"/"
+        let url = base_url+"?"+params
         this.get_content(url)        
     }
     async get_content(url){
+        const headers = JSON.parse(sessionStorage.getItem("header"))
+        let response = await fetch(url,{method:"GET",headers:headers})
         
+        if(response.status ===200){
+            let data = await response.json()
+            this.setState({data:data})
+        }
+        else{
+            console.log(response)
+        }
     }
 
     render() {
