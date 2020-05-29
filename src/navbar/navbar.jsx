@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
-import { Input, Menu, Icon,Popup, Button } from 'semantic-ui-react'
+import _ from 'lodash'
+import { Input, Menu, Icon,Popup, Button, Search } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 export default class NavBar extends Component {
   constructor(props) {
     super(props)
     this.logout = this.logout.bind(this)
+    this.handleSearchChange = this.handleSearchChange.bind(this)
     this.state = {
       activeItem: 'home',
-      isLoggedIn: false
+      isLoggedIn: false,
+      isLoadingSearch:false
     }
 
   }
@@ -57,6 +60,12 @@ export default class NavBar extends Component {
     this.setState({ isLoggedIn: isLoggedIn })
   }
 
+  handleSearchChange = (e, { value }) => {
+    this.setState({ isLoadingSearch: true, value })
+    const re = new RegExp(_.escapeRegExp(value, 'i'))
+    console.log(re)
+  }
+
 
   render() {
     const { activeItem } = this.state
@@ -76,7 +85,8 @@ export default class NavBar extends Component {
         ><Popup content='Home' trigger={<Icon name='home' size='large'/>} />
         </Menu.Item>
         <Menu.Item>
-          <Input className="search" icon='search' placeholder='Search...' />
+          {/* <Input className="search" icon='search' placeholder='Search...' /> */}
+          <Search fluid loading={this.state.isLoadingSearch} onSearchChange={this.handleSearchChange} results={this.state.searchResult}></Search>
         </Menu.Item>
         <Menu.Menu position='right'>
           {this.log_button()}

@@ -39,24 +39,22 @@ class ProjectDetail extends Component {
     handleDomainClick = (name) => this.setState({ activeDomain: name })
 
 
-    componentDidMount() {
+    async componentDidMount() {
         const project_detail_url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
         const get_issues_url = project_detail_url + "bugs/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
+        const warning_text = "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?"
+        let project_res = await fetch(project_detail_url, { headers: headers })
+        let data = await project_res.json()
+        this.setState({ data: data, member_names: data.member_names, warning_text: warning_text })
 
-        fetch(project_detail_url, { headers: headers }).then(res => res.json()).then((data) => {
-            console.log(Date.now())
-            this.setState({ data: data, member_names: data.member_names, warning_text: "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?" })
-            
-        })
+        let issues_res = await fetch(get_issues_url, { headers: headers })
+        let issue_data = await issues_res.json()
+        this.setState({ issue_data: issue_data })
 
-
-        fetch(get_issues_url, { headers: headers }).then(issue_res => issue_res.json()).then((issue_data) => {
-            this.setState({ issue_data: issue_data })
-        })
-
+        this.setPermissions()
         this.stateOptions()
-     
+
     }
 
 
@@ -127,12 +125,12 @@ class ProjectDetail extends Component {
 
     }
     setPermissions() {
-        const username = JSON.parse(sessionStorage.getItem("user_data")).username
-        const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
-        const isCreator = this.state.data.creator === user_id
-        const isMember = this.state.member_names.includes(username)
-        console.log(isCreator, isMember)
-        this.setState({ isUserATeamMember: true, isUserACreator: true })
+        // const username = JSON.parse(sessionStorage.getItem("user_data")).username
+        // const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
+        // const isCreator = this.state.data.creator === user_id
+        // const isMember = this.state.member_names.includes(username)
+        // console.log(isCreator, isMember)
+        // this.setState({ isUserATeamMember: true, isUserACreator: true })
     }
     DisPlayMembers() {
         const { member_names } = this.state
