@@ -4,6 +4,7 @@ import Pluralize from 'react-pluralize'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import EditorPage from './editor'
+import { project_url } from '../routes'
 class ProjectPage extends Component {
     constructor(props) {
         super(props)
@@ -16,7 +17,7 @@ class ProjectPage extends Component {
     componentDidMount() {
         let isLoggedIn = this.props.isLoggedIn || sessionStorage.getItem("isLoggedIn")
         this.setState({ isLoggedIn: isLoggedIn })
-        Axios.get('http://localhost:8000/bug_reporter/projects/', { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
+        Axios.get(project_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then(res => res.data)
             .then((data) => {
                 this.setState({ data: data })
@@ -62,7 +63,7 @@ class ProjectPage extends Component {
     close = () => this.setState({ open: false })
 
     createProject(body) {
-        fetch('http://localhost:8000/bug_reporter/projects/', {
+        fetch(project_url, {
             method: 'POST',
             body: body,
             headers: {
@@ -91,7 +92,7 @@ class ProjectPage extends Component {
         })
     }
 
-    handleProjectDescriptionEditorChange(content){
+    handleProjectDescriptionEditorChange(content) {
         this.setState({
             values: { ...this.state.values, "wiki": content }
         })
@@ -104,7 +105,7 @@ class ProjectPage extends Component {
     }
 
     fetch_content(type) {
-        let base_url = "http://localhost:8000/bug_reporter/projects/"
+        let base_url = project_url
         let userId = JSON.parse(sessionStorage.getItem("user_data")).id
         switch (type) {
             case "latest":
@@ -136,7 +137,7 @@ class ProjectPage extends Component {
 
 
     render() {
-        const { open, dimmer } = this.state
+        const { open } = this.state
         return (
             <Container className='project-box'>
                 <Header as="h2" color='red' className='projects-header'>Projects<Icon className='add-button' onClick={this.show('blurring')} name='plus' size='large' /></Header>
@@ -161,9 +162,9 @@ class ProjectPage extends Component {
                         <Modal.Description>
 
                             <Form>
-                            <Form.Input label="Title" name="name" value={this.state.name} onChange={this.onChange} placeholder="Title" />
-                            <EditorPage onEditorChange={this.handleProjectDescriptionEditorChange} placeholder="Descrpition" />
-                            <Form.Input label="Git Link" name="githublink" onChange={this.onChange} value={this.state.githublink} />
+                                <Form.Input label="Title" name="name" value={this.state.name} onChange={this.onChange} placeholder="Title" />
+                                <EditorPage onEditorChange={this.handleProjectDescriptionEditorChange} placeholder="Descrpition" />
+                                <Form.Input label="Git Link" name="githublink" onChange={this.onChange} value={this.state.githublink} />
                                 <Button
                                     positive
                                     type='submit'

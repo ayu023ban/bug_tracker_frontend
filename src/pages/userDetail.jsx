@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container, Card, Header, Menu, Form, Button, Breadcrumb, Icon, Divider, Grid, Segment, List } from "semantic-ui-react";
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
+import {user_url} from '../routes'
 
 
 
@@ -18,7 +19,7 @@ class UserDetail extends Component {
         }
     }
     componentDidMount() {
-        const url = `http://localhost:8000/bug_reporter/users/${this.state.id}/`
+        const url = user_url+this.state.id.toString()+"/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
         fetch(url, { method: "GET", headers: headers }).then((res) => {
             if (res.status === 200) {
@@ -61,8 +62,7 @@ class UserDetail extends Component {
                 array = null
         }
         const data = JSON.stringify(this.filter(this.state.update, array))
-        // console.log(data)
-        const url = `http://localhost:8000/bug_reporter/users/${this.state.id}/`
+        const url = user_url+this.state.id.toString()+"/"
         const headers = {
             "Content-type": "application/json; charset=UTF-8",
             'Authorization': `Token ${sessionStorage.getItem('token')}`,

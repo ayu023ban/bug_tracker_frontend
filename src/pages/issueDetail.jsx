@@ -3,6 +3,7 @@ import { Container, Card, Header, Breadcrumb, Form, Segment, Button, Icon, Divid
 import { Link } from 'react-router-dom'
 import { Editor } from '@tinymce/tinymce-react';
 import './scss/tinymce.css'
+import {issue_url,comment_url} from "../routes"
 import WebSocketInstance from './websocket'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
@@ -37,7 +38,7 @@ class IssueDetail extends Component {
         WebSocketInstance.connect(`ws://localhost:8000/bug_reporter/ws/comments/${this.state.id}`)
         WebSocketInstance.addCallbacks(this.commentsLoderFromWebsocket,this.newCommentFromWebsocket)
         this.ma = setInterval(this.fetchCommentFromWebSocket,500)
-        let issueurl = `http://localhost:8000/bug_reporter/bugs/${this.state.id}/`
+        const issueurl = issue_url+this.state.id.toString()+"/"
         fetch(issueurl, { headers: header }).then(res => res.json()).then((data) => {
             this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
         })
@@ -50,7 +51,6 @@ class IssueDetail extends Component {
         }
     }
     commentsLoderFromWebsocket(data){
-        console.log("test1")
         const comments = data["data"]
         this.setState({comments:comments})
     }
@@ -89,7 +89,8 @@ class IssueDetail extends Component {
     }
 
     deleteComment(){
-        const url = `http://localhost:8000/bug_reporter/comments/${this.state.commentToBeDelete}/`
+        // const url = `http://localhost:8000/bug_reporter/comments/${this.state.commentToBeDelete}/`
+        const url = comment_url+this.state.commentToBeDelete.toString()+"/"
         fetch(url,{
             method: 'DELETE',
             headers: {
@@ -109,19 +110,16 @@ class IssueDetail extends Component {
     }
 
     handleEditorChange(content) {
-        // console.log(content)
         this.setState({ commentDescription: content })
     }
     handleUpdateEditorChange(content) {
         this.setState({
             update: { ...this.state.update, "description": content }
         })
-        // console.log(this.state.update)
     }
 
     onUpdate = e => {
         const { name, value } = e.target
-        // console.log(this.state.update)
         this.setState({
             update: { ...this.state.update, [name]: value }
         })
@@ -133,8 +131,8 @@ class IssueDetail extends Component {
     }
 
     deleteIssue() {
-        const { id } = this.state
-        fetch(`http://localhost:8000/bug_reporter/bugs/${id}/`, {
+        const url = issue_url+this.state.id.toString()+"/"
+        fetch(url, {
             method: 'DELETE',
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
@@ -149,7 +147,8 @@ class IssueDetail extends Component {
     updateIssue() {
         let data = JSON.stringify(this.state.update)
         let IssueId = this.state.id
-        fetch(`http://localhost:8000/bug_reporter/bugs/${IssueId}/`, {
+        const url = issue_url+this.state.id.toString()+"/"
+        fetch(url, {
             method: 'PATCH', body: data,
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
@@ -170,7 +169,8 @@ class IssueDetail extends Component {
 
     domainUpdate(string) {
         let { id } = this.state
-        fetch(`http://127.0.0.1:8000/bug_reporter/bugs/${id}/`, {
+        const url = issue_url+this.state.id.toString()+"/"
+        fetch(url, {
             method: 'PATCH',
             body: JSON.stringify({ domain: string }),
             headers: {
@@ -188,8 +188,8 @@ class IssueDetail extends Component {
     }
 
     statusUpdate(string) {
-        let { id } = this.state
-        fetch(`http://localhost:8000/bug_reporter/bugs/${id}/`, {
+        const url = issue_url+this.state.id.toString()+"/"
+        fetch(url, {
             method: 'PATCH',
             body: JSON.stringify({ status: string }),
             headers: {
@@ -213,9 +213,9 @@ class IssueDetail extends Component {
         })
     }
     setImportant() {
-        const { id } = this.state
+        const url = issue_url+this.state.id.toString()+"/"
         const imp = this.state.bug.important 
-        fetch(`http://127.0.0.1:8000/bug_reporter/bugs/${id}/`, {
+        fetch(url, {
             method: 'PATCH',
             body: JSON.stringify({ important: !imp }),
             headers: {

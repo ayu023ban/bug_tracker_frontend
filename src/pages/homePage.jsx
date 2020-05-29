@@ -4,6 +4,7 @@ import moment from 'moment'
 import './scss/homePage.scss'
 import './scss/tinymce.css'
 import { Editor } from '@tinymce/tinymce-react';
+import {issue_url} from '../routes'
 
 class IssueCard extends Component {
     constructor(props) {
@@ -69,14 +70,14 @@ class HomePage extends Component {
     componentDidMount() {
         let isLoggedIn = this.props.isLoggedIn || sessionStorage.getItem("isLoggedIn")
         this.setState({ isLoggedIn: isLoggedIn })
-        fetch('http://localhost:8000/bug_reporter/bugs/', { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
+        fetch(issue_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then(res => res.json())
             .then((data) => {
                 this.setState({ data: data })
             });
     }
     fetch_content(type) {
-        let base_url = "http://localhost:8000/bug_reporter/bugs/"
+        let base_url = issue_url
         switch (type) {
             case "latest":
                 base_url += "?ordering=-issued_at"

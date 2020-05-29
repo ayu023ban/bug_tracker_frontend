@@ -1,0 +1,15 @@
+const protocol = "http"
+const hostname = "localhost"
+const port ="8000"
+const base_path = "bug_reporter"
+const comment = "comments"
+const issue = "bugs"
+const user = "users"
+const project = "projects"
+export const host = `${hostname}:${port}`
+export const origin = `${protocol}://${host}`
+export const full_origin = `${origin}/${base_path}/`
+export const user_url = `${full_origin}${user}/`
+export const issue_url = `${full_origin}${issue}/`
+export const project_url = `${full_origin}${project}/`
+export const comment_url = `${full_origin}${comment}/`

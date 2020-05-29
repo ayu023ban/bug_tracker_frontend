@@ -5,6 +5,7 @@ import Pluralize from 'react-pluralize'
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
+import {project_url,user_url,issue_url} from '../routes'
 import axios from 'axios'
 import EditorPage from './editor'
 import { IssueCard } from './homePage'
@@ -40,7 +41,7 @@ class ProjectDetail extends Component {
 
 
     async componentDidMount() {
-        const project_detail_url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
+        const project_detail_url = project_url+this.state.id.toString()+"/"
         const get_issues_url = project_detail_url + "bugs/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
         const warning_text = "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?"
@@ -60,7 +61,7 @@ class ProjectDetail extends Component {
 
     deleteCurrentProject() {
         console.log(this.state.id)
-        const url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/`
+        const url = project_url+this.state.id.toString()+"/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
         fetch(url, { method: 'DELETE', headers: headers }).then((res) => {
             if (res.status === 204) {
@@ -73,9 +74,8 @@ class ProjectDetail extends Component {
     }
 
     stateOptions() {
-        const url = "http://localhost:8000/bug_reporter/users/"
         const header = JSON.parse(sessionStorage.getItem("header"))
-        fetch(url, { headers: header }).then(res => res.json()).then((data) => {
+        fetch(user_url, { headers: header }).then(res => res.json()).then((data) => {
             const user_data = data.map((element) => {
                 return {
                     key: element.id.toString(),
@@ -93,7 +93,8 @@ class ProjectDetail extends Component {
             return Number(obj.key)
         })
         const body = JSON.stringify({ members: user_id })
-        const url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/update_members/`
+        // const url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/update_members/`
+        const url = project_url+this.state.id.toString()+"/update_members/"
         const params = { method: 'PATCH', body: body, headers: { 'Content-Type': 'application/json', "Authorization": `Token ${sessionStorage.getItem("token")}` } }
         fetch(url, params).then(res => res.json()).then(res => res.user_ids).then((user_ids) => {
             const user_names = user_ids.map((id) => {
@@ -189,13 +190,13 @@ class ProjectDetail extends Component {
 
     createIssue(data) {
         console.log(data)
-        const url = 'http://localhost:8000/bug_reporter/bugs/'
+        // const url = 'http://localhost:8000/bug_reporter/bugs/'
         const header = {
             "Content-Type": "application/json",
             // 'Accept':"application/json; charset=UTF-8",
             "Authorization": `Token ${sessionStorage.getItem("token")}`
         }
-        axios.post(url, data, { headers: header }).then((res) => {
+        axios.post(issue_url, data, { headers: header }).then((res) => {
             if (res.status === 201) {
                 this.newIssueClose()
             }
@@ -226,8 +227,8 @@ class ProjectDetail extends Component {
     }
     updateProject() {
         let data = JSON.stringify(this.state.updateProjectValues)
-        let ProjectId = this.state.id
-        fetch(`http://localhost:8000/bug_reporter/projects/${ProjectId}/`, {
+        const project_detail_url = project_url+this.state.id.toString()+"/"
+        fetch(project_detail_url, {
             method: 'PATCH', body: data,
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
@@ -396,7 +397,7 @@ class ProjectDetail extends Component {
         }
         else {
             return (
-                <div>This issue is currently not available</div>
+                <div>This project is currently not available</div>
             )
         }
     }
