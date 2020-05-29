@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Segment, Button, Container, Header, Breadcrumb, Card, Icon, Transition, Label } from 'semantic-ui-react';
+import { Segment, Button, Grid, Container, Header, Breadcrumb, Card, Icon, Transition, Label } from 'semantic-ui-react';
 import moment from 'moment'
 import './scss/homePage.scss'
 import './scss/tinymce.css'
-import { Editor } from '@tinymce/tinymce-react';
-import {issue_url} from '../routes'
+// import { Editor } from '@tinymce/tinymce-react';
+import { issue_url } from '../routes'
 
 class IssueCard extends Component {
     constructor(props) {
@@ -20,7 +20,7 @@ class IssueCard extends Component {
     handleClickCardDescription(bug) {
         this.props.history.push({
             pathname: '/issue',
-            state: {bug:bug.id }
+            state: { bug: bug.id }
         })
     }
 
@@ -34,7 +34,7 @@ class IssueCard extends Component {
                     <Card.Header>
                         <Icon name={(large) ? ("minus") : ("plus")} size='large' onClick={this.toggle} color='red' />
                         {bug.name}
-                        <Icon name='reply' className='add-button' color='red'size='large' onClick={() => { this.handleClickCardDescription(bug) }}  />
+                        <Icon name='reply' className='add-button' color='red' size='large' onClick={() => { this.handleClickCardDescription(bug) }} />
                         <Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
                     </Card.Header>
                 </Card.Content>
@@ -42,7 +42,7 @@ class IssueCard extends Component {
                     <Transition.Group >
                         <Card.Content   >
                             <Card.Description >
-                            <div dangerouslySetInnerHTML={{ __html: bug.description }} />
+                                <div dangerouslySetInnerHTML={{ __html: bug.description }} />
                             </Card.Description>
                         </Card.Content>
                         <Card.Content extra >
@@ -64,7 +64,12 @@ class HomePage extends Component {
         this.updateIssue = this.updateIssue.bind(this)
         this.state = {
             data: [],
-            isLoggedIn: false
+            visible: false,
+            isLoggedIn: false,
+            activeDomain: null,
+            activeStatus: null,
+            important: false,
+            myIssue: false,
         }
     }
     componentDidMount() {
@@ -96,12 +101,12 @@ class HomePage extends Component {
                 break
             case "myissue":
                 // base_url += "mybugs/"
-                base_url +=`?creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`
+                base_url += `?creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`
                 break
             default:
                 base_url += ""
         }
-        
+
         fetch(base_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then((res => res.json()))
             .then((data) => {
@@ -131,10 +136,50 @@ class HomePage extends Component {
         return listCards
     }
 
-    
+    toggleFilter = () => this.setState({ visible: !this.state.visible })
+    async handleStatusClick(status) {
+        (status === this.state.activeStatus) ? await this.setState({ activeStatus: null }) : await this.setState({ activeStatus: status })
+        this.generateUrl()
 
+    }
+    async handleDomainClick(domain) {
+        (domain === this.state.activeDomain) ? await this.setState({ activeDomain: null }) : await this.setState({ activeDomain: domain })
+        this.generateUrl()
+    }
+    async handlemyIssueClick() {
+        await this.setState({ myIssue: !this.state.myIssue })
+        this.generateUrl()
+    }
+    async handleImportantClick() {
+        await this.setState({ important: !this.state.important })
+        this.generateUrl()
+    }
+
+    generateUrl() {
+        let base_url = issue_url
+        let x = []
+        if (this.state.activeDomain != null) {
+            x.push(`status=${this.state.activeDomain}`)
+        }
+        if (this.state.activeStatus != null) {
+            x.push(`status=${this.state.activeStatus}`)
+        }
+        if (this.state.important) {
+            x.push("important=true")
+        }
+        if (this.state.myIssue) {
+            x.push(`creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`)
+        }
+        let params = x.join("&")
+        let url = base_url+"?"+params+"/"
+        this.get_content(url)        
+    }
+    async get_content(url){
+        
+    }
 
     render() {
+        const { visible } = this.state
         return (
             <div className="HomePage">
                 <Container>
@@ -145,7 +190,43 @@ class HomePage extends Component {
                     </Breadcrumb>
                     <Header dividing />
                     <Container>
-                        <Segment.Group horizontal>
+                        <Button icon="options" content="filter" onClick={() => { this.toggleFilter() }} />
+                        <Transition visible={visible} duration={500} animation="slide down">
+                            <Segment>
+                                <Grid style={{ justifyContent: "space-evenly" }}>
+                                    <Grid.Row textAlign='center' columns={4}>
+                                        <Grid.Column> <Header>Status</Header></Grid.Column>
+                                        <Grid.Column><Header>Domain</Header></Grid.Column>
+                                        <Grid.Column><Header>My Issues</Header></Grid.Column>
+                                        <Grid.Column><Header>Important</Header></Grid.Column>
+                                    </Grid.Row>
+                                    <Grid.Row textAlign='center' columns={4} >
+                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                            <Button color='red' basic={!(this.state.activeStatus === "P")} onClick={() => { this.handleStatusClick("P") }}> Pending</Button>
+                                            <Button color='blue' basic={!(this.state.activeStatus === "R")} onClick={() => { this.handleStatusClick("R") }} > Resolved</Button>
+                                            <Button color='green' basic={!(this.state.activeStatus === "T")} onClick={() => { this.handleStatusClick("T") }} > To Be Discussed</Button>
+                                        </Grid.Column>
+                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                            <Button color='red' basic={!(this.state.activeDomain === "f")} onClick={() => { this.handleDomainClick("f") }}> Front End</Button>
+                                            <Button color='blue' basic={!(this.state.activeDomain === "b")} onClick={() => { this.handleDomainClick("b") }} > Back End</Button>
+                                            <Button color='green' basic={!(this.state.activeDomain === "o")} onClick={() => { this.handleDomainClick("o") }} > Other</Button>
+                                        </Grid.Column>
+                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                            <Button basic={!this.state.myIssue} color='red' onClick={(event) => { this.handlemyIssueClick() }}> My Issues</Button>
+                                        </Grid.Column>
+                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                            <Button basic={!this.state.important} color='red' onClick={(event) => { this.handleImportantClick() }}> Important</Button>
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                </Grid>
+                            </Segment>
+                        </Transition>
+
+
+
+
+
+                        {/* <Segment.Group horizontal>
                             <Segment horizontal textAlign='center' children={Button} >
                                 <Button basic color='red' onClick={(event) => { this.updateIssue("P") }}> Pending</Button>
                                 <Button basic color='blue' onClick={(event) => { this.updateIssue("R") }} > Resolved</Button>
@@ -157,7 +238,7 @@ class HomePage extends Component {
                                 <Button basic color='green' onClick={(event) => { this.updateIssue("tag") }} > Tags</Button>
                                 <Button basic color='violet' onClick={(event) => { this.updateIssue("imp") }} > Important</Button>
                             </Segment>
-                        </Segment.Group>
+                        </Segment.Group> */}
                     </Container>
                     <Header dividing />
                     <Container >
