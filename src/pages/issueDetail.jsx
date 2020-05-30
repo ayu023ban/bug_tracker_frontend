@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Container, Label, Card, Header, Breadcrumb, Form, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { Editor } from '@tinymce/tinymce-react';
+// import { Editor } from '@tinymce/tinymce-react';
 import './scss/tinymce.css'
 import { issue_url, comment_url, project_url } from "../routes"
 import WebSocketInstance from './websocket'
@@ -180,7 +180,6 @@ class IssueDetail extends Component {
 
     updateIssue() {
         let data = JSON.stringify(this.state.update)
-        let IssueId = this.state.id
         const url = issue_url + this.state.id.toString() + "/"
         fetch(url, {
             method: 'PATCH', body: data,
@@ -202,7 +201,6 @@ class IssueDetail extends Component {
     }
 
     domainUpdate(string) {
-        let { id } = this.state
         const url = issue_url + this.state.id.toString() + "/"
         fetch(url, {
             method: 'PATCH',

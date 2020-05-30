@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Container, Header, Breadcrumb, Segment, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed, Form } from 'semantic-ui-react'
 import moment from 'moment'
-import Pluralize from 'react-pluralize'
+// import Pluralize from 'react-pluralize'
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'

@@ -156,7 +156,7 @@ class ProjectPage extends Component {
 
                 </Container>
 
-                <Modal open={open} onClose={this.close} closeOnDocumentClick closeOnDimmerClick closeOnEscape size='large' >
+                <Modal open={open} onClose={this.close} closeOnDimmerClick={false} closeOnEscape size='large' >
                     <Modal.Header>Create New Project</Modal.Header>
                     <Modal.Content scrolling size='large'>
                         <Modal.Description>
