@@ -170,9 +170,10 @@ class HomePage extends Component {
         if (this.state.myIssue) {
             x.push(`creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`)
         }
-        let params = x.join("&")
-        let url = base_url+"?"+params
-        this.get_content(url)        
+        let params = x.join("&") 
+        let q = (x.length!==0)?"?":""
+        let url = base_url+q+params
+        this.get_content(url) 
     }
     async get_content(url){
         const headers = JSON.parse(sessionStorage.getItem("header"))

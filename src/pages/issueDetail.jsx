@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Card, Header, Breadcrumb, Form, Segment, Button, Icon, Divider, Modal } from 'semantic-ui-react'
+import { Container, Label, Card, Header, Breadcrumb, Form, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { Editor } from '@tinymce/tinymce-react';
 import './scss/tinymce.css'
@@ -15,6 +15,7 @@ class IssueDetail extends Component {
     constructor(props) {
         super(props)
         this.handleEditorChange = this.handleEditorChange.bind(this)
+        this.assignDropClick = this.assignDropClick.bind(this)
         this.commentsLoderFromWebsocket = this.commentsLoderFromWebsocket.bind(this)
         this.newCommentFromWebsocket = this.newCommentFromWebsocket.bind(this)
         this.handleUpdateEditorChange = this.handleUpdateEditorChange.bind(this)
@@ -28,8 +29,10 @@ class IssueDetail extends Component {
             settingsOpen: false,
             updateForm: false,
             update: [],
+            members_data_for_search: [],
             updateFormDescription: null,
             deleteCommentModalOpen: false,
+            editAssign: false
         }
     }
 
@@ -67,13 +70,26 @@ class IssueDetail extends Component {
         const header = JSON.parse(sessionStorage.getItem("header"))
         const res = await fetch(url, { method: "GET", headers: header })
         let members = await res.json()
+        let members_data_for_search = []
+        for (let i = 0; i < members.members.length; i++) {
+            let obj = {
+                key: members.members[i],
+                text: members.member_names[i],
+                value: members.member_names[i]
+            }
+            members_data_for_search.push(obj)
+        }
         members = members.members
         const user = JSON.parse(sessionStorage.getItem("user_data"))
         const userId = user.id
         const isMaster = user.isMaster
         const isuserACreator = this.state.bug.creator === userId || isMaster
         const isUserAMember = members.includes(userId) || isMaster
-        this.setState({ isUserAMember: isUserAMember, isuserACreator: isuserACreator })
+        this.setState({
+            isUserAMember: isUserAMember,
+            isuserACreator: isuserACreator,
+            members_data_for_search: members_data_for_search
+        })
     }
     listComments() {
         const { comments } = this.state
@@ -85,7 +101,7 @@ class IssueDetail extends Component {
                     <Card.Content>
                         <Card.Description className="commentCardDescription">
                             <div dangerouslySetInnerHTML={{ __html: comment.description }} />
-                            { userId === comment.creator &&
+                            {userId === comment.creator &&
                                 <Icon name='trash' size='large' color='red' onClick={() => {
                                     this.setState({ commentToBeDelete: comment.id })
                                     this.toggleDeleteComment()
@@ -249,6 +265,64 @@ class IssueDetail extends Component {
             }
         })
     }
+    assignComponent() {
+        let search;
+        if (this.state.isUserAMember) {
+            search =
+                <span style={{ display: "flex", alignItems: "center" }}>
+                    {(this.state.editAssign) ?
+                        <Dropdown
+                            placeholder='Select Member to assign'
+                            fluid
+                            search
+                            clearable
+                            closeOnChange={false}
+                            onClose={() => { this.setState({ editAssign: !this.state.editAssign }) }}
+                            selection
+                            onChange={this.assignDropClick}
+                            options={this.state.members_data_for_search}
+                        />
+                        :
+                        <span>
+                            {(this.state.bug.assigned_to != null)?
+                                <span>
+                                    assigned to {this.state.bug.assigned_name}
+                                </span>
+                                :
+                                <span>assign to team member</span>
+                            }
+                            <Button icon="edit" style={{ backgroundColor: "inherit" }} onClick={() => { this.setState({ editAssign: !this.state.editAssign }) }} />
+                        </span>
+                    }
+                </span>
+        }
+        else if (this.state.bug.assigned_to != null) {
+            search = <span>reported to {this.state.bug.assigned_name}</span>
+        }
+        else {
+            search = <span></span>
+        }
+        return search
+    }
+    async assignDropClick(event, data) {
+        const member = this.state.members_data_for_search.find(o => o.value === data.value)
+        let member_id
+        if (member !== undefined) {
+             member_id = member.key
+            
+        }
+        else{
+            member_id = "None"
+        }
+        let url = `${issue_url}${this.state.id}/assign/?assign_to=${member_id}`
+        console.log(url)
+            const headers = JSON.parse(sessionStorage.getItem("header"))
+            let res = await fetch(url, { method: "GET", headers: headers })
+            if (res.status === 202) {
+                data = await res.json()
+                this.setState({ bug: data })
+            }
+    }
 
 
     commentToggle = () => this.setState({ commentOpen: !this.state.commentOpen })
@@ -277,12 +351,17 @@ class IssueDetail extends Component {
                                             <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
                                         }
                                     </Card.Header>
+                                    <Label ribbon='right'>{bug.project_name}</Label>
                                     <Card.Meta>reported by {bug.creator_name}</Card.Meta>
                                 </Card.Content>
                                 <Card.Content>
                                     <Card.Description><div dangerouslySetInnerHTML={{ __html: bug.description }} /></Card.Description>
                                 </Card.Content>
-                                <Card.Content extra><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /> <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span> </Card.Content>
+                                <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between",alignItems:"center" }} >
+                                    <span><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /></span>
+                                    {this.assignComponent()}
+                                    <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span>
+                                </Card.Content>
                             </Card>
                         }
                         {updateForm && (isUserAMember || isuserACreator) &&

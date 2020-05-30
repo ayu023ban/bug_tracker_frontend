@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Container, Card, Header, Menu, Form, Button, Breadcrumb, Icon, Divider, Grid, Segment, List } from "semantic-ui-react";
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
-import {user_url} from '../routes'
+import { user_url } from '../routes'
 
 
 
@@ -19,7 +19,7 @@ class UserDetail extends Component {
         }
     }
     componentDidMount() {
-        const url = user_url+this.state.id.toString()+"/"
+        const url = user_url + this.state.id.toString() + "/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
         fetch(url, { method: "GET", headers: headers }).then((res) => {
             if (res.status === 200) {
@@ -62,7 +62,7 @@ class UserDetail extends Component {
                 array = null
         }
         const data = JSON.stringify(this.filter(this.state.update, array))
-        const url = user_url+this.state.id.toString()+"/"
+        const url = user_url + this.state.id.toString() + "/"
         const headers = {
             "Content-type": "application/json; charset=UTF-8",
             'Authorization': `Token ${sessionStorage.getItem('token')}`,
@@ -77,8 +77,8 @@ class UserDetail extends Component {
         }
     }
     render() {
-        const { userData } = this.state
-        const { activeItem } = this.state;
+        const { userData, activeItem } = this.state
+        const isUserCreator = this.state.id === JSON.parse(sessionStorage.getItem("user_data")).id
         const isGithub = userData != null && userData.githubLink !== "" && userData.githubLink !== null && userData.githubLink !== undefined
         const isFacebook = userData != null && userData.facebookLink !== "" && userData.facebookLink !== null && userData.facebookLink !== undefined
         const isInstagram = userData != null && userData.instagramLink !== "" && userData.instagramLink !== null && userData.instagramLink !== undefined
@@ -90,7 +90,7 @@ class UserDetail extends Component {
                 <Container>
                     <Header>
                         <Breadcrumb as={Header}>
-                            <Breadcrumb.Section className='previousSection' as={Link} to='/users'>Issues</Breadcrumb.Section>
+                            <Breadcrumb.Section className='previousSection' as={Link} to='/users'>Users</Breadcrumb.Section>
                             <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
                             <Breadcrumb.Section>{userData.username}</Breadcrumb.Section>
                         </Breadcrumb>
@@ -101,7 +101,7 @@ class UserDetail extends Component {
                             <Grid>
                                 {/* <Grid.Row> */}
                                 <Grid.Column width={5} >
-                                    <Avatar name={userData.username} />
+                                    <Avatar size='225' name={userData.username} />
                                 </Grid.Column>
                                 <Grid.Column width={10}>
                                     <Grid>
@@ -146,119 +146,123 @@ class UserDetail extends Component {
                         </Card.Content>
                     </Card>
                     <Divider hidden section />
-                    <Menu attached="top" tabular>
-                        <Menu.Item
-                            name="Email"
-                            active={activeItem === "Email"}
-                            onClick={this.handleItemClick}
-                        />
-                        <Menu.Item
-                            name="Username"
-                            active={activeItem === "Username"}
-                            onClick={this.handleItemClick}
-                        />
-                        <Menu.Item
-                            name="Social Link"
-                            active={activeItem === "Social Link"}
-                            onClick={this.handleItemClick}
-                        />
-                    </Menu>
-                    <Segment attached="bottom" className="form-segment">
-                        {this.state.activeItem === "Email" &&
-                            <Form className="email-form">
-                                <Form.Input
-                                    label="Email"
-                                    placeholder="Email"
-                                    name="socialEmail"
-                                    value={this.state.update.socialEmail}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Input
-                                    label="Email Confirmation"
-                                    placeholder="Email"
-                                    name="socialEmailConfirmation"
-                                    value={this.state.update.socialEmailConfirmation}
-                                    onChange={this.updateForm}
-                                />
-                                <Button
-                                    positive
-                                    type="submit"
-                                    icon="checkmark"
-                                    content="Update"
-                                    onClick={this.formSubmit}
-                                    className="form-submit"
-                                />
-                            </Form>
-                        }
-                        {this.state.activeItem === "Username" &&
-                            <Form className="username-form">
-                                <Form.Input
-                                    label="Username"
-                                    placeholder="username"
-                                    name="username"
-                                    value={this.state.update.username}
-                                    onChange={this.updateForm}
-                                />
-                                <Button
-                                    positive
-                                    type="submit"
-                                    icon="checkmark"
-                                    content="Update"
-                                    onClick={this.formSubmit}
-                                    className="username-submit"
-                                />
-                            </Form>
-                        }
-                        {this.state.activeItem === "Social Link" &&
-                            <Form className="social-form">
-                                <Form.Input
-                                    label="GitHub"
-                                    placeholder="put your Github profile link here"
-                                    name="githublink"
-                                    value={this.state.update.githubLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Input
-                                    label="Facebook"
-                                    placeholder="put your Facebook profile link here"
-                                    name="facebookLink"
-                                    value={this.state.update.facebookLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Input
-                                    label="LinkedIn"
-                                    placeholder="put your Linked profile link here"
-                                    name="linkedinLink"
-                                    value={this.state.update.linkedinLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Input
-                                    label="Instagram"
-                                    placeholder="put your Instagram profile link here"
-                                    name="instagramLink"
-                                    value={this.state.update.instagramLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Button
-                                    positive
-                                    type="submit"
-                                    icon="checkmark"
-                                    content="Update"
-                                    onClick={this.formSubmit}
-                                    className="social-submit"
-                                />
-                            </Form>
-                        }
-                    </Segment>
+                    {isUserCreator &&
+                        <Menu attached="top" tabular>
+                            <Menu.Item
+                                name="Email"
+                                active={activeItem === "Email"}
+                                onClick={this.handleItemClick}
+                            />
+                            <Menu.Item
+                                name="Username"
+                                active={activeItem === "Username"}
+                                onClick={this.handleItemClick}
+                            />
+                            <Menu.Item
+                                name="Social Link"
+                                active={activeItem === "Social Link"}
+                                onClick={this.handleItemClick}
+                            />
+                        </Menu>
+                    }
+                    {isUserCreator &&
+                        <Segment attached="bottom" className="form-segment">
+                            {this.state.activeItem === "Email" &&
+                                <Form className="email-form">
+                                    <Form.Input
+                                        label="Email"
+                                        placeholder="Email"
+                                        name="socialEmail"
+                                        value={this.state.update.socialEmail}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Input
+                                        label="Email Confirmation"
+                                        placeholder="Email"
+                                        name="socialEmailConfirmation"
+                                        value={this.state.update.socialEmailConfirmation}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Button
+                                        positive
+                                        type="submit"
+                                        icon="checkmark"
+                                        content="Update"
+                                        onClick={this.formSubmit}
+                                        className="form-submit"
+                                    />
+                                </Form>
+                            }
+                            {this.state.activeItem === "Username" &&
+                                <Form className="username-form">
+                                    <Form.Input
+                                        label="Username"
+                                        placeholder="username"
+                                        name="username"
+                                        value={this.state.update.username}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Button
+                                        positive
+                                        type="submit"
+                                        icon="checkmark"
+                                        content="Update"
+                                        onClick={this.formSubmit}
+                                        className="username-submit"
+                                    />
+                                </Form>
+                            }
+                            {this.state.activeItem === "Social Link" &&
+                                <Form className="social-form">
+                                    <Form.Input
+                                        label="GitHub"
+                                        placeholder="put your Github profile link here"
+                                        name="githublink"
+                                        value={this.state.update.githubLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Input
+                                        label="Facebook"
+                                        placeholder="put your Facebook profile link here"
+                                        name="facebookLink"
+                                        value={this.state.update.facebookLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Input
+                                        label="LinkedIn"
+                                        placeholder="put your Linked profile link here"
+                                        name="linkedinLink"
+                                        value={this.state.update.linkedinLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Input
+                                        label="Instagram"
+                                        placeholder="put your Instagram profile link here"
+                                        name="instagramLink"
+                                        value={this.state.update.instagramLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Button
+                                        positive
+                                        type="submit"
+                                        icon="checkmark"
+                                        content="Update"
+                                        onClick={this.formSubmit}
+                                        className="social-submit"
+                                    />
+                                </Form>
+                            }
+                        </Segment>
+                    }
                     <Divider hidden section />
-                    <div style={{display:"grid",gridTemplateColumns:"auto auto",justifyContent:"space-evenly" }} >
-                        <Segment circular style={{ width: 175, height: 175,margin:"0" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "auto auto", justifyContent: "space-evenly" }} >
+                        <Segment circular style={{ width: 175, height: 175, margin: "0" }}>
                             <Header as='h2'>
                                 Projects
                                 <Header.Subheader>{userData.no_of_projects}</Header.Subheader>
                             </Header>
                         </Segment>
-                        <Segment circular inverted style={{ width: 175, height: 175,margin:"0" }}>
+                        <Segment circular inverted style={{ width: 175, height: 175, margin: "0" }}>
                             <Header inverted as='h2'>
                                 Issues
                             <Header.Subheader>{userData.no_of_issues}</Header.Subheader>
