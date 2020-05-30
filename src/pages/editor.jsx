@@ -23,8 +23,8 @@ class EditorPage extends React.Component {
           apiKey="81jvj4ftt29hdio9oky5wnvlxtugicmawfi048fvjjf2dlg8"
           init={{
             placeholder: placeholder,
-            plugins: ' emoticons placeholder  linkchecker link image imagetools autolink lists checklist quicklink blockquote powerpaste quickbars codesample hr autoresize',
-            toolbar: ' emoticons quickimage codesample | link hr | bold italic underline | formatselect | bullist numlist checklist | undo redo ',
+            plugins: ' emoticons placeholder  linkchecker link image imagetools autolink lists checklist quicklink powerpaste quickbars blockquote codesample hr autoresize',
+            toolbar: ' emoticons blockquote quickimage codesample | link hr | bold italic underline | formatselect | bullist numlist checklist | undo redo ',
             toolbar_mode: 'floating',
             images_upload_handler: async function (blobInfo, success, failure) {
               let formData = new FormData()

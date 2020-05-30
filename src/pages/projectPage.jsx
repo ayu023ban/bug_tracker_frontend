@@ -1,10 +1,19 @@
 import React, { Component } from 'react'
-import { Segment, Container, Modal, Header, Button, Card, Icon, Image, Divider, Form } from 'semantic-ui-react'
+import { Segment, Container, Modal, Header, Button, Card, Icon, Image, Divider, Form, Input } from 'semantic-ui-react'
 import Pluralize from 'react-pluralize'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import EditorPage from './editor'
 import { project_url } from '../routes'
+
+
+function isGitUrl(str) {
+    var regex = /^(?:git|ssh|https?|git@[-\w.]+):(\/\/)(github\.com)\/(\w{1,})\/(\w{1,})\/?$/;
+    // return regex.test(str);
+    return str.match(regex)
+};
+
+
 class ProjectPage extends Component {
     constructor(props) {
         super(props)
@@ -12,6 +21,8 @@ class ProjectPage extends Component {
         this.state = {
             data: [],
             isLoggedIn: false,
+            projectNameError: true,
+            projectLinkError: false
         }
     }
     componentDidMount() {
@@ -87,8 +98,24 @@ class ProjectPage extends Component {
 
     onChange = e => {
         const { name, value } = e.target
+        let nameError, gitlinkerror
+        if (name === "name") {
+            (value.length <= 0 || value.length > 20) ? nameError = {
+                content: "name can be between 0 and 20 characters",
+                pointing: 'below'
+            } : nameError = false
+        }
+        if (name === "githublink") {
+
+            !isGitUrl(value) && value.length >0 ? gitlinkerror = {
+                content: "please provide valid github repo link",
+                pointing: 'below'
+            } : gitlinkerror = false
+        }
         this.setState({
-            values: { ...this.state.values, [name]: value }
+            values: { ...this.state.values, [name]: value },
+            projectNameError: nameError,
+            projectLinkError: gitlinkerror,
         })
     }
 
@@ -162,14 +189,15 @@ class ProjectPage extends Component {
                         <Modal.Description>
 
                             <Form>
-                                <Form.Input label="Title" name="name" value={this.state.name} onChange={this.onChange} placeholder="Title" />
-                                <EditorPage onEditorChange={this.handleProjectDescriptionEditorChange}  placeholder="Descrpition" />
-                                <Form.Input label="Git Link" name="githublink" onChange={this.onChange} value={this.state.githublink} />
+                                <Form.Field control={Input} error={this.state.projectNameError} required label="Title" name="name" value={this.state.name} onChange={this.onChange} placeholder="Title" />
+                                <EditorPage onEditorChange={this.handleProjectDescriptionEditorChange} placeholder="Descrpition" />
+                                <Form.Field control={Input} error={this.state.projectLinkError} label="Git Link" name="githublink" onChange={this.onChange} value={this.state.githublink} />
                                 <Button
                                     positive
                                     type='submit'
                                     icon='checkmark'
                                     content="Create"
+                                    disabled={this.state.projectLinkError || this.state.projectNameError}
                                     onClick={(event) => this.onSubmit()}
                                 />
                             </Form>
