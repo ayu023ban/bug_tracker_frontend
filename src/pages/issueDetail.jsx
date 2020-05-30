@@ -366,7 +366,7 @@ class IssueDetail extends Component {
                             <Segment className='update-segment'>
                                 <Form className='update-form'>
                                     <Form.Input label='Title' placeholder='Title' name='name' value={this.state.update.title} onChange={this.onUpdate} />
-                                    <EditorPage onEditorChange={this.handleUpdateEditorChange} placeholder="Description" />
+                                    <EditorPage onEditorChange={this.handleUpdateEditorChange} bug={this.state.id} placeholder="Description" />
                                     <Button positive type='submit' icon='checkmark' content="Update" onClick={(event) => this.updateIssue()} className='form-submit' />
                                     <div className='close'>
                                         <Icon name="times" onClick={(event) => this.formToggle()} />

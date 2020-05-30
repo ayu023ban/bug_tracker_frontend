@@ -163,7 +163,7 @@ class ProjectPage extends Component {
 
                             <Form>
                                 <Form.Input label="Title" name="name" value={this.state.name} onChange={this.onChange} placeholder="Title" />
-                                <EditorPage onEditorChange={this.handleProjectDescriptionEditorChange} placeholder="Descrpition" />
+                                <EditorPage onEditorChange={this.handleProjectDescriptionEditorChange}  placeholder="Descrpition" />
                                 <Form.Input label="Git Link" name="githublink" onChange={this.onChange} value={this.state.githublink} />
                                 <Button
                                     positive

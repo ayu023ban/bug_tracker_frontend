@@ -2,22 +2,7 @@ import React from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Container } from 'semantic-ui-react'
 import axios from 'axios'
-
-function getCookie(cname) {
-  var name = cname + "=";
-  var decodedCookie = decodeURIComponent(document.cookie);
-  var ca = decodedCookie.split(';');
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
+import {image_url} from '../routes'
 
 
 class EditorPage extends React.Component {
@@ -31,7 +16,7 @@ class EditorPage extends React.Component {
   }
 
   render() {
-    const { placeholder } = this.props
+    const { placeholder ,bug,comment } = this.props
     return (
       <Container className="editor">
         <Editor
@@ -41,31 +26,25 @@ class EditorPage extends React.Component {
             plugins: ' emoticons placeholder  linkchecker link image imagetools autolink lists checklist quicklink blockquote powerpaste quickbars codesample hr autoresize',
             toolbar: ' emoticons quickimage codesample | link hr | bold italic underline | formatselect | bullist numlist checklist | undo redo ',
             toolbar_mode: 'floating',
-            // images_upload_url: 'postAcceptor.php',
-            // images_upload_base_path: '/some/basepath',
             images_upload_handler: async function (blobInfo, success, failure) {
-              // console.log(blobInfo)
-              console.log(blobInfo.blob())
-              // console.log(blobInfo.filename())
-              const headers = {
-                "Content-type": 'undefined',
-                'Authorization': `Token ${sessionStorage.getItem('token')}`,
-              }
               let formData = new FormData()
               formData.append('image', blobInfo.blob(), blobInfo.filename())
-              // formData.append('bug',)
-              // formData.append('comment',)
-              // formData.append('csrfmiddlewaretoken', getCookie("csrftoken"))
-              const url = `http://localhost:8000/bug_reporter/images/`
-              // let res = await fetch(url, { method: "POST", headers: headers, body: formData })
-              let res = axios.post(url, formData, {
+              if(bug !== null && bug !== undefined){
+                formData.append('bug',bug)
+              }
+              if(comment !== null && comment !== undefined){
+                formData.append('comment',comment)
+              }
+              let res = await axios.post(image_url, formData, {
                 headers: {
                   "Content-type": `multipart/form-data; boundary=${formData._boundary}`,
                   'Authorization': `Token ${sessionStorage.getItem('token')}`,
                   'Accept-Language': 'en-US,en;q=0.8',
                 }
               })
-              console.log(res)
+              // let data = await res
+              success(res.data.image)
+              // console.log(res)
             },
             autoresize_bottom_margin: 0,
             autoresize_overflow_padding: 0,
