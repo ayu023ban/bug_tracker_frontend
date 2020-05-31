@@ -7,7 +7,7 @@ import EditorPage from './editor'
 import { project_url } from '../routes'
 
 
-function isGitUrl(str) {
+export function isGitUrl(str) {
     var regex = /^(?:git|ssh|https?|git@[-\w.]+):(\/\/)(github\.com)\/(\w{1,})\/(\w{1,})\/?$/;
     return regex.test(str);
     // return str.match(regex)
@@ -21,8 +21,9 @@ class ProjectPage extends Component {
         this.state = {
             data: [],
             isLoggedIn: false,
-            projectNameError: true,
-            projectLinkError: false
+            projectNameError: false,
+            projectLinkError: false,
+            values:{name:""}
         }
     }
     componentDidMount() {
@@ -100,14 +101,14 @@ class ProjectPage extends Component {
         const { name, value } = e.target
         let nameError, gitlinkerror
         if (name === "name") {
-            (value.length <= 0 || value.length > 20) ? nameError = {
+            value.length > 20 ? nameError = {
                 content: "name can be between 0 and 20 characters",
                 pointing: 'below'
             } : nameError = false
         }
         if (name === "githublink") {
 
-            !isGitUrl(value) && value.length >0 ? gitlinkerror = {
+            !isGitUrl(value) && value.length > 0 ? gitlinkerror = {
                 content: "please provide valid github repo link",
                 pointing: 'below'
             } : gitlinkerror = false
@@ -197,7 +198,7 @@ class ProjectPage extends Component {
                                     type='submit'
                                     icon='checkmark'
                                     content="Create"
-                                    disabled={this.state.projectLinkError || this.state.projectNameError}
+                                    disabled={this.state.projectLinkError || this.state.projectNameError || this.state.values.name.length === 0}
                                     onClick={(event) => this.onSubmit()}
                                 />
                             </Form>

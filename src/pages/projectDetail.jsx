@@ -6,9 +6,66 @@ import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
 import { project_url, user_url, issue_url } from '../routes'
+import { isGitUrl } from './projectPage'
 import axios from 'axios'
 import EditorPage from './editor'
 import { IssueCard } from './homePage'
+
+
+
+class ProjectForm extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            errors: {},
+            values: { name: "" }
+        }
+        this.handleEditorChange = this.handleEditorChange.bind(this)
+    }
+    onChange = e => {
+        const { name, value } = e.target
+        let error
+        if (name === "name") {
+            value.length > 20 ? error = {
+                content: "name can be between 0 and 20 characters",
+                pointing: 'below'
+            } : error = false
+        }
+        if (name === "githublink") {
+            !isGitUrl(value) && value.length > 0 ? error = {
+                content: "please provide valid github repo link",
+                pointing: 'below'
+            } : error = false
+        }
+        this.setState({
+            values: { ...this.state.values, [name]: value },
+            errors: { ...this.state.errors, [name]: error }
+        })
+    }
+    handleEditorChange(content) {
+        this.setState({
+            values: { ...this.state.values, "wiki": content }
+        })
+    }
+    onSubmitForm(){
+        let data = this.state.values
+        this.props.onSubmit(data)
+    }
+    render() {
+        return (
+            <Form>
+                <Form.Input required name='name' placeholder='name' label='name' value={this.state.values.name} onChange={this.onChange} />
+                <EditorPage onEditorChange={this.handleUpdateEditorChange} placeholder="Wiki" />
+                <Form.Input error={this.state.errors.githublink} label="Git Link" name="githublink" onChange={this.onChange} value={this.state.values.githublink} />
+                <Button icon='cross' content='Cancel' onClick={this.updateFormToggle} />
+                <Button positive disabled={this.state.errors.name || this.state.errors.githublink || this.state.values.name.length === 0} type='submit' icon='checkmark' content="Update" onClick={() => this.onSubmitForm()} />
+            </Form>
+        )
+    }
+}
+
+
+
 class ProjectDetail extends Component {
     constructor(props) {
         super(props)
@@ -24,8 +81,10 @@ class ProjectDetail extends Component {
             isUserACreator: false,
             activeDomain: "f",
             values: { name: "", description: "" },
+            updateProjectErrors: {},
+            newIssueNameError: false,
             updatingForm: false,
-            updateProjectValues: {}
+            updateProjectValues: { name: "" }
         }
         this.deleteCurrentProject = this.deleteCurrentProject.bind(this)
         this.handleIssueDescriptionEditorChange = this.handleIssueDescriptionEditorChange.bind(this)
@@ -93,7 +152,6 @@ class ProjectDetail extends Component {
             return Number(obj.key)
         })
         const body = JSON.stringify({ members: user_id })
-        // const url = `http://localhost:8000/bug_reporter/projects/${this.state.id}/update_members/`
         const url = project_url + this.state.id.toString() + "/update_members/"
         const params = { method: 'PATCH', body: body, headers: { 'Content-Type': 'application/json', "Authorization": `Token ${sessionStorage.getItem("token")}` } }
         fetch(url, params).then(res => res.json()).then(res => res.user_ids).then((user_ids) => {
@@ -114,11 +172,6 @@ class ProjectDetail extends Component {
             selection
             options={this.state.user_data_for_search}
         />
-        // ) : (<div>
-        //     <Icon name='users' /><Pluralize singular={'member'} count={data.members.length} />
-        // </div>
-        //     )
-
         return search
 
     }
@@ -187,10 +240,8 @@ class ProjectDetail extends Component {
 
     createIssue(data) {
         console.log(data)
-        // const url = 'http://localhost:8000/bug_reporter/bugs/'
         const header = {
             "Content-Type": "application/json",
-            // 'Accept':"application/json; charset=UTF-8",
             "Authorization": `Token ${sessionStorage.getItem("token")}`
         }
         axios.post(issue_url, data, { headers: header }).then((res) => {
@@ -217,13 +268,27 @@ class ProjectDetail extends Component {
 
     onUpdate = e => {
         const { name, value } = e.target
-        console.log(this.state.updateProjectValues)
+        let error
+        if (name === "name") {
+            value.length > 20 ? error = {
+                content: "name can be between 0 and 20 characters",
+                pointing: 'below'
+            } : error = false
+        }
+        if (name === "githublink") {
+            !isGitUrl(value) && value.length > 0 ? error = {
+                content: "please provide valid github repo link",
+                pointing: 'below'
+            } : error = false
+        }
         this.setState({
-            updateProjectValues: { ...this.state.updateProjectValues, [name]: value }
+            updateProjectValues: { ...this.state.updateProjectValues, [name]: value },
+            updateProjectErrors: { ...this.state.updateProjectErrors, [name]: error }
         })
     }
-    updateProject() {
-        let data = JSON.stringify(this.state.updateProjectValues)
+    updateProject(data) {
+        // let data = JSON.stringify(this.state.updateProjectValues)
+        data  = JSON.stringify(data)
         const project_detail_url = project_url + this.state.id.toString() + "/"
         fetch(project_detail_url, {
             method: 'PATCH', body: data,
@@ -258,13 +323,7 @@ class ProjectDetail extends Component {
     }
 
     render() {
-        const { data } = this.state
-        const { openModal1 } = this.state
-        const { openModal2 } = this.state
-        const { activeDomain } = this.state
-        const { updatingForm } = this.state
-        const { isUserATeamMember } = this.state
-        const { isUserACreator } = this.state
+        const { data, openModal1, openModal2, activeDomain, updatingForm, isUserATeamMember, isUserACreator } = this.state
         if (data !== null) {
             return (
                 <Container >
@@ -303,18 +362,20 @@ class ProjectDetail extends Component {
                                         </Grid.Row>
                                     </Grid>
                                 </Card.Content>
-                            } 
+                            }
                         </Card>
                     }
                     {updatingForm &&
                         <Card fluid color='red'>
                             <Card.Content>
-                                <Form>
-                                    <Form.Input name='name' placeholder='name' label='name' value={this.state.updateProjectValues.name} onChange={this.onUpdate} />
+                                {/* <Form>
+                                    <Form.Input required name='name' placeholder='name' label='name' value={this.state.updateProjectValues.name} onChange={this.onUpdate} />
                                     <EditorPage onEditorChange={this.handleUpdateEditorChange} placeholder="Wiki" />
+                                    <Form.Input error={this.state.updateProjectErrors.githublink} label="Git Link" name="githublink" onChange={this.onUpdate} value={this.state.updateProjectValues.githublink} />
                                     <Button icon='cross' content='Cancel' onClick={this.updateFormToggle} />
-                                    <Button positive type='submit' icon='checkmark' content="Update" onClick={(event) => this.updateProject()} />
-                                </Form>
+                                    <Button positive disabled={this.state.updateProjectErrors.name || this.state.updateProjectErrors.githublink || this.state.updateProjectValues.name.length === 0} type='submit' icon='checkmark' content="Update" onClick={(event) => this.updateProject()} />
+                                </Form> */}
+                                <ProjectForm onSubmit = {(data)=>{this.updateProject(data)}} />
                             </Card.Content>
                         </Card>
 
@@ -357,7 +418,7 @@ class ProjectDetail extends Component {
                         </Modal.Actions>
                     </Modal>
 
-                    <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnDocumentClick closeOnDimmerClick closeOnEscape size='large' >
+                    <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnDocumentClick closeOnEscape size='large' >
                         <Modal.Header>Create New Issue</Modal.Header>
                         <Modal.Content scrolling>
                             <Modal.Description>
