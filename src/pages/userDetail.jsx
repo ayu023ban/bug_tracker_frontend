@@ -1,9 +1,13 @@
 import React, { Component } from "react";
-import { Container, Card, Header, Menu, Form, Button, Breadcrumb, Icon, Divider, Grid, Segment, List } from "semantic-ui-react";
+import { Container, Card, Header, Menu, Form, Button, Input, Breadcrumb, Icon, Divider, Grid, Segment, List } from "semantic-ui-react";
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import { user_url } from '../routes'
 
+function isEmail(str) {
+    var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(str)
+};
 
 
 class UserDetail extends Component {
@@ -14,7 +18,19 @@ class UserDetail extends Component {
         this.state = {
             id: this.props.location.state.id,
             userData: null,
-            update: {},
+            update: {
+                socialEmail: "",
+                username: ""
+            },
+            errors: {
+                email: false,
+                emailConfirm: false,
+                username: false,
+                github: false,
+                instagram: false,
+                facebook: false,
+                linkedin: false
+            },
             activeItem: "Email"
         }
     }
@@ -31,12 +47,78 @@ class UserDetail extends Component {
     handleItemClick = (e, { name }) => {
         this.setState({ activeItem: name });
     }
+
+
     updateForm(e) {
         const { name, value } = e.target
+        let errorname, error, regex
+        switch (name) {
+            case "socialEmail":
+                errorname = "email"
+                !isEmail(value) && value.length > 0 ? error = {
+                    content: "please enter valid email address",
+                    pointing: 'below'
+                } : error = false
+                break
+            case "socialEmailConfirmation":
+                errorname = "emailConfirm"
+                this.state.update.socialEmail !== value ?
+                    error = {
+                        content: "email does not match with the above",
+                        pointing: "below"
+                    } : error = false
+                break
+            case "username":
+                errorname = "username"
+                regex = /^[\w ]+$/
+                !regex.test(value) ? error = {
+                    content: "write username in correct format",
+                    pointing: "below"
+                } : error = false
+                break
+            case "githubLink":
+                errorname = 'github'
+                regex = /^https?:\/\/(www.)?github\.com\/(\w+)\/?$/
+                !regex.test(value) && value.length > 0 ? error = {
+                    content: "write correct github profile link",
+                    pointing: "below"
+                } : error = false
+                break
+            case "facebookLink":
+                errorname = 'facebook'
+                regex = /^https?:\/\/(www.)?facebook\.com\/(\w+)\/?$/
+                !regex.test(value) && value.length > 0 ? error = {
+                    content: "write correct facebook profile link",
+                    pointing: "below"
+                } : error = false
+                break
+            case "linkedinLink":
+                errorname = 'linkedin'
+                regex = /^https?:\/\/(www.)?linkedin\.com\/in\/([\w-]+)\/?$/
+                !regex.test(value) && value.length > 0 ? error = {
+                    content: "write correct linkedin profile link",
+                    pointing: "below"
+                } : error = false
+                break
+            case "instagramLink":
+                errorname = 'instagram'
+                regex = /^https?:\/\/(www.)?instagram\.com\/([\w-]+)\/?$/
+                !regex.test(value) && value.length > 0 ? error = {
+                    content: "write correct instagram profile link",
+                    pointing: "below"
+                } : error = false
+                break
+            default:
+                console.log("noerror")
+        }
         this.setState({
-            update: { ...this.state.update, [name]: value }
+            update: { ...this.state.update, [name]: value },
+            errors: { ...this.state.errors, [errorname]: error }
         })
     }
+
+
+
     filter = function (obj, keys) {
         let result = {}
         keys.forEach(key => {
@@ -56,12 +138,13 @@ class UserDetail extends Component {
                 array = ["username"]
                 break
             case "Social Link":
-                array = ["facebookLink", "socialEmail", "instagramLink", "linkedinLink"]
+                array = ["facebookLink", "githubLink", "instagramLink", "linkedinLink"]
                 break
             default:
                 array = null
         }
         const data = JSON.stringify(this.filter(this.state.update, array))
+        console.log(data)
         const url = user_url + this.state.id.toString() + "/"
         const headers = {
             "Content-type": "application/json; charset=UTF-8",
@@ -138,7 +221,7 @@ class UserDetail extends Component {
                                 </Grid.Column>
                             </Grid>
                             <List floated="right" horizontal relaxed >
-                                {isGithub && <List.Item><Button circular icon='github' /></List.Item>}
+                                {isGithub && <List.Item><Button onClick={() => { window.open(userData.githubLink, "_blank") }} circular color="github" icon="github" /></List.Item>}
                                 {isFacebook && <List.Item><Button onClick={() => { window.open(userData.facebookLink, "_blank") }} circular color="facebook" icon="facebook" /></List.Item>}
                                 {isLinkedin && <List.Item><Button onClick={() => { window.open(userData.instagramLink, "_blank") }} circular color="linkedin" icon="linkedin" /></List.Item>}
                                 {isInstagram && <List.Item><Button onClick={() => { window.open(userData.instagramLink, "_blank") }} circular color="instagram" icon='instagram' /></List.Item>}
@@ -169,14 +252,20 @@ class UserDetail extends Component {
                         <Segment attached="bottom" className="form-segment">
                             {this.state.activeItem === "Email" &&
                                 <Form className="email-form">
-                                    <Form.Input
+                                    <Form.Field
+                                        control={Input}
+                                        required
+                                        error={this.state.errors.email}
                                         label="Email"
                                         placeholder="Email"
                                         name="socialEmail"
                                         value={this.state.update.socialEmail}
                                         onChange={this.updateForm}
                                     />
-                                    <Form.Input
+                                    <Form.Field
+                                        control={Input}
+                                        required
+                                        error={this.state.errors.emailConfirm}
                                         label="Email Confirmation"
                                         placeholder="Email"
                                         name="socialEmailConfirmation"
@@ -186,6 +275,7 @@ class UserDetail extends Component {
                                     <Button
                                         positive
                                         type="submit"
+                                        disabled={this.state.errors.email || this.state.errors.emailConfirm || this.state.update.socialEmail.length === 0}
                                         icon="checkmark"
                                         content="Update"
                                         onClick={this.formSubmit}
@@ -195,7 +285,10 @@ class UserDetail extends Component {
                             }
                             {this.state.activeItem === "Username" &&
                                 <Form className="username-form">
-                                    <Form.Input
+                                    <Form.Field
+                                        control={Input}
+                                        required
+                                        error={this.state.errors.username}
                                         label="Username"
                                         placeholder="username"
                                         name="username"
@@ -204,6 +297,7 @@ class UserDetail extends Component {
                                     />
                                     <Button
                                         positive
+                                        disabled={this.state.errors.username || this.state.update.username.length === 0}
                                         type="submit"
                                         icon="checkmark"
                                         content="Update"
@@ -217,12 +311,14 @@ class UserDetail extends Component {
                                     <Form.Input
                                         label="GitHub"
                                         placeholder="put your Github profile link here"
-                                        name="githublink"
+                                        error={this.state.errors.github}
+                                        name="githubLink"
                                         value={this.state.update.githubLink}
                                         onChange={this.updateForm}
                                     />
                                     <Form.Input
                                         label="Facebook"
+                                        error={this.state.errors.facebook}
                                         placeholder="put your Facebook profile link here"
                                         name="facebookLink"
                                         value={this.state.update.facebookLink}
@@ -230,6 +326,7 @@ class UserDetail extends Component {
                                     />
                                     <Form.Input
                                         label="LinkedIn"
+                                        error={this.state.errors.linkedin}
                                         placeholder="put your Linked profile link here"
                                         name="linkedinLink"
                                         value={this.state.update.linkedinLink}
@@ -237,6 +334,7 @@ class UserDetail extends Component {
                                     />
                                     <Form.Input
                                         label="Instagram"
+                                        error={this.state.errors.instagram}
                                         placeholder="put your Instagram profile link here"
                                         name="instagramLink"
                                         value={this.state.update.instagramLink}
@@ -244,6 +342,7 @@ class UserDetail extends Component {
                                     />
                                     <Button
                                         positive
+                                        disabled={this.state.errors.facebook || this.state.errors.linkedin || this.state.errors.instagram || this.state.errors.github}
                                         type="submit"
                                         icon="checkmark"
                                         content="Update"

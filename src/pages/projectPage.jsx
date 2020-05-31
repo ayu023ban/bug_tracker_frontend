@@ -9,8 +9,8 @@ import { project_url } from '../routes'
 
 function isGitUrl(str) {
     var regex = /^(?:git|ssh|https?|git@[-\w.]+):(\/\/)(github\.com)\/(\w{1,})\/(\w{1,})\/?$/;
-    // return regex.test(str);
-    return str.match(regex)
+    return regex.test(str);
+    // return str.match(regex)
 };
 
 
