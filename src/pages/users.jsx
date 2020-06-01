@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Card, Button, Segment, Icon, Header, Divider } from 'semantic-ui-react'
+import { Container, Card, Segment, Header, Divider } from 'semantic-ui-react'
 import Avatar from 'react-avatar'
 import {user_url} from '../routes'
 import './scss/users.scss'
@@ -11,7 +11,6 @@ class UserList extends Component {
     }
 
     componentDidMount() {
-        // const url = `http://localhost:8000/bug_reporter/users/`
         const headers = JSON.parse(sessionStorage.getItem("header"))
         fetch(user_url, { method: "GET", headers: headers }).then((res) => {
             if (res.status === 200) {
@@ -36,9 +35,9 @@ class UserList extends Component {
                 }}>
                     <Card.Content>
                         <div className="user-card-content">
-                            <Avatar className='avatar' round textSizeRatio='2.5' size='40' name={user.username} />
+                            <Avatar className='avatar' round textSizeRatio='2.5' size='40' name={user.full_name} />
                             <div className="user-content">
-                                <span>{user.username}</span>
+                                <span>{user.full_name}</span>
                                 <span>{user.email}</span>
                             </div>
                         </div>

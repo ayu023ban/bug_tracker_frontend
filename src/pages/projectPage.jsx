@@ -4,7 +4,7 @@ import Pluralize from 'react-pluralize'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import { project_url } from '../routes'
-import { ProjectForm } from './projectDetail'
+import { ProjectForm } from '../components/forms'
 
 
 export function isGitUrl(str) {

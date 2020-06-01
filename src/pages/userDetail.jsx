@@ -3,7 +3,7 @@ import { Container, Card, Header, Menu, Form, Button, Input, Breadcrumb, Icon, D
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import { user_url } from '../routes'
-import {filter} from '../components/helperFunctions'
+import { filter } from '../components/helperFunctions'
 function isEmail(str) {
     var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return regex.test(str)
@@ -34,15 +34,16 @@ class UserDetail extends Component {
             activeItem: "Email"
         }
     }
-    componentDidMount() {
+    async componentDidMount() {
         const url = user_url + this.state.id.toString() + "/"
         const headers = JSON.parse(sessionStorage.getItem("header"))
-        fetch(url, { method: "GET", headers: headers }).then((res) => {
-            if (res.status === 200) {
-                return res.json()
-            }
-            else { console.log(res) }
-        }).then(data => this.setState({ userData: data }))
+        let res = await fetch(url, { method: "GET", headers: headers })
+        if (res.status === 200) {
+            res = await res.json()
+            this.setState({ userData: res, update: res })
+        }
+        else { console.log(res) }
+
     }
     handleItemClick = (e, { name }) => {
         this.setState({ activeItem: name });
@@ -122,15 +123,26 @@ class UserDetail extends Component {
             case "Email":
                 array = ["socialEmail"]
                 break
-            case "Username":
-                array = ["username"]
+            case "Full Name":
+                array = ["username", "first_name", "last_name", "full_name"]
+                let name = this.state.update.username.split(" ")
+                let first_name = name[0]
+                let last_name = (name[1]) ? name[1] : ""
+                let full_name = first_name +((name[1]) ? " " : "")+ last_name
+                let username = first_name.toLowerCase() + ((name[1]) ? "_" : "") + last_name.toLowerCase()
+                await this.setState({
+                    update: { ...this.state.update, first_name: first_name, last_name: last_name, username: username, full_name: full_name }
+                })
                 break
+
             case "Social Link":
                 array = ["facebookLink", "githubLink", "instagramLink", "linkedinLink"]
                 break
             default:
                 array = null
         }
+        console.log(this.state.update)
+        console.log(this.state.userData)
         const data = JSON.stringify(filter(this.state.update, array))
         console.log(data)
         const url = user_url + this.state.id.toString() + "/"
@@ -172,7 +184,7 @@ class UserDetail extends Component {
                             <Grid>
                                 {/* <Grid.Row> */}
                                 <Grid.Column width={5} >
-                                    <Avatar size='225' name={userData.username} />
+                                    <Avatar size='225' name={userData.full_name} />
                                 </Grid.Column>
                                 <Grid.Column width={10}>
                                     <Grid>
@@ -225,8 +237,8 @@ class UserDetail extends Component {
                                 onClick={this.handleItemClick}
                             />
                             <Menu.Item
-                                name="Username"
-                                active={activeItem === "Username"}
+                                name="Full Name"
+                                active={activeItem === "Full Name"}
                                 onClick={this.handleItemClick}
                             />
                             <Menu.Item
@@ -263,7 +275,7 @@ class UserDetail extends Component {
                                     <Button
                                         positive
                                         type="submit"
-                                        disabled={this.state.errors.email || this.state.errors.emailConfirm || this.state.update.socialEmail.length === 0}
+                                        disabled={this.state.errors.email || this.state.errors.emailConfirm || this.state.update.socialEmail == null || this.state.update.socialEmail.length === 0}
                                         icon="checkmark"
                                         content="Update"
                                         onClick={this.formSubmit}
@@ -271,16 +283,16 @@ class UserDetail extends Component {
                                     />
                                 </Form>
                             }
-                            {this.state.activeItem === "Username" &&
-                                <Form className="username-form">
+                            {this.state.activeItem === "Full Name" &&
+                                <Form>
                                     <Form.Field
                                         control={Input}
                                         required
                                         error={this.state.errors.username}
-                                        label="Username"
-                                        placeholder="username"
+                                        label="Full Name"
+                                        placeholder="Full Name"
                                         name="username"
-                                        value={this.state.update.username}
+                                        value={this.state.update.full_name}
                                         onChange={this.updateForm}
                                     />
                                     <Button

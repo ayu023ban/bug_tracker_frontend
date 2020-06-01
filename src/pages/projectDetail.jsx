@@ -21,6 +21,7 @@ class ProjectDetail extends Component {
             id: this.props.location.state.id,
             data: null,
             member_names: [],
+            member_ids:[],
             openModal1: false,
             openModal2: false,
             warning_text: warning_text,
@@ -48,7 +49,7 @@ class ProjectDetail extends Component {
         const headers = JSON.parse(sessionStorage.getItem("header"))
         let project_res = await fetch(project_detail_url, { headers: headers })
         let data = await project_res.json()
-        this.setState({ data: data, member_names: data.member_names })
+        this.setState({ data: data, member_names: data.member_names,member_ids:data.members })
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
         this.setState({ issue_data: issue_data })
@@ -78,8 +79,8 @@ class ProjectDetail extends Component {
             const user_data = data.map((element) => {
                 return {
                     key: element.id.toString(),
-                    text: element.username,
-                    value: element.username
+                    text: element.full_name,
+                    value: element.full_name
                 }
             })
             this.setState({ user_data_for_search: user_data })
@@ -98,7 +99,7 @@ class ProjectDetail extends Component {
             const user_names = user_ids.map((id) => {
                 return this.state.user_data_for_search.find(o => o.key === id.toString()).text
             })
-            this.setState({ member_names: user_names })
+            this.setState({ member_names: user_names,member_ids:user_ids })
         })
     }
 
@@ -116,11 +117,9 @@ class ProjectDetail extends Component {
 
     }
     setPermissions() {
-        const username = JSON.parse(sessionStorage.getItem("user_data")).username
         const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
         const isCreator = this.state.data.creator === user_id
-        const isMember = this.state.member_names.includes(username)
-        console.log(isCreator, isMember)
+        const isMember = this.state.member_ids.includes(user_id)
         this.setState({ isUserATeamMember: isMember, isUserACreator: isCreator })
     }
     DisPlayMembers() {
@@ -323,5 +322,4 @@ class ProjectDetail extends Component {
         }
     }
 }
-export { ProjectForm }
 export default ProjectDetail
