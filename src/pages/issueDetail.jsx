@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { Container, Label, Card, Header, Breadcrumb, Form, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
+import { Container, Label, Card, Header, Breadcrumb, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-// import { Editor } from '@tinymce/tinymce-react';
 import './scss/tinymce.css'
 import { issue_url, comment_url, project_url } from "../routes"
 import WebSocketInstance from './websocket'
@@ -10,7 +9,8 @@ import Pluralize from 'react-pluralize'
 import EditorPage from './editor'
 import Background from '../images/options.jpg'
 import './scss/issueDetail.scss'
-
+import { IssueForm } from '../components/forms'
+import { filter } from '../components/helperFunctions'
 class IssueDetail extends Component {
     constructor(props) {
         super(props)
@@ -18,9 +18,9 @@ class IssueDetail extends Component {
         this.assignDropClick = this.assignDropClick.bind(this)
         this.commentsLoderFromWebsocket = this.commentsLoderFromWebsocket.bind(this)
         this.newCommentFromWebsocket = this.newCommentFromWebsocket.bind(this)
-        this.handleUpdateEditorChange = this.handleUpdateEditorChange.bind(this)
         this.goToCorrespondingProject = this.goToCorrespondingProject.bind(this)
         this.settingToggle = this.settingToggle.bind(this)
+        this.updateIssue = this.updateIssue.bind(this)
         this.newCommentFromWebsocket = this.newCommentFromWebsocket.bind(this)
         this.fetchCommentFromWebSocket = this.fetchCommentFromWebSocket.bind(this)
         this.state = {
@@ -123,7 +123,6 @@ class IssueDetail extends Component {
     }
 
     deleteComment() {
-        // const url = `http://localhost:8000/bug_reporter/comments/${this.state.commentToBeDelete}/`
         const url = comment_url + this.state.commentToBeDelete.toString() + "/"
         fetch(url, {
             method: 'DELETE',
@@ -146,20 +145,6 @@ class IssueDetail extends Component {
     handleEditorChange(content) {
         this.setState({ commentDescription: content })
     }
-    handleUpdateEditorChange(content) {
-        this.setState({
-            update: { ...this.state.update, "description": content }
-        })
-    }
-
-    onUpdate = e => {
-        const { name, value } = e.target
-        this.setState({
-            update: { ...this.state.update, [name]: value }
-        })
-    }
-
-
     onCommentSubmit() {
         WebSocketInstance.newComment(this.state.commentDescription)
     }
@@ -178,8 +163,8 @@ class IssueDetail extends Component {
             })
     }
 
-    updateIssue() {
-        let data = JSON.stringify(this.state.update)
+    updateIssue(data) {
+        data = JSON.stringify(data)
         const url = issue_url + this.state.id.toString() + "/"
         fetch(url, {
             method: 'PATCH', body: data,
@@ -282,7 +267,7 @@ class IssueDetail extends Component {
                         />
                         :
                         <span>
-                            {(this.state.bug.assigned_to != null)?
+                            {(this.state.bug.assigned_to != null) ?
                                 <span>
                                     assigned to {this.state.bug.assigned_name}
                                 </span>
@@ -306,20 +291,20 @@ class IssueDetail extends Component {
         const member = this.state.members_data_for_search.find(o => o.value === data.value)
         let member_id
         if (member !== undefined) {
-             member_id = member.key
-            
+            member_id = member.key
+
         }
-        else{
+        else {
             member_id = "None"
         }
         let url = `${issue_url}${this.state.id}/assign/?assign_to=${member_id}`
         console.log(url)
-            const headers = JSON.parse(sessionStorage.getItem("header"))
-            let res = await fetch(url, { method: "GET", headers: headers })
-            if (res.status === 202) {
-                data = await res.json()
-                this.setState({ bug: data })
-            }
+        const headers = JSON.parse(sessionStorage.getItem("header"))
+        let res = await fetch(url, { method: "GET", headers: headers })
+        if (res.status === 202) {
+            data = await res.json()
+            this.setState({ bug: data })
+        }
     }
 
 
@@ -355,7 +340,7 @@ class IssueDetail extends Component {
                                 <Card.Content>
                                     <Card.Description><div dangerouslySetInnerHTML={{ __html: bug.description }} /></Card.Description>
                                 </Card.Content>
-                                <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between",alignItems:"center" }} >
+                                <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between", alignItems: "center" }} >
                                     <span><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /></span>
                                     {this.assignComponent()}
                                     <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span>
@@ -364,14 +349,8 @@ class IssueDetail extends Component {
                         }
                         {updateForm && (isUserAMember || isuserACreator) &&
                             <Segment className='update-segment'>
-                                <Form className='update-form'>
-                                    <Form.Input label='Title' placeholder='Title' name='name' value={this.state.update.title} onChange={this.onUpdate} />
-                                    <EditorPage onEditorChange={this.handleUpdateEditorChange} bug={this.state.id} placeholder="Description" />
-                                    <Button positive type='submit' icon='checkmark' content="Update" onClick={(event) => this.updateIssue()} className='form-submit' />
-                                    <div className='close'>
-                                        <Icon name="times" onClick={(event) => this.formToggle()} />
-                                    </div>
-                                </Form>
+                                <IssueForm initialValues={filter(this.state.bug, ["name", "description"])} isDomain={false} onSubmit={this.updateIssue} isClose={true} onClose={() => { this.formToggle() }} submitName="Update" />
+
                             </Segment>
                         }
                     </div>
@@ -432,7 +411,6 @@ class IssueDetail extends Component {
                             </div>
                         </div>
                     }
-
                     <Modal open={this.state.deleteCommentModalOpen} dimmer onClose={() => { this.toggleDeleteComment() }} basic size='small'>
                         <Header icon='archive' content='Delete this Comment' />
                         <Modal.Content>

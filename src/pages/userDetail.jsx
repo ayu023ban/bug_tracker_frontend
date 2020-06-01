@@ -3,7 +3,7 @@ import { Container, Card, Header, Menu, Form, Button, Input, Breadcrumb, Icon, D
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import { user_url } from '../routes'
-
+import {filter} from '../components/helperFunctions'
 function isEmail(str) {
     var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return regex.test(str)
@@ -116,18 +116,6 @@ class UserDetail extends Component {
             errors: { ...this.state.errors, [errorname]: error }
         })
     }
-
-
-
-    filter = function (obj, keys) {
-        let result = {}
-        keys.forEach(key => {
-            if (obj.hasOwnProperty(key)) {
-                result[key] = obj[key];
-            }
-        });
-        return result;
-    }
     async formSubmit() {
         let array;
         switch (this.state.activeItem) {
@@ -143,7 +131,7 @@ class UserDetail extends Component {
             default:
                 array = null
         }
-        const data = JSON.stringify(this.filter(this.state.update, array))
+        const data = JSON.stringify(filter(this.state.update, array))
         console.log(data)
         const url = user_url + this.state.id.toString() + "/"
         const headers = {

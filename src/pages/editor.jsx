@@ -21,6 +21,7 @@ class EditorPage extends React.Component {
       <Container className="editor">
         <Editor
           apiKey="81jvj4ftt29hdio9oky5wnvlxtugicmawfi048fvjjf2dlg8"
+          initialValue={this.props.initialValue}
           init={{
             placeholder: placeholder,
             plugins: ' emoticons placeholder  linkchecker link image imagetools autolink lists checklist quicklink powerpaste quickbars blockquote codesample hr autoresize',
