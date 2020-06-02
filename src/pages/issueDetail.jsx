@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Label, Card, Header, Breadcrumb, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
+import { Container, Label, Card, Header, Placeholder, Breadcrumb, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import './scss/tinymce.css'
 import { issue_url, comment_url, project_url } from "../api-routes"
@@ -11,6 +11,7 @@ import Background from '../images/options.jpg'
 import './scss/issueDetail.scss'
 import { IssueForm } from '../components/forms'
 import { filter } from '../components/helperFunctions'
+import { NormalPlaceholder, BigPlaceholder } from '../components/placeholders'
 class IssueDetail extends Component {
     constructor(props) {
         super(props)
@@ -26,6 +27,7 @@ class IssueDetail extends Component {
         this.state = {
             id: this.props.location.state.bug,
             comments: null,
+            bug: null,
             settingsOpen: false,
             updateForm: false,
             update: [],
@@ -48,16 +50,19 @@ class IssueDetail extends Component {
         this.setPermissions()
 
     }
+
     fetchCommentFromWebSocket() {
         if (WebSocketInstance.state() === 1) {
             clearInterval(this.ma)
             WebSocketInstance.fetchMessages()
         }
     }
+
     commentsLoderFromWebsocket(data) {
         const comments = data["data"]
         this.setState({ comments: comments })
     }
+
     newCommentFromWebsocket(data) {
         console.log("test2")
         const comment = data.data
@@ -91,34 +96,43 @@ class IssueDetail extends Component {
             members_data_for_search: members_data_for_search
         })
     }
+
     listComments() {
         const { comments } = this.state
         const userId = JSON.parse(sessionStorage.getItem("user_data")).id
         let list;
-        if (comments != null) {
-            list = comments.map(comment =>
-                <Card raised fluid color='red'>
-                    <Card.Content>
-                        <Card.Description className="commentCardDescription">
-                            <div dangerouslySetInnerHTML={{ __html: comment.description }} />
-                            {userId === comment.creator &&
-                                <Icon name='trash' size='large' color='red' onClick={() => {
-                                    this.setState({ commentToBeDelete: comment.id })
-                                    this.toggleDeleteComment()
-                                }} />
-                            }
-                        </Card.Description>
-                    </Card.Content>
-                    <Card.Content extra >
-                        {moment(comment.created_at).fromNow()}
-                        <span id='issueDetailCardTime' ><Icon name='user' />by {comment.creator_name}</span>
-                    </Card.Content>
+        if (Boolean(comments)) {
+            if (comments.length !== 0) {
+                list = comments.map(comment =>
+                    <Card raised fluid color='red'>
+                        <Card.Content>
+                            <Card.Description className="commentCardDescription">
+                                <div dangerouslySetInnerHTML={{ __html: comment.description }} />
+                                {userId === comment.creator &&
+                                    <Icon name='trash' size='large' color='red' onClick={() => {
+                                        this.setState({ commentToBeDelete: comment.id })
+                                        this.toggleDeleteComment()
+                                    }} />
+                                }
+                            </Card.Description>
+                        </Card.Content>
+                        <Card.Content extra >
+                            {moment(comment.created_at).fromNow()}
+                            <span id='issueDetailCardTime' ><Icon name='user' />by {comment.creator_name}</span>
+                        </Card.Content>
+                    </Card>)
+            }
+            else {
+                list = <Segment raised>no comments available</Segment>
+            }
+        }
+        else list =
+            <Container>
+                <NormalPlaceholder />
+                <NormalPlaceholder />
+                <NormalPlaceholder />
+            </Container>
 
-                </Card>)
-        }
-        else {
-            list = "no comments available"
-        }
         return list
     }
 
@@ -229,6 +243,7 @@ class IssueDetail extends Component {
             state: { id: this.state.bug.project }
         })
     }
+
     setImportant() {
         const url = issue_url + this.state.id.toString() + "/"
         const imp = this.state.bug.important
@@ -248,6 +263,7 @@ class IssueDetail extends Component {
             }
         })
     }
+
     assignComponent() {
         let search;
         if (this.state.isUserAMember) {
@@ -287,6 +303,7 @@ class IssueDetail extends Component {
         }
         return search
     }
+
     async assignDropClick(event, data) {
         const member = this.state.members_data_for_search.find(o => o.value === data.value)
         let member_id
@@ -307,7 +324,6 @@ class IssueDetail extends Component {
         }
     }
 
-
     commentToggle = () => this.setState({ commentOpen: !this.state.commentOpen })
     settingToggle = () => this.setState({ settingsOpen: !this.state.settingsOpen })
     formToggle = () => this.setState({ updateForm: !this.state.updateForm })
@@ -321,40 +337,46 @@ class IssueDetail extends Component {
                         <Breadcrumb as={Header}>
                             <Breadcrumb.Section className='previousSection' as={Link} to='/home'>Issues</Breadcrumb.Section>
                             <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
-                            <Breadcrumb.Section>{bug.name}</Breadcrumb.Section>
+                            <Breadcrumb.Section>{Boolean(bug) && bug.name}</Breadcrumb.Section>
                         </Breadcrumb>
                     </Header>
                     <Divider section />
                     <div className="main-issue-box">
-                        {!updateForm &&
-                            <Card fluid color='red' className='IssueTop issue-head'>
-                                <Card.Content>
-                                    <Card.Header as='h2'>{bug.name}
-                                        {(isUserAMember || isuserACreator) &&
-                                            <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
-                                        }
-                                    </Card.Header>
-                                    <Label ribbon='right'>{bug.project_name}</Label>
-                                    <Card.Meta>reported by {bug.creator_name}</Card.Meta>
-                                </Card.Content>
-                                <Card.Content>
-                                    <Card.Description><div dangerouslySetInnerHTML={{ __html: bug.description }} /></Card.Description>
-                                </Card.Content>
-                                <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between", alignItems: "center" }} >
-                                    <span><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /></span>
-                                    {this.assignComponent()}
-                                    <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span>
-                                </Card.Content>
-                            </Card>
-                        }
-                        {updateForm && (isUserAMember || isuserACreator) &&
+                        {!(updateForm) ?
+                            Boolean(bug) ?
+                                <Card fluid color='red' className='IssueTop issue-head'>
+                                    <Card.Content>
+                                        <Card.Header as='h2'>{bug.name}
+                                            {(isUserAMember || isuserACreator) &&
+                                                <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
+                                            }
+                                        </Card.Header>
+                                        <Label ribbon='right'>{bug.project_name}</Label>
+                                        <Card.Meta>reported by {bug.creator_name}</Card.Meta>
+                                    </Card.Content>
+                                    <Card.Content>
+                                        <Card.Description><div dangerouslySetInnerHTML={{ __html: bug.description }} /></Card.Description>
+                                    </Card.Content>
+                                    <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between", alignItems: "center" }} >
+                                        <span><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /></span>
+                                        {this.assignComponent()}
+                                        <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span>
+                                    </Card.Content>
+                                </Card>
+                                : <BigPlaceholder />
+                            :
                             <Segment className='update-segment'>
-                                <IssueForm initialValues={filter(this.state.bug, ["name", "description"])} isDomain={false} onSubmit={this.updateIssue} isClose={true} onClose={() => { this.formToggle() }} submitName="Update" />
+                                <IssueForm initialValues={filter(bug, ["name", "description"])} isDomain={false} onSubmit={this.updateIssue} isClose={true} onClose={() => { this.formToggle() }} submitName="Update" />
 
                             </Segment>
                         }
                     </div>
-                    <Header as="h2" color='red' className='projects-header'>Comments<Button className='add-button' onClick={this.commentToggle}><Icon name={(commentOpen) ? "minus" : "plus"} size='big' /></Button></Header>
+                    <Header as="h2" color='red' className='projects-header'>
+                        Comments
+                    {Boolean(bug) &&
+                            <Button className='add-button' onClick={this.commentToggle}><Icon name={(commentOpen) ? "minus" : "plus"} size='big' /></Button>
+                        }
+                    </Header>
                     {commentOpen &&
                         <Card color='red' fluid>
                             <Card.Content>

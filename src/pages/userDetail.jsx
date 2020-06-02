@@ -40,7 +40,8 @@ class UserDetail extends Component {
         let res = await fetch(url, { method: "GET", headers: headers })
         if (res.status === 200) {
             res = await res.json()
-            this.setState({ userData: res, update: res })
+            await this.setState({ userData: res, update: res })
+            this.getGithubHandle()
         }
         else { console.log(res) }
 
@@ -48,7 +49,13 @@ class UserDetail extends Component {
     handleItemClick = (e, { name }) => {
         this.setState({ activeItem: name });
     }
-
+    getGithubHandle() {
+        let { userData } = this.state
+        let githubregex = /^https?:\/\/(www.)?github\.com\/(\w+)\/?$/
+        let githubHandle = (userData && Boolean(userData.githubLink)) ? userData.githubLink.match(githubregex)[2] : null
+        // console.log(githubHandle)
+        return githubHandle
+    }
 
     updateForm(e) {
         const { name, value } = e.target
@@ -128,7 +135,7 @@ class UserDetail extends Component {
                 let name = this.state.update.username.split(" ")
                 let first_name = name[0]
                 let last_name = (name[1]) ? name[1] : ""
-                let full_name = first_name +((name[1]) ? " " : "")+ last_name
+                let full_name = first_name + ((name[1]) ? " " : "") + last_name
                 let username = first_name.toLowerCase() + ((name[1]) ? "_" : "") + last_name.toLowerCase()
                 await this.setState({
                     update: { ...this.state.update, first_name: first_name, last_name: last_name, username: username, full_name: full_name }
@@ -141,8 +148,8 @@ class UserDetail extends Component {
             default:
                 array = null
         }
-        console.log(this.state.update)
-        console.log(this.state.userData)
+        // console.log(this.state.update)
+        // console.log(this.state.userData)
         const data = JSON.stringify(filter(this.state.update, array))
         console.log(data)
         const url = user_url + this.state.id.toString() + "/"
@@ -167,7 +174,6 @@ class UserDetail extends Component {
         const isInstagram = userData != null && userData.instagramLink !== "" && userData.instagramLink !== null && userData.instagramLink !== undefined
         const isLinkedin = userData != null && userData.linkedinLink !== "" && userData.linkedinLink !== null && userData.linkedinLink !== undefined
         const isSocialEmail = userData != null && userData.socialEmail !== "" && userData.socialEmail !== null && userData.socialEmail !== undefined
-
         if (userData != null) {
             return (
                 <Container className="ContainerDiv">
@@ -184,7 +190,7 @@ class UserDetail extends Component {
                             <Grid>
                                 {/* <Grid.Row> */}
                                 <Grid.Column width={5} >
-                                    <Avatar size='225' name={userData.full_name} />
+                                    <Avatar size='225' name={userData.full_name} githubHandle={this.getGithubHandle()} />
                                 </Grid.Column>
                                 <Grid.Column width={10}>
                                     <Grid>

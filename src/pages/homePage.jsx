@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Segment, Button, Grid, Container, Header, Breadcrumb, Card, Icon, Transition, Label } from 'semantic-ui-react';
+import { Segment, Button, Grid, Container, Header, Breadcrumb, Card, Icon, Transition, Label, Placeholder } from 'semantic-ui-react';
 import moment from 'moment'
 import './scss/homePage.scss'
 import './scss/tinymce.css'
-// import { Editor } from '@tinymce/tinymce-react';
 import { issue_url } from '../api-routes'
-
+import { NormalPlaceholder } from '../components/placeholders'
 class IssueCard extends Component {
     constructor(props) {
         super(props)
@@ -27,11 +26,10 @@ class IssueCard extends Component {
     render() {
         const { bug } = this.props
         const { large } = this.state
-        // console.log(bug)
         return (
             <Card fluid color='red' raised  >
                 <Card.Content  >
-                    <Card.Header>
+                    <Card.Header style={{ marginTop: "20px" }}>
                         <Icon name={(large) ? ("minus") : ("plus")} size='large' onClick={this.toggle} color='red' />
                         {bug.name}
                         <Icon name='reply' className='add-button' color='red' size='large' onClick={() => { this.handleClickCardDescription(bug) }} />
@@ -63,7 +61,7 @@ class HomePage extends Component {
         super(props)
         this.updateIssue = this.updateIssue.bind(this)
         this.state = {
-            data: [],
+            data: null,
             visible: false,
             isLoggedIn: false,
             activeDomain: null,
@@ -123,16 +121,27 @@ class HomePage extends Component {
     ListCards() {
         let listCards = []
         const { data } = this.state
-        if (this.state.isLoggedIn) {
-            listCards = data.map((bug) => {
-                return (
-                    <IssueCard bug={bug} history={this.props.history} />
-                )
-            })
+        if (Boolean(data)) {
+            if (data.length !== 0) {
+                listCards = data.map((bug) => {
+                    return (
+                        <IssueCard bug={bug} history={this.props.history} />
+                    )
+                })
+            }
+            else {
+                listCards = <Segment>issues are not available</Segment>
+            }
         }
         else {
-            listCards = <Segment>issues are not available</Segment>
+            listCards =
+                <Container>
+                        <NormalPlaceholder />
+                        <NormalPlaceholder />
+                        <NormalPlaceholder />
+                </Container>
         }
+
         return listCards
     }
 
@@ -230,24 +239,6 @@ class HomePage extends Component {
                             </Grid>
                         </Segment>
                     </Transition>
-
-
-
-
-
-                    {/* <Segment.Group horizontal>
-                            <Segment horizontal textAlign='center' children={Button} >
-                                <Button basic color='red' onClick={(event) => { this.updateIssue("P") }}> Pending</Button>
-                                <Button basic color='blue' onClick={(event) => { this.updateIssue("R") }} > Resolved</Button>
-                                <Button basic color='green' onClick={(event) => { this.updateIssue("T") }} > To Be Discussed</Button>
-                            </Segment>
-                            <Segment horizontal textAlign='center' children={Button} >
-                                <Button basic color='teal' onClick={(event) => { this.updateIssue("latest") }} > Latest</Button>
-                                <Button basic color='blue' onClick={(event) => { this.updateIssue("myissue") }} > My Issues</Button>
-                                <Button basic color='green' onClick={(event) => { this.updateIssue("tag") }} > Tags</Button>
-                                <Button basic color='violet' onClick={(event) => { this.updateIssue("imp") }} > Important</Button>
-                            </Segment>
-                        </Segment.Group> */}
                 </Container>
                 <Header dividing />
                 <Container >

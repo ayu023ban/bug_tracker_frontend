@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Segment, Container, Modal, Header, Button, Card, Icon, Image, Divider } from 'semantic-ui-react'
+import { Segment, Container, Modal, Grid, Header, Button, Card, Icon, Image, Divider, Placeholder } from 'semantic-ui-react'
 import Pluralize from 'react-pluralize'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import { project_url } from '../api-routes'
 import { ProjectForm } from '../components/forms'
+import { NormalPlaceholder } from '../components/placeholders'
 
 
 export function isGitUrl(str) {
@@ -17,7 +18,7 @@ class ProjectPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            data: [],
+            data: null,
             isLoggedIn: false,
             projectNameError: false,
             projectLinkError: false,
@@ -43,27 +44,47 @@ class ProjectPage extends Component {
     listProjects() {
         let listCards = []
         let { data } = this.state
-        if (this.state.isLoggedIn) {
-            listCards = data.map(element =>
-                <Card color='red' raised onClick={() => { this.handleClickCardDescription(element.id) }}  >
-                    <Card.Content>
-                        <Card.Description className='projectDescription' >
-                            <div dangerouslySetInnerHTML={{ __html: element.wiki }} />
-                            <Image floated='right'><a href={element.githublink} rel='noopener noreferrer' target="_blank"><Icon name="github" size='big' /></a></Image>
-                        </Card.Description>
-                    </Card.Content>
-                    <Card.Content>
-                        <Card.Header>{element.name}</Card.Header>
-                        <Card.Meta>
-                            <Icon name='users' /> <Pluralize singular={'member'} count={element.members.length} />
-                        </Card.Meta>
-                    </Card.Content>
-                </Card>
-            )
+        if (Boolean(data)) {
+            if (data.length !== 0) {
+                listCards = data.map(element =>
+                    <Card color='red' raised onClick={() => { this.handleClickCardDescription(element.id) }}  >
+                        <Card.Content>
+                            <Card.Description className='projectDescription' >
+                                <div dangerouslySetInnerHTML={{ __html: element.wiki }} />
+                                {Boolean(element.githublink) &&
+                                    <Image floated='right'><a href={element.githublink} rel='noopener noreferrer' target="_blank"><Icon name="github" size='big' /></a></Image>
+                                }
+                            </Card.Description>
+                        </Card.Content>
+                        <Card.Content>
+                            <Card.Header>{element.name}</Card.Header>
+                            <Card.Meta>
+                                <Icon name='users' /> <Pluralize singular={'member'} count={element.members.length} />
+                            </Card.Meta>
+                        </Card.Content>
+                    </Card>
+                )
+                listCards = <Card.Group itemsPerRow='2'>{listCards}</Card.Group>
+            }
+            else {
+                listCards = <Segment >"Projects are not available"</Segment>
+            }
         }
         else {
-            listCards = <Segment >"Projects are not available"</Segment>
+            listCards =
+                <Grid columns={2} stackable>
+                    <Grid.Column>
+                        <NormalPlaceholder />
+                    </Grid.Column>
+                    <Grid.Column>
+                        <NormalPlaceholder />
+                    </Grid.Column>
+                    <Grid.Column>
+                        <NormalPlaceholder />
+                    </Grid.Column>
+                </Grid>
         }
+
 
 
         return listCards
@@ -72,21 +93,25 @@ class ProjectPage extends Component {
     show = (dimmer) => () => this.setState({ dimmer, open: true })
     close = () => this.setState({ open: false })
 
-    createProject(body) {
+    async createProject(body) {
         body = JSON.stringify(body)
-        fetch(project_url, {
+        let res = await fetch(project_url, {
             method: 'POST',
             body: body,
             headers: {
                 "Content-type": "application/json; charset=UTF-8",
                 "Authorization": `Token ${sessionStorage.getItem("token")}`
             },
-        }).then((res) => {
-            if (res.status === 201) {
-                this.close()
-            }
         })
-
+        if (res.status === 201) {
+            res = await res.json()
+            console.log(res)
+            this.setState({
+                data: [res, ...this.state.data]
+            })
+            this.close()
+        }
+        else { console.log(res) }
     }
 
     updateType(input) {
@@ -140,12 +165,12 @@ class ProjectPage extends Component {
                     <Button basic color='violet' onClick={(event) => { this.updateIssue("collaborated") }} > Collaborated</Button>
                 </Segment>
                 <Divider section />
-                <Container>
-                    <Card.Group itemsPerRow='2'>
-                        {this.listProjects()}
-                    </Card.Group>
+                {/* <Container> */}
+                {/* <Card.Group itemsPerRow='2'> */}
+                {this.listProjects()}
+                {/* </Card.Group> */}
 
-                </Container>
+                {/* </Container> */}
 
                 <Modal open={open} onClose={this.close} closeOnDimmerClick={false} closeOnEscape size='large' >
                     <Modal.Header>Create New Project</Modal.Header>
