@@ -3,7 +3,7 @@ import { Segment, Container, Modal, Header, Button, Card, Icon, Image, Divider }
 import Pluralize from 'react-pluralize'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
-import { project_url } from '../routes'
+import { project_url } from '../api-routes'
 import { ProjectForm } from '../components/forms'
 
 

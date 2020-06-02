@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Container, Card, Header, Menu, Form, Button, Input, Breadcrumb, Icon, Divider, Grid, Segment, List } from "semantic-ui-react";
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
-import { user_url } from '../routes'
+import { user_url } from '../api-routes'
 import { filter } from '../components/helperFunctions'
 function isEmail(str) {
     var regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

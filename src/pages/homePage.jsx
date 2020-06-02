@@ -4,7 +4,7 @@ import moment from 'moment'
 import './scss/homePage.scss'
 import './scss/tinymce.css'
 // import { Editor } from '@tinymce/tinymce-react';
-import { issue_url } from '../routes'
+import { issue_url } from '../api-routes'
 
 class IssueCard extends Component {
     constructor(props) {

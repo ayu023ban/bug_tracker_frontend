@@ -2,7 +2,7 @@ import React from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Container } from 'semantic-ui-react'
 import axios from 'axios'
-import {image_url} from '../routes'
+import {image_url} from '../api-routes'
 
 
 class EditorPage extends React.Component {

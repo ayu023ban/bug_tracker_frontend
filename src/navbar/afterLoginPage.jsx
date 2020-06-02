@@ -20,10 +20,8 @@ class LoginComp extends Component {
                         sessionStorage.setItem("isLoggedIn", true)
                         sessionStorage.setItem("user_data", JSON.stringify(res.data.user_data))
                         sessionStorage.setItem("header", JSON.stringify({ Authorization: `Token ${sessionStorage.getItem("token")}` }))
-                        console.log(res.data.token)
-                        console.log(res.data.user_data)
-                        this.setState({ isRequestSuccessful: true })
                         this.props.onLogin()
+                        this.setState({ isRequestSuccessful: true })
                     }
                     else {
                         console.log(res)

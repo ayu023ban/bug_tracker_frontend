@@ -6,45 +6,47 @@ import ProjectPage from './pages/projectPage'
 import PageNotFound from './pages/pageNotFound'
 import SideBar from './navbar/sidebar'
 import EditorPage from './pages/editor'
-import LoginComp from './navbar/login'
+import LoginComp from './navbar/afterLoginPage'
 import UserList from './pages/users'
 import UserDetail from './pages/userDetail'
 import ProjectDetail from './pages/projectDetail'
 import IssueDetail from './pages/issueDetail'
-import loginPage from './pages/loginPage'
+import LoginPage from './pages/beforeLoginPage';
+import { PublicRoute, PrivateRoute } from './routeComp'
 class Router extends Component {
   constructor(props) {
     super(props)
     this.handleLogIn = this.handleLogIn.bind(this)
     this.handleLogOut = this.handleLogOut.bind(this)
-    this.state={isLoggedIn:false}
+    let login = Boolean(sessionStorage.getItem("isLoggedIn"))
+    this.state = { isLoggedIn: login }
   }
   handleLogIn() {
+    console.log("test")
     this.setState({ isLoggedIn: true })
-    this.render()
   }
-  handleLogOut(){
-    this.setState({isLoggedIn:false})
-    this.render()
+  handleLogOut() {
+    this.setState({ isLoggedIn: false })
   }
   render() {
-    const {isLoggedIn} = this.state
+    const { isLoggedIn } = this.state
     const supportsHistory = 'pushState' in window.history
+    console.log("test")
     return (
       <BrowserRouter forceRefresh={!supportsHistory}>
-        <NavBar isLoggedIn={isLoggedIn} onLogout = {this.handleLogOut} />
+        <NavBar isLoggedIn={isLoggedIn} onLogout={this.handleLogOut}  />
         <SideBar />
         <Switch>
-        <Route exact path='/product' component={loginPage} />
-          <Route exact path='/' render={(props)=><HomePage {...props} isLoggedIn={isLoggedIn} />} />
+          <PrivateRoute exact path="/" isLogin={isLoggedIn} component={HomePage} />
           <Route exact path='/login' render={(props) => <LoginComp {...props} onLogin={this.handleLogIn} />} />
-          <Route exact path='/project' render={(props) => <ProjectDetail {...props} isLoggedIn={isLoggedIn} />} />
-          <Route exact path='/projects' render={(props) => <ProjectPage {...props} isLoggedIn={isLoggedIn} />} />
-          <Route exact path='/issue' render={(props) => <IssueDetail {...props} isLoggedIn={isLoggedIn} />} />
-          <Route exact path='/editor' component={EditorPage} />
-          <Route exact path='/users' component={UserList} />
-          <Route exact path = '/user' component={UserDetail} />
-          <Route exact path='/home' render={(props)=><HomePage {...props} isLoggedIn={isLoggedIn} />} />
+          <PrivateRoute exact path='/project' isLogin={isLoggedIn} component={ProjectDetail} />
+          <PrivateRoute exact path="/home" isLogin={isLoggedIn} component={HomePage} />
+          <PrivateRoute exact path='/projects' component={ProjectPage} />
+          <PrivateRoute exact path='/issue' component={HomePage} />
+          <PrivateRoute exact path='/editor' isLogin={isLoggedIn} component={EditorPage} />
+          <PrivateRoute exact path='/users' isLogin={isLoggedIn} component={UserList} />
+          <PublicRoute exact restricted path='/beforelogin' isLogin={isLoggedIn} component={LoginPage} />
+          <PrivateRoute exact path='/user' isLogin={isLoggedIn} component={UserDetail} />
           <Route component={PageNotFound} />
         </Switch>
       </BrowserRouter>
