@@ -13,7 +13,7 @@ import ProjectDetail from './pages/projectDetail'
 import IssueDetail from './pages/issueDetail'
 import LoginPage from './pages/beforeLoginPage';
 import { PublicRoute, PrivateRoute } from './routeComp'
-// import { Transition } from 'semantic-ui-react'
+import {login} from './components/helperFunctions'
 class Router extends Component {
   constructor(props) {
     super(props)
@@ -22,7 +22,14 @@ class Router extends Component {
     let login = Boolean(sessionStorage.getItem("isLoggedIn"))
     this.state = { isLoggedIn: login, open: true }
   }
+  async componentDidMount(){
+    if(await login()){
+      console.log("test")
+      this.handleLogIn()
+    }
+  }
   handleLogIn() {
+    
     this.setState({ isLoggedIn: true })
   }
   handleLogOut() {

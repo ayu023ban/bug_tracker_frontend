@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import _ from 'lodash'
 import { Input, Menu, Icon, Popup, Button, Search } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import {setCookie} from '../components/helperFunctions'
 export default class NavBar extends Component {
   constructor(props) {
     super(props)
@@ -27,6 +28,7 @@ export default class NavBar extends Component {
       sessionStorage.removeItem("token")
       sessionStorage.removeItem("user_data")
       sessionStorage.removeItem("header")
+      setCookie("token","","-1")
       this.props.onLogout()
       // this.componentDidMount()
     }
