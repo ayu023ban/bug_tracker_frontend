@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Label, Card, Header, Placeholder, Breadcrumb, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
+import { Container, Label, Card, Header, Breadcrumb, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import './scss/tinymce.css'
 import { issue_url, comment_url, project_url } from "../api-routes"
@@ -160,6 +160,7 @@ class IssueDetail extends Component {
         this.setState({ commentDescription: content })
     }
     onCommentSubmit() {
+        console.log(WebSocketInstance)
         WebSocketInstance.newComment(this.state.commentDescription)
     }
 

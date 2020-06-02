@@ -4,6 +4,7 @@
 class WebSocketService {
   constructor() {
     this.socketRef = null
+    this.connect = this.connect.bind(this)
   }
   static instance = null;
   callbacks = {};
@@ -31,10 +32,9 @@ class WebSocketService {
     };
     this.socketRef.onclose = (e) => {
       console.log("WebSocket closed let's reopen");
-      // console.log(e)
-    setTimeout(this.connect,3000);
+      this.connect(path)
     };
-    
+
   }
 
   // disconnect() {
@@ -47,10 +47,10 @@ class WebSocketService {
     if (Object.keys(this.callbacks).length === 0) {
       return;
     }
-    if(command ==="messages" || command==="new_message"){
-          this.callbacks[command](parsedData)
+    if (command === "messages" || command === "new_message") {
+      this.callbacks[command](parsedData)
     }
-    else{console.log(parsedData)}
+    else { console.log(parsedData) }
 
   }
 
@@ -63,7 +63,7 @@ class WebSocketService {
   newComment(message) {
     this.sendMessage({
       command: "new_message",
-      description:message
+      description: message
     })
   }
 
