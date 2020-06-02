@@ -130,7 +130,7 @@ class ProjectPage extends Component {
     render() {
         const { open } = this.state
         return (
-            <Container className='project-box'>
+            <Container className='project-box ContainerDiv'>
                 <Header as="h2" color='red' className='projects-header'>Projects<Icon className='add-button' onClick={this.show('blurring')} name='plus' size='large' /></Header>
                 <Divider section />
                 <Segment horizontal textAlign='center' children={Button} >

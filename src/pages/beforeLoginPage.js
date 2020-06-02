@@ -5,7 +5,7 @@ class LoginPage extends Component {
 
   render() {
     return (
-      <Container>
+      <Container className="ContainerDiv">
       <Header>Login Page</Header>
       </Container>
     )

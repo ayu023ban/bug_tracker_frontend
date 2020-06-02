@@ -170,7 +170,7 @@ class UserDetail extends Component {
 
         if (userData != null) {
             return (
-                <Container>
+                <Container className="ContainerDiv">
                     <Header>
                         <Breadcrumb as={Header}>
                             <Breadcrumb.Section className='previousSection' as={Link} to='/users'>Users</Breadcrumb.Section>

@@ -316,7 +316,7 @@ class IssueDetail extends Component {
         const { bug, commentOpen, updateForm, isUserAMember, isuserACreator } = this.state
         if (this.state.bug !== undefined) {
             return (
-                <Container>
+                <Container className="ContainerDiv"  >
                     <Header>
                         <Breadcrumb as={Header}>
                             <Breadcrumb.Section className='previousSection' as={Link} to='/home'>Issues</Breadcrumb.Section>

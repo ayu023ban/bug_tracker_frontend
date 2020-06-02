@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Segment,Loader,Dimmer} from 'semantic-ui-react'
+import { Segment, Loader, Dimmer } from 'semantic-ui-react'
 import axios from 'axios'
 import { Redirect } from 'react-router'
 class LoginComp extends Component {
@@ -75,14 +75,14 @@ class LoginComp extends Component {
         }
         else {
             return (
-                <Segment>
+                <Segment className="ContainerDiv">
                     <Dimmer active>
                         <Loader size='massive'>Logging In</Loader>
                     </Dimmer>
-                    </Segment>
+                </Segment>
             )
         }
-            
+
     }
 }
 export default LoginComp

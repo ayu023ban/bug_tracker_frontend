@@ -216,7 +216,7 @@ class ProjectDetail extends Component {
         const { data, openModal1, openModal2, updatingForm, isUserATeamMember, isUserACreator } = this.state
         if (data !== null) {
             return (
-                <Container >
+                <Container className="ContainerDiv" >
                     <Header>
                         <Breadcrumb as={Header}>
                             <Breadcrumb.Section className='previousSection' as={Link} to='/projects'>Projects</Breadcrumb.Section>

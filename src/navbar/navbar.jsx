@@ -74,7 +74,10 @@ export default class NavBar extends Component {
         <Menu.Item
           name='projects'
           active={activeItem === 'projects'}
-          onClick={this.handleItemClick}
+          onClick={(e)=>{
+            this.handleItemClick(e,"projects")
+            this.props.onSideBarButton()
+            }}
         ><Popup content='Click to Close Sidebar' trigger={<Icon name='bars' size='large' />} /></Menu.Item>
         <Menu.Item as={Link}
           name='home'

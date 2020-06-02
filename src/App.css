@@ -4,3 +4,6 @@
   grid-template-columns: max-content auto;
   grid-template-rows: max-content auto;
 }
+.ContainerDiv{
+  grid-column: 2/3;
+}

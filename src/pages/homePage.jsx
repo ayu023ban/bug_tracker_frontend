@@ -170,20 +170,20 @@ class HomePage extends Component {
         if (this.state.myIssue) {
             x.push(`creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`)
         }
-        let params = x.join("&") 
-        let q = (x.length!==0)?"?":""
-        let url = base_url+q+params
-        this.get_content(url) 
+        let params = x.join("&")
+        let q = (x.length !== 0) ? "?" : ""
+        let url = base_url + q + params
+        this.get_content(url)
     }
-    async get_content(url){
+    async get_content(url) {
         const headers = JSON.parse(sessionStorage.getItem("header"))
-        let response = await fetch(url,{method:"GET",headers:headers})
-        
-        if(response.status ===200){
+        let response = await fetch(url, { method: "GET", headers: headers })
+
+        if (response.status === 200) {
             let data = await response.json()
-            this.setState({data:data})
+            this.setState({ data: data })
         }
-        else{
+        else {
             console.log(response)
         }
     }
@@ -191,52 +191,51 @@ class HomePage extends Component {
     render() {
         const { visible } = this.state
         return (
-            <div className="HomePage">
+            <Container className="ContainerDiv">
+                <Breadcrumb size='huge' className="PageTopic" >
+                    <Breadcrumb.Section>
+                        <Header>Issues</Header>
+                    </Breadcrumb.Section>
+                </Breadcrumb>
+                <Header dividing />
                 <Container>
-                    <Breadcrumb size='huge' className="PageTopic" >
-                        <Breadcrumb.Section>
-                            <Header>Issues</Header>
-                        </Breadcrumb.Section>
-                    </Breadcrumb>
-                    <Header dividing />
-                    <Container>
-                        <Button icon="options" content="filter" onClick={() => { this.toggleFilter() }} />
-                        <Transition visible={visible} duration={500} animation="slide down">
-                            <Segment>
-                                <Grid style={{ justifyContent: "space-evenly" }}>
-                                    <Grid.Row textAlign='center' columns={4}>
-                                        <Grid.Column> <Header>Status</Header></Grid.Column>
-                                        <Grid.Column><Header>Domain</Header></Grid.Column>
-                                        <Grid.Column><Header>My Issues</Header></Grid.Column>
-                                        <Grid.Column><Header>Important</Header></Grid.Column>
-                                    </Grid.Row>
-                                    <Grid.Row textAlign='center' columns={4} >
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                                            <Button color='red' basic={!(this.state.activeStatus === "P")} onClick={() => { this.handleStatusClick("P") }}> Pending</Button>
-                                            <Button color='blue' basic={!(this.state.activeStatus === "R")} onClick={() => { this.handleStatusClick("R") }} > Resolved</Button>
-                                            <Button color='green' basic={!(this.state.activeStatus === "T")} onClick={() => { this.handleStatusClick("T") }} > To Be Discussed</Button>
-                                        </Grid.Column>
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                                            <Button color='red' basic={!(this.state.activeDomain === "f")} onClick={() => { this.handleDomainClick("f") }}> Front End</Button>
-                                            <Button color='blue' basic={!(this.state.activeDomain === "b")} onClick={() => { this.handleDomainClick("b") }} > Back End</Button>
-                                            <Button color='green' basic={!(this.state.activeDomain === "o")} onClick={() => { this.handleDomainClick("o") }} > Other</Button>
-                                        </Grid.Column>
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                                            <Button basic={!this.state.myIssue} color='red' onClick={(event) => { this.handlemyIssueClick() }}> My Issues</Button>
-                                        </Grid.Column>
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                                            <Button basic={!this.state.important} color='red' onClick={(event) => { this.handleImportantClick() }}> Important</Button>
-                                        </Grid.Column>
-                                    </Grid.Row>
-                                </Grid>
-                            </Segment>
-                        </Transition>
+                    <Button icon="options" content="filter" onClick={() => { this.toggleFilter() }} />
+                    <Transition visible={visible} duration={500} animation="slide down">
+                        <Segment>
+                            <Grid style={{ justifyContent: "space-evenly" }}>
+                                <Grid.Row textAlign='center' columns={4}>
+                                    <Grid.Column> <Header>Status</Header></Grid.Column>
+                                    <Grid.Column><Header>Domain</Header></Grid.Column>
+                                    <Grid.Column><Header>My Issues</Header></Grid.Column>
+                                    <Grid.Column><Header>Important</Header></Grid.Column>
+                                </Grid.Row>
+                                <Grid.Row textAlign='center' columns={4} >
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button color='red' basic={!(this.state.activeStatus === "P")} onClick={() => { this.handleStatusClick("P") }}> Pending</Button>
+                                        <Button color='blue' basic={!(this.state.activeStatus === "R")} onClick={() => { this.handleStatusClick("R") }} > Resolved</Button>
+                                        <Button color='green' basic={!(this.state.activeStatus === "T")} onClick={() => { this.handleStatusClick("T") }} > To Be Discussed</Button>
+                                    </Grid.Column>
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button color='red' basic={!(this.state.activeDomain === "f")} onClick={() => { this.handleDomainClick("f") }}> Front End</Button>
+                                        <Button color='blue' basic={!(this.state.activeDomain === "b")} onClick={() => { this.handleDomainClick("b") }} > Back End</Button>
+                                        <Button color='green' basic={!(this.state.activeDomain === "o")} onClick={() => { this.handleDomainClick("o") }} > Other</Button>
+                                    </Grid.Column>
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button basic={!this.state.myIssue} color='red' onClick={(event) => { this.handlemyIssueClick() }}> My Issues</Button>
+                                    </Grid.Column>
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button basic={!this.state.important} color='red' onClick={(event) => { this.handleImportantClick() }}> Important</Button>
+                                    </Grid.Column>
+                                </Grid.Row>
+                            </Grid>
+                        </Segment>
+                    </Transition>
 
 
 
 
 
-                        {/* <Segment.Group horizontal>
+                    {/* <Segment.Group horizontal>
                             <Segment horizontal textAlign='center' children={Button} >
                                 <Button basic color='red' onClick={(event) => { this.updateIssue("P") }}> Pending</Button>
                                 <Button basic color='blue' onClick={(event) => { this.updateIssue("R") }} > Resolved</Button>
@@ -249,13 +248,12 @@ class HomePage extends Component {
                                 <Button basic color='violet' onClick={(event) => { this.updateIssue("imp") }} > Important</Button>
                             </Segment>
                         </Segment.Group> */}
-                    </Container>
-                    <Header dividing />
-                    <Container >
-                        {this.ListCards()}
-                    </Container>
                 </Container>
-            </div>
+                <Header dividing />
+                <Container >
+                    {this.ListCards()}
+                </Container>
+            </Container>
         )
     }
 }

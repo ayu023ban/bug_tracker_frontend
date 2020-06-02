@@ -13,36 +13,40 @@ import ProjectDetail from './pages/projectDetail'
 import IssueDetail from './pages/issueDetail'
 import LoginPage from './pages/beforeLoginPage';
 import { PublicRoute, PrivateRoute } from './routeComp'
+// import { Transition } from 'semantic-ui-react'
 class Router extends Component {
   constructor(props) {
     super(props)
     this.handleLogIn = this.handleLogIn.bind(this)
     this.handleLogOut = this.handleLogOut.bind(this)
     let login = Boolean(sessionStorage.getItem("isLoggedIn"))
-    this.state = { isLoggedIn: login }
+    this.state = { isLoggedIn: login, open: true }
   }
   handleLogIn() {
-    console.log("test")
     this.setState({ isLoggedIn: true })
   }
   handleLogOut() {
     this.setState({ isLoggedIn: false })
   }
+  handleSideBarOpen = () => {
+    this.setState((prevState) => ({ open: !prevState.open }))
+  }
   render() {
-    const { isLoggedIn } = this.state
+    const { isLoggedIn, open } = this.state
     const supportsHistory = 'pushState' in window.history
-    console.log("test")
     return (
-      <BrowserRouter forceRefresh={!supportsHistory}>
-        <NavBar isLoggedIn={isLoggedIn} onLogout={this.handleLogOut}  />
-        <SideBar />
+      <BrowserRouter forceRefresh={!supportsHistory} >
+        <NavBar isLoggedIn={isLoggedIn} onLogout={this.handleLogOut} onSideBarButton={this.handleSideBarOpen} />
+        {open &&
+          <SideBar />
+        }
         <Switch>
           <PrivateRoute exact path="/" isLogin={isLoggedIn} component={HomePage} />
           <Route exact path='/login' render={(props) => <LoginComp {...props} onLogin={this.handleLogIn} />} />
           <PrivateRoute exact path='/project' isLogin={isLoggedIn} component={ProjectDetail} />
-          <PrivateRoute exact path="/home" isLogin={isLoggedIn} component={HomePage} />
-          <PrivateRoute exact path='/projects' component={ProjectPage} />
-          <PrivateRoute exact path='/issue' component={HomePage} />
+          <PrivateRoute  exact path="/home" isLogin={isLoggedIn} component={HomePage} />
+          <PrivateRoute isLogin={isLoggedIn} exact path='/projects' component={ProjectPage} />
+          <PrivateRoute isLogin={isLoggedIn} exact path='/issue' component={IssueDetail} />
           <PrivateRoute exact path='/editor' isLogin={isLoggedIn} component={EditorPage} />
           <PrivateRoute exact path='/users' isLogin={isLoggedIn} component={UserList} />
           <PublicRoute exact restricted path='/beforelogin' isLogin={isLoggedIn} component={LoginPage} />

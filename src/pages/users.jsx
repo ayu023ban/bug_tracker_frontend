@@ -56,7 +56,7 @@ class UserList extends Component {
 
     render() {
         return (
-            <Container>
+            <Container className="ContainerDiv" >
                 <Header as="h2" color='red' className='projects-header'>Users</Header>
                 <Divider section />
                 <Card.Group itemsPerRow="3">
