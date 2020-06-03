@@ -98,7 +98,6 @@ class IssueDetail extends Component {
         })
     }
     DeleteClickHandler(id) {
-        console.log("test")
         this.setState({ commentToBeDelete: id })
         this.toggleDeleteComment()
     }

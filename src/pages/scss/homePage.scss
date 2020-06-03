@@ -5,3 +5,12 @@
 //     font-size: 14px !important;
 //     color: rgba($color: #000000, $alpha: 0.68) !important;
 // }
+.grid_3_column{
+    display: grid !important;
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
+    align-items: center;
+}
+.visible.transition{
+    display:grid !important;
+}
