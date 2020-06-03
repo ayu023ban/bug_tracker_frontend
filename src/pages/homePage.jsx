@@ -1,60 +1,10 @@
 import React, { Component } from 'react';
-import { Segment, Button, Grid, Container, Header, Breadcrumb, Card, Icon, Transition, Label, Placeholder } from 'semantic-ui-react';
-import moment from 'moment'
+import { Segment, Button, Grid, Container, Header, Breadcrumb, Transition } from 'semantic-ui-react';
 import './scss/homePage.scss'
 import './scss/tinymce.css'
 import { issue_url } from '../api-routes'
 import { NormalPlaceholder } from '../components/placeholders'
-class IssueCard extends Component {
-    constructor(props) {
-        super(props)
-        this.handleClickCardDescription = this.handleClickCardDescription.bind(this)
-        this.state = {
-            large: false
-        }
-    }
-
-    toggle = () => this.setState({ large: !this.state.large })
-
-    handleClickCardDescription(bug) {
-        this.props.history.push({
-            pathname: '/issue',
-            state: { bug: bug.id }
-        })
-    }
-
-    render() {
-        const { bug } = this.props
-        const { large } = this.state
-        return (
-            <Card fluid color='red' raised  >
-                <Card.Content  >
-                    <Card.Header style={{ marginTop: "20px" }}>
-                        <Icon name={(large) ? ("minus") : ("plus")} size='large' onClick={this.toggle} color='red' />
-                        {bug.name}
-                        <Icon name='reply' className='add-button' color='red' size='large' onClick={() => { this.handleClickCardDescription(bug) }} />
-                        <Label attached='top right'>{<Icon name='tasks' />}{bug.project_name}</Label>
-                    </Card.Header>
-                </Card.Content>
-                {large &&
-                    <Transition.Group >
-                        <Card.Content   >
-                            <Card.Description >
-                                <div dangerouslySetInnerHTML={{ __html: bug.description }} />
-                            </Card.Description>
-                        </Card.Content>
-                        <Card.Content extra >
-                            {moment(bug.issued_at).fromNow()}
-                        </Card.Content>
-                    </Transition.Group>
-                }
-            </Card>
-        )
-    }
-}
-
-
-
+import {IssueCard} from '../components/cards'
 
 class HomePage extends Component {
     constructor(props) {

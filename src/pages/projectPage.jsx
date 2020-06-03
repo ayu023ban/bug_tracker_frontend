@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import { Segment, Container, Modal, Grid, Header, Button, Card, Icon, Image, Divider, Placeholder } from 'semantic-ui-react'
-import Pluralize from 'react-pluralize'
+import { Segment, Container, Modal, Grid, Header, Button, Card, Icon, Divider } from 'semantic-ui-react'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import { project_url } from '../api-routes'
 import { ProjectForm } from '../components/forms'
 import { NormalPlaceholder } from '../components/placeholders'
-
+import { ProjectCard } from '../components/cards'
 
 export function isGitUrl(str) {
     var regex = /^(?:git|ssh|https?|git@[-\w.]+):(\/\/)(github\.com)\/(\w{1,})\/(\w{1,})\/?$/;
@@ -47,22 +46,7 @@ class ProjectPage extends Component {
         if (Boolean(data)) {
             if (data.length !== 0) {
                 listCards = data.map(element =>
-                    <Card color='red' raised onClick={() => { this.handleClickCardDescription(element.id) }}  >
-                        <Card.Content>
-                            <Card.Description className='projectDescription' >
-                                <div dangerouslySetInnerHTML={{ __html: element.wiki }} />
-                                {Boolean(element.githublink) &&
-                                    <Image floated='right'><a href={element.githublink} rel='noopener noreferrer' target="_blank"><Icon name="github" size='big' /></a></Image>
-                                }
-                            </Card.Description>
-                        </Card.Content>
-                        <Card.Content>
-                            <Card.Header>{element.name}</Card.Header>
-                            <Card.Meta>
-                                <Icon name='users' /> <Pluralize singular={'member'} count={element.members.length} />
-                            </Card.Meta>
-                        </Card.Content>
-                    </Card>
+                    <ProjectCard history={this.props.history} project={element} />
                 )
                 listCards = <Card.Group itemsPerRow='2'>{listCards}</Card.Group>
             }
@@ -84,9 +68,6 @@ class ProjectPage extends Component {
                     </Grid.Column>
                 </Grid>
         }
-
-
-
         return listCards
     }
 
@@ -165,13 +146,7 @@ class ProjectPage extends Component {
                     <Button basic color='violet' onClick={(event) => { this.updateIssue("collaborated") }} > Collaborated</Button>
                 </Segment>
                 <Divider section />
-                {/* <Container> */}
-                {/* <Card.Group itemsPerRow='2'> */}
                 {this.listProjects()}
-                {/* </Card.Group> */}
-
-                {/* </Container> */}
-
                 <Modal open={open} onClose={this.close} closeOnDimmerClick={false} closeOnEscape size='large' >
                     <Modal.Header>Create New Project</Modal.Header>
                     <Modal.Content scrolling size='large'>

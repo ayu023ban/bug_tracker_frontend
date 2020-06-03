@@ -1,5 +1,5 @@
 import React from 'react'
-import { Placeholder, Segment } from 'semantic-ui-react'
+import { Placeholder, Segment,Card } from 'semantic-ui-react'
 
 const NormalPlaceholder = () => (
     <Segment raised>
@@ -35,4 +35,18 @@ const BigPlaceholder = () => (
         </Placeholder>
     </Segment>
 )
-export { NormalPlaceholder, BigPlaceholder }
+
+const CardPlaceHolder = () => (
+    <Card raised>
+        <Placeholder >
+            <Placeholder.Header image>
+                <Placeholder.Line />
+                <Placeholder.Line />
+            </Placeholder.Header>
+            <Placeholder.Line />
+            <Placeholder.Line />
+            <Placeholder.Line />
+        </Placeholder>
+    </Card>
+)
+export { NormalPlaceholder, BigPlaceholder,CardPlaceHolder }

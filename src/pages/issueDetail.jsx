@@ -12,6 +12,7 @@ import './scss/issueDetail.scss'
 import { IssueForm } from '../components/forms'
 import { filter } from '../components/helperFunctions'
 import { NormalPlaceholder, BigPlaceholder } from '../components/placeholders'
+import { CommentCard } from '../components/cards'
 class IssueDetail extends Component {
     constructor(props) {
         super(props)
@@ -96,6 +97,11 @@ class IssueDetail extends Component {
             members_data_for_search: members_data_for_search
         })
     }
+    DeleteClickHandler(id) {
+        console.log("test")
+        this.setState({ commentToBeDelete: id })
+        this.toggleDeleteComment()
+    }
 
     listComments() {
         const { comments } = this.state
@@ -104,23 +110,8 @@ class IssueDetail extends Component {
         if (Boolean(comments)) {
             if (comments.length !== 0) {
                 list = comments.map(comment =>
-                    <Card raised fluid color='red'>
-                        <Card.Content>
-                            <Card.Description className="commentCardDescription">
-                                <div dangerouslySetInnerHTML={{ __html: comment.description }} />
-                                {userId === comment.creator &&
-                                    <Icon name='trash' size='large' color='red' onClick={() => {
-                                        this.setState({ commentToBeDelete: comment.id })
-                                        this.toggleDeleteComment()
-                                    }} />
-                                }
-                            </Card.Description>
-                        </Card.Content>
-                        <Card.Content extra >
-                            {moment(comment.created_at).fromNow()}
-                            <span id='issueDetailCardTime' ><Icon name='user' />by {comment.creator_name}</span>
-                        </Card.Content>
-                    </Card>)
+                    <CommentCard comment={comment} userId={userId} onCommentTrashClick={(id)=>{this.DeleteClickHandler(id)}} />
+                )
             }
             else {
                 list = <Segment raised>no comments available</Segment>

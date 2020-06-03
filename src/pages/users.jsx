@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Container, Card, Segment, Header, Divider } from 'semantic-ui-react'
+import { Container, Card, Segment, Header, Divider, Placeholder } from 'semantic-ui-react'
 import Avatar from 'react-avatar'
-import {user_url} from '../api-routes'
+import { user_url } from '../api-routes'
 import './scss/users.scss'
+import { CardPlaceHolder } from '../components/placeholders'
 
 class UserList extends Component {
     constructor(props) {
@@ -26,30 +27,44 @@ class UserList extends Component {
         const { users } = this.state
         let list = ""
         if (users !== null) {
-            list = users.map(user =>
-                <Card raised color='red' onClick={() => {
-                    this.props.history.push({
-                        pathname: '/user',
-                        state: { id: user.id }
-                    })
-                }}>
-                    <Card.Content>
-                        <div className="user-card-content">
-                            <Avatar className='avatar' round textSizeRatio='2.5' size='40' name={user.full_name} />
-                            <div className="user-content">
-                                <span>{user.full_name}</span>
-                                <span>{user.email}</span>
+            if (users.length !== 0) {
+                list = users.map(user =>
+                    <Card raised color='red' onClick={() => {
+                        this.props.history.push({
+                            pathname: '/user',
+                            state: { id: user.id }
+                        })
+                    }}>
+                        <Card.Content>
+                            <div className="user-card-content">
+                                <Avatar className='avatar' round textSizeRatio='2.5' size='40' name={user.full_name} />
+                                <div className="user-content">
+                                    <span>{user.full_name}</span>
+                                    <span>{user.email}</span>
+                                </div>
                             </div>
-                        </div>
-                    </Card.Content>
-                </Card>
-            )
-        }
-        else {
-            list = <Segment>
-                Users are not available
+                        </Card.Content>
+                    </Card>
+                )
+                list = <Card.Group itemsPerRow="3">{list}</Card.Group>
+            }
+            else {
+                list = <Segment>
+                    Users are not available
                 </Segment>
 
+            }
+        }
+        else {
+            list =
+                <Card.Group itemsPerRow="3">
+                    <CardPlaceHolder />
+                    <CardPlaceHolder />
+                    <CardPlaceHolder />
+                    <CardPlaceHolder />
+                    <CardPlaceHolder />
+                    <CardPlaceHolder />
+                </Card.Group>
         }
         return list
     }
@@ -59,9 +74,9 @@ class UserList extends Component {
             <Container className="ContainerDiv" >
                 <Header as="h2" color='red' className='projects-header'>Users</Header>
                 <Divider section />
-                <Card.Group itemsPerRow="3">
-                    {this.listUser()}
-                </Card.Group>
+                {/* <Card.Group itemsPerRow="3"> */}
+                {this.listUser()}
+                {/* </Card.Group> */}
             </Container>
         )
     }
