@@ -4,15 +4,17 @@ import './scss/homePage.scss'
 import './scss/tinymce.css'
 import { issue_url } from '../api-routes'
 import { NormalPlaceholder } from '../components/placeholders'
-import {IssueCard} from '../components/cards'
+import { IssueCard } from '../components/cards'
 
 class HomePage extends Component {
     constructor(props) {
         super(props)
         this.updateIssue = this.updateIssue.bind(this)
+        this.tagClick = this.tagClick.bind(this)
         this.state = {
             data: null,
             visible: false,
+            tagView: { is: false, tag: { id: null, name: null } },
             isLoggedIn: false,
             activeDomain: null,
             activeStatus: null,
@@ -75,7 +77,7 @@ class HomePage extends Component {
             if (data.length !== 0) {
                 listCards = data.map((bug) => {
                     return (
-                        <IssueCard bug={bug} history={this.props.history} />
+                        <IssueCard bug={bug} onTagClick={this.tagClick} history={this.props.history} />
                     )
                 })
             }
@@ -86,9 +88,9 @@ class HomePage extends Component {
         else {
             listCards =
                 <Container>
-                        <NormalPlaceholder />
-                        <NormalPlaceholder />
-                        <NormalPlaceholder />
+                    <NormalPlaceholder />
+                    <NormalPlaceholder />
+                    <NormalPlaceholder />
                 </Container>
         }
 
@@ -113,8 +115,11 @@ class HomePage extends Component {
         await this.setState({ important: !this.state.important })
         this.generateUrl()
     }
+    tagClick(tag) {
 
-    generateUrl() {
+        this.generateUrl(tag)
+    }
+    generateUrl(tag) {
         let base_url = issue_url
         let x = []
         if (this.state.activeDomain != null) {
@@ -129,9 +134,14 @@ class HomePage extends Component {
         if (this.state.myIssue) {
             x.push(`creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`)
         }
+        if (tag) {
+            x = [`tags=${tag.id}`]
+            this.setState({ tagView: { is: true, tag: tag } })
+        }
         let params = x.join("&")
         let q = (x.length !== 0) ? "?" : ""
         let url = base_url + q + params
+
         this.get_content(url)
     }
     async get_content(url) {
@@ -148,15 +158,17 @@ class HomePage extends Component {
     }
 
     render() {
-        const { visible } = this.state
+        const { visible, tagView } = this.state
         return (
             <Container className="ContainerDiv">
+
                 <Breadcrumb size='huge' className="PageTopic" >
                     <Breadcrumb.Section>
-                        <Header>Issues</Header>
+                        <Header>{(tagView.is) ? `Issues tagged [${tagView.tag.name}]` : "Issues"}</Header>
                     </Breadcrumb.Section>
                 </Breadcrumb>
                 <Header dividing />
+                {!tagView.is && 
                 <Container>
                     <Button icon="options" content="filter" onClick={() => { this.toggleFilter() }} />
                     <Transition visible={visible} duration={500} animation="slide down">
@@ -189,8 +201,10 @@ class HomePage extends Component {
                             </Grid>
                         </Segment>
                     </Transition>
+                    <Header dividing />
                 </Container>
-                <Header dividing />
+                }
+                
                 <Container >
                     {this.ListCards()}
                 </Container>

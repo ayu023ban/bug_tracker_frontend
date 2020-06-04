@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Card, Icon, Label, Transition, Image, Grid } from 'semantic-ui-react'
+import { Card, Icon, Label, Transition, Image, Grid, List } from 'semantic-ui-react'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
 
@@ -20,11 +20,28 @@ class IssueCard extends Component {
             state: { id: id }
         })
     }
+
     projectClick(id) {
         this.props.history.push({
             pathname: '/project',
             state: { id: id }
         })
+    }
+
+    listTags(bug) {
+        let list;
+        const colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black',]
+        if (Boolean(bug.tags)) {
+            let tags = bug.tags.slice(0,10)
+            list = tags.map(e =>
+                <Label style={{cursor:"pointer"}} color={colors[Math.floor(Math.random()*colors.length)]} onClick={()=>{this.props.onTagClick(e)}} tag>{e.name}</Label>
+            )
+            list = <Label.Group >{list}</Label.Group>
+        }
+        else {
+            list = <span></span>
+        }
+        return list
     }
 
     handleClickCardDescription(bug) {
@@ -41,9 +58,11 @@ class IssueCard extends Component {
         return (
             <Card fluid color={backgroundColor} raised  >
                 <Card.Content  >
-                    <Card.Header style={{ marginTop: 10 }}>
-                        <Icon name={(large) ? ("minus") : ("plus")} size='large' onClick={this.toggle} color='red' />
-                        {bug.name}
+                    <Card.Header style={{ marginTop: 10, display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between" }}>
+                        <span><Icon name={(large) ? ("minus") : ("plus")} size='large' onClick={this.toggle} color='red' />
+                            {bug.name}
+                        </span>
+                        {this.listTags(bug)}
                         <Icon name='reply' className='add-button' color='red' size='large' onClick={() => { this.handleClickCardDescription(bug) }} />
                     </Card.Header>
                 </Card.Content>
@@ -123,7 +142,7 @@ class CommentCard extends Component {
         const { comment, userId } = this.props
         return (
             <Card raised fluid color='red'>
-                <Card.Content extra style={{backgroundColor:"#f5f5f5"}} >
+                <Card.Content extra style={{ backgroundColor: "#f5f5f5" }} >
                     <span onClick={() => { this.creatorClick(comment.creator) }} style={{ cursor: "pointer", fontWeight: "bold" }}>
                         {comment.creator_name}
                     </span> commented {moment(comment.created_at).fromNow()}
