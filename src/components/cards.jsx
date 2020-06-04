@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Card, Icon, Label, Transition, Image, Grid } from 'semantic-ui-react'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
-import { Link } from 'react-router-dom'
 
 class IssueCard extends Component {
     constructor(props) {
@@ -96,18 +95,17 @@ class ProjectCard extends Component {
         return (
             <Card color='red' fluid raised onClick={() => { this.handleClickCardDescription(element.id) }}  >
                 <Card.Content>
-                    <Card.Description className='projectDescription' >
-                        <div dangerouslySetInnerHTML={{ __html: element.wiki }} />
-                        {Boolean(element.githublink) &&
-                            <Image floated='right'><a href={element.githublink} rel='noopener noreferrer' target="_blank"><Icon name="github" size='big' /></a></Image>
-                        }
-                    </Card.Description>
+                    <Card.Header>{element.name}</Card.Header>
                 </Card.Content>
                 <Card.Content>
-                    <Card.Header>{element.name}</Card.Header>
-                    <Card.Meta>
-                        <Icon name='users' /> <Pluralize singular={'member'} count={element.members.length} />
-                    </Card.Meta>
+                    <Card.Description className='projectDescription' >
+                        <div dangerouslySetInnerHTML={{ __html: element.wiki }} />
+                    </Card.Description>
+                </Card.Content>
+                <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-around", alignItems: "center", justifyItems: "center" }} >
+                    <span><Icon name='users' /> <Pluralize singular={'member'} count={element.members.length} /></span>
+                    <span><Icon name='bug' /> <Pluralize singular={'issue'} count={element.no_of_issues} /></span>
+                    <span>{Boolean(element.githublink) && <a href={element.githublink} rel='noopener noreferrer' target="_blank"><Icon name="github" /></a>}</span>
                 </Card.Content>
             </Card>
         )
@@ -115,10 +113,21 @@ class ProjectCard extends Component {
 }
 
 class CommentCard extends Component {
+    creatorClick(id) {
+        this.props.history.push({
+            pathname: '/user',
+            state: { id: id }
+        })
+    }
     render() {
         const { comment, userId } = this.props
         return (
             <Card raised fluid color='red'>
+                <Card.Content extra style={{backgroundColor:"#f5f5f5"}} >
+                    <span onClick={() => { this.creatorClick(comment.creator) }} style={{ cursor: "pointer", fontWeight: "bold" }}>
+                        {comment.creator_name}
+                    </span> commented {moment(comment.created_at).fromNow()}
+                </Card.Content>
                 <Card.Content>
                     <Card.Description className="commentCardDescription">
                         <div dangerouslySetInnerHTML={{ __html: comment.description }} />
@@ -130,10 +139,7 @@ class CommentCard extends Component {
                         }
                     </Card.Description>
                 </Card.Content>
-                <Card.Content extra >
-                    {moment(comment.created_at).fromNow()}
-                    <span id='issueDetailCardTime' ><Icon name='user' />by {comment.creator_name}</span>
-                </Card.Content>
+
             </Card>
         )
     }

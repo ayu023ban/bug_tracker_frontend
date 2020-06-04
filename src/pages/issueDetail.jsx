@@ -109,7 +109,7 @@ class IssueDetail extends Component {
         if (Boolean(comments)) {
             if (comments.length !== 0) {
                 list = comments.map(comment =>
-                    <CommentCard comment={comment} userId={userId} onCommentTrashClick={(id)=>{this.DeleteClickHandler(id)}} />
+                    <CommentCard history={this.props.history} comment={comment} userId={userId} onCommentTrashClick={(id)=>{this.DeleteClickHandler(id)}} />
                 )
             }
             else {
