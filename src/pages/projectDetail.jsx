@@ -269,8 +269,7 @@ class ProjectDetail extends Component {
     }
 
     render() {
-        const { data, openModal1, openModal2, updatingForm, isUserATeamMember, isUserACreator } = this.state
-        // if (data !== null) {
+        const { data, openModal1, openModal2, updatingForm} = this.state
         return (
             <Container className="ContainerDiv" >
                 <Header>
@@ -337,7 +336,7 @@ class ProjectDetail extends Component {
                     <Modal.Header>Create New Issue</Modal.Header>
                     <Modal.Content scrolling>
                         <Modal.Description>
-                            <IssueForm onSubmit={this.createIssue} submitName="Create" isDomain={true} />
+                            <IssueForm tags={true} onSubmit={this.createIssue} submitName="Create" isDomain={true} />
                         </Modal.Description>
                     </Modal.Content>
                     <Modal.Actions>
@@ -346,12 +345,6 @@ class ProjectDetail extends Component {
                 </Modal>
             </Container>
         )
-        // }
-        // else {
-        //     return (
-        //         <div>This project is currently not available</div>
-        //     )
-        // }
     }
 }
 export default ProjectDetail

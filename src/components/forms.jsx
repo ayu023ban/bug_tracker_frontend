@@ -72,9 +72,9 @@ class IssueForm extends Component {
             values: { name: this.initialval()[0] }
         }
         this.handleEditorChange = this.handleEditorChange.bind(this)
-
+        this.onChange = this.onChange.bind(this)
     }
-    onChange = e => {
+    async onChange(e) {
         const { name, value } = e.target
         let error
         if (name === "name") {
@@ -83,7 +83,10 @@ class IssueForm extends Component {
                 pointing: 'below'
             } : error = false
         }
-        this.setState({
+        if (name === "tags" && !Boolean(this.props.tags)) {
+            return
+        }
+        await this.setState({
             values: { ...this.state.values, [name]: value },
             errors: { ...this.state.errors, [name]: error }
         })
@@ -95,7 +98,18 @@ class IssueForm extends Component {
     }
     handleDomainClick = (name) => this.setState({ activeDomain: name })
     onSubmitForm() {
-        const data = this.state.values
+        let data = this.state.values
+        if (this.props.tags) {
+            function onlyUnique(value, index, self) {
+                return self.indexOf(value) === index;
+            }
+            let regex = /^\w+$/
+            let tags = this.state.values.tags.split(" ")
+            tags = tags.filter(e => regex.test(e))
+            tags = tags.filter(onlyUnique)
+            data = { ...this.state.values, tags: tags }
+            console.log(data)
+        }
         if (this.props.isDomain) {
             data.domain = this.state.activeDomain
         }
@@ -114,7 +128,9 @@ class IssueForm extends Component {
             <Form>
                 <Form.Input error={this.state.errors.name} label='Name' name='name' onChange={this.onChange} value={this.state.values.name} placeholder='Title' />
                 <EditorPage initialValue={this.initialval()[1]} onEditorChange={this.handleEditorChange} placeholder="Descrpition" />
-
+                {this.props.tags &&
+                    <Form.Input onChange={this.onChange} name="tags" value={this.state.values.tags} label="Tags" placeholder="Use space for multiple tags" />
+                }
                 {this.props.isDomain &&
                     <Form.Field>
                         <Button.Group>
