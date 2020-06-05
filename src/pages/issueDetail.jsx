@@ -109,7 +109,7 @@ class IssueDetail extends Component {
         if (Boolean(comments)) {
             if (comments.length !== 0) {
                 list = comments.map(comment =>
-                    <CommentCard history={this.props.history} comment={comment} userId={userId} onCommentTrashClick={(id)=>{this.DeleteClickHandler(id)}} />
+                    <CommentCard history={this.props.history} comment={comment} userId={userId} onCommentTrashClick={(id) => { this.DeleteClickHandler(id) }} />
                 )
             }
             else {
@@ -342,7 +342,7 @@ class IssueDetail extends Component {
                                                 <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
                                             }
                                         </Card.Header>
-                                        <Label ribbon='right'>{bug.project_name}</Label>
+                                        <Label ribbon='right' style={{ cursor: "pointer" }} onClick={this.goToCorrespondingProject}>{bug.project_name}</Label>
                                         <Card.Meta>reported by {bug.creator_name}</Card.Meta>
                                     </Card.Content>
                                     <Card.Content>
@@ -388,35 +388,31 @@ class IssueDetail extends Component {
                     {this.state.settingsOpen && (isUserAMember || isuserACreator) &&
                         <div className='settings' style={{ backgroundImage: `url("${Background}")` }} >
                             <div className="close"><Icon name="times" size='large' onClick={this.settingToggle} /></div>
-                            <div className="setting-box">
-                                {isuserACreator &&
-                                    <div className="icon-back">
-                                        <Modal basic trigger={<Icon name='trash' size='large' />} closeIcon>
-                                            <Header icon='archive' content='Delete This Issue' />
-                                            <Modal.Actions >
-                                                {/* <Button color='red'onClick={} icon='remove'  content='No' /> */}
-                                                <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
-                                            </Modal.Actions>
-                                        </Modal>
-                                    </div>
-                                }
-                                <div className="icon-back">
-                                    <Icon name='edit' size='large' onClick={(event) => { this.settingToggle(); this.formToggle() }} />
-                                </div>
-                                <div className={`icon-back ${(this.state.bug.important) ? "selected" : ""}`}>
-                                    <Icon name="check square" onClick={(event) => this.setImportant()} />
-                                </div>
-                                <div className="icon-back">
-                                    <Icon name="arrow right" onClick={this.goToCorrespondingProject} />
-                                </div>
-                                <div className="line"></div>
-                            </div>
                             <div className="second-box">
+                                <div className="type">
+                                    {isuserACreator &&
+                                            <Modal basic trigger={<Button color='white'><Icon size='large' name="trash"/></Button>
+                                            } closeIcon>
+                                                <Header icon='archive' content='Delete This Issue' />
+                                                <Modal.Actions >
+                                                    <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
+                                                </Modal.Actions>
+                                            </Modal>
+                                       
+                                    }
+                                    <Button color='white' onClick={(event) => this.settingToggle()} ><Icon size='large' name="edit" /></Button>
+                                </div>
+                            </div>
+                            <div className="line"></div>
+                            <div className="second-box">
+                                <div className="type">
+                                    <Button color='white' className={this.state.bug.important ? 'selected' : ''} onClick={(event) => this.setImportant()} ><Icon size='large' name="check square" /></Button>
+                                </div>
                                 <div className="type">
                                     <Button color='white' className={this.state.activeDomain === 'f' ? 'selected' : ''} onClick={(event) => this.domainUpdate('f')} >Frontend</Button>
                                     <Button color='white' className={this.state.activeDomain === 'b' ? 'selected' : ''} onClick={(event) => this.domainUpdate('b')} >Backend</Button>
                                 </div>
-                                <div className="status">
+                                <div className="type">
                                     <Button color='white' className={this.state.activeStatus === 'P' ? 'selected' : ''} onClick={(event) => this.statusUpdate('P')} >pending</Button>
                                     <Button color='white' className={this.state.activeStatus === 'R' ? 'selected' : ''} onClick={(event) => this.statusUpdate('R')} >resolved</Button>
                                     <Button color='white ' className={this.state.activeStatus === 'T' ? 'selected' : ''} onClick={(event) => this.statusUpdate('T')} >to be discussed</Button>

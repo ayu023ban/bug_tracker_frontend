@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Card, Icon, Label, Transition, Image, Grid, List } from 'semantic-ui-react'
 import moment from 'moment'
+import {Redirect} from 'react-router-dom'
 import Pluralize from 'react-pluralize'
 
 class IssueCard extends Component {
@@ -27,14 +28,19 @@ class IssueCard extends Component {
             state: { id: id }
         })
     }
-
+    onTagClick(tag){
+        this.props.history.push({
+            pathname: '/home/tagged',
+            state: { tag: tag }
+        })
+    }
     listTags(bug) {
         let list;
         const colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey', 'black',]
         if (Boolean(bug.tags)) {
             let tags = bug.tags.slice(0,10)
             list = tags.map(e =>
-                <Label style={{cursor:"pointer"}} color={colors[Math.floor(Math.random()*colors.length)]} onClick={()=>{this.props.onTagClick(e)}} tag>{e.name}</Label>
+                <Label style={{cursor:"pointer"}} color={colors[Math.floor(Math.random()*colors.length)]} onClick={()=>{this.onTagClick(e)}} tag>{e.name}</Label>
             )
             list = <Label.Group >{list}</Label.Group>
         }

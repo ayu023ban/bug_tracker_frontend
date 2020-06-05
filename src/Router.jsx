@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import NavBar from './navbar/navbar'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import HomePage from './pages/homePage'
+import HomePage, { smallHomePage } from './pages/homePage'
 import ProjectPage from './pages/projectPage'
 import PageNotFound from './pages/pageNotFound'
 import SideBar from './navbar/sidebar'
@@ -52,6 +52,7 @@ class Router extends Component {
           <Route exact path='/login' render={(props) => <LoginComp {...props} onLogin={this.handleLogIn} />} />
           <PrivateRoute exact path='/project' isLogin={isLoggedIn} component={ProjectDetail} />
           <PrivateRoute  exact path="/home" isLogin={isLoggedIn} component={HomePage} />
+          <PrivateRoute exact path="/home/tagged" isLogin={isLoggedIn} component={smallHomePage} />
           <PrivateRoute isLogin={isLoggedIn} exact path='/projects' component={ProjectPage} />
           <PrivateRoute isLogin={isLoggedIn} exact path='/issue' component={IssueDetail} />
           <PrivateRoute exact path='/editor' isLogin={isLoggedIn} component={EditorPage} />

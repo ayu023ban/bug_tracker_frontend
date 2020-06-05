@@ -16,7 +16,8 @@ class UserDetail extends Component {
         super(props)
         this.updateForm = this.updateForm.bind(this)
         this.formSubmit = this.formSubmit.bind(this)
-        this.onPopupClick = this.onPopupClick.bind(this)
+        this.toggleDisable = this.toggleDisable.bind(this)
+        this.toggleMaster = this.toggleMaster.bind(this)
         this.state = {
             id: this.props.location.state.id,
             userData: null,
@@ -166,10 +167,9 @@ class UserDetail extends Component {
             })
         }
     }
-    async onPopupClick() {
+    async toggleDisable() {
         const url = user_url + this.state.id.toString() + "/disable/"
         const headers = {
-            "Content-type": "application/json; charset=UTF-8",
             'Authorization': `Token ${sessionStorage.getItem('token')}`,
         }
         let res = await fetch(url, { method: "GET", headers: headers })
@@ -178,6 +178,18 @@ class UserDetail extends Component {
             this.setState({ menuVisible: !this.state.menuVisible, userData: data })
         }
     }
+    async toggleMaster(){
+        const url = user_url + this.state.id.toString() + "/master/"
+        const headers = {
+            'Authorization': `Token ${sessionStorage.getItem('token')}`,
+        }
+        let res = await fetch(url, { method: "GET", headers: headers })
+        if (res.status === 200) {
+            const data = await res.json()
+            this.setState({ menuVisible: !this.state.menuVisible, userData: data })
+        }
+    }
+
     render() {
         const { userData, activeItem } = this.state
         const isUserCreator = this.state.id === JSON.parse(sessionStorage.getItem("user_data")).id
@@ -239,16 +251,22 @@ class UserDetail extends Component {
                                 {JSON.parse(sessionStorage.getItem("user_data")).isMaster && JSON.parse(sessionStorage.getItem("user_data")).id !== this.state.id &&
                                     <Grid.Column width={1}>
                                         <Popup
-                                            style={{ cursor: "pointer" }}
-                                            onClick={this.onPopupClick}
+                                            style={{ padding:0 }}
                                             onOpen={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
                                             open={this.state.menuVisible}
                                             onClose={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
                                             on='click'
                                             pinned
-                                            position="bottom center"
+                                            position="bottom right"
                                             trigger={<Icon name='ellipsis vertical' style={{ cursor: "pointer" }} color='grey' onClick={() => { this.setState({ menuVisible: !this.state.menuVisible }) }} />}
-                                        >{userData.isDisabled ? <span><Icon name="circle outline" />enable</span> : <span><Icon name='ban' />Disable</span>}</Popup>
+                                        >
+                                            <div>
+                                            <Button.Group  basic vertical>
+                                                <Button  icon={userData.isDisabled ? "circle outline" : "ban"} content={userData.isDisabled ? "enable" : "Disable"} labelPosition='left' onClick={this.toggleDisable} />
+                                                <Button  icon={userData.isMaster ? "user cancel" : "user secret"} content={userData.isMaster ? "remove Master" : "make Master"} labelPosition='left' onClick={this.toggleMaster} />
+                                                </Button.Group>
+                                            </div>
+                                        </Popup>
                                     </Grid.Column>
                                 }
                             </Grid>

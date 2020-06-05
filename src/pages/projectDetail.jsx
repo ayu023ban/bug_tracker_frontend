@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { Container, Header, Breadcrumb, Segment, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed, Placeholder } from 'semantic-ui-react'
 import moment from 'moment'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
 import { project_url, user_url, issue_url } from '../api-routes'
 import axios from 'axios'
-import { IssueCard } from './homePage'
+import { IssueCard } from '../components/cards'
 import { ProjectForm, IssueForm } from '../components/forms'
 import { filter } from '../components/helperFunctions'
 import { NormalPlaceholder, BigPlaceholder } from '../components/placeholders'
@@ -154,7 +154,6 @@ class ProjectDetail extends Component {
         }
 
     }
-
     ListCards() {
         let listCards = []
         const { issue_data } = this.state
@@ -264,12 +263,12 @@ class ProjectDetail extends Component {
             </Card>
         }
         else {
-            return <BigPlaceholder/>
+            return <BigPlaceholder />
         }
     }
 
     render() {
-        const { data, openModal1, openModal2, updatingForm} = this.state
+        const { data, openModal1, openModal2, updatingForm } = this.state
         return (
             <Container className="ContainerDiv" >
                 <Header>
