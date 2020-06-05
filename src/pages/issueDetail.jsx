@@ -276,7 +276,7 @@ class IssueDetail extends Component {
                         <span>
                             {(this.state.bug.assigned_to != null) ?
                                 <span>
-                                    assigned to {this.state.bug.assigned_name}
+                                    assigned to <span onClick={() => { this.creatorClick(this.state.bug.assigned_to) }} style={{ cursor: "pointer", fontWeight: "bold" }}>{this.state.bug.assigned_name}</span>
                                 </span>
                                 :
                                 <span>assign to team member</span>
@@ -287,7 +287,7 @@ class IssueDetail extends Component {
                 </span>
         }
         else if (this.state.bug.assigned_to != null) {
-            search = <span>reported to {this.state.bug.assigned_name}</span>
+            search = <span>assigned to <span onClick={() => { this.creatorClick(this.state.bug.assigned_to) }} style={{ cursor: "pointer", fontWeight: "bold" }}>{this.state.bug.assigned_name}</span></span>
         }
         else {
             search = <span></span>
@@ -319,6 +319,12 @@ class IssueDetail extends Component {
     settingToggle = () => this.setState({ settingsOpen: !this.state.settingsOpen })
     formToggle = () => this.setState({ updateForm: !this.state.updateForm })
     toggleDeleteComment = () => this.setState({ deleteCommentModalOpen: !this.state.deleteCommentModalOpen })
+    creatorClick(id) {
+        this.props.history.push({
+            pathname: '/user',
+            state: { id: id }
+        })
+    }
     render() {
         const { bug, commentOpen, updateForm, isUserAMember, isuserACreator } = this.state
         if (this.state.bug !== undefined) {
@@ -343,7 +349,7 @@ class IssueDetail extends Component {
                                             }
                                         </Card.Header>
                                         <Label ribbon='right' style={{ cursor: "pointer" }} onClick={this.goToCorrespondingProject}>{bug.project_name}</Label>
-                                        <Card.Meta>reported by {bug.creator_name}</Card.Meta>
+                                        <Card.Meta>reported by <span onClick={() => { this.creatorClick(bug.creator) }} style={{ cursor: "pointer", fontWeight: "bold" }}>{bug.creator_name}</span></Card.Meta>
                                     </Card.Content>
                                     <Card.Content>
                                         <Card.Description><div dangerouslySetInnerHTML={{ __html: bug.description }} /></Card.Description>
@@ -398,7 +404,6 @@ class IssueDetail extends Component {
                                                     <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
                                                 </Modal.Actions>
                                             </Modal>
-                                       
                                     }
                                     <Button color='white' onClick={(event) => this.settingToggle()} ><Icon size='large' name="edit" /></Button>
                                 </div>

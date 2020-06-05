@@ -54,7 +54,7 @@ class ProjectDetail extends Component {
         await this.setState({ data: data, member_names: data.member_names, member_ids: data.members })
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
-        await this.setState({ issue_data: issue_data })
+        await this.setState({ issue_data: issue_data})
         this.setPermissions()
         this.stateOptions()
 
@@ -78,6 +78,7 @@ class ProjectDetail extends Component {
     stateOptions() {
         const header = JSON.parse(sessionStorage.getItem("header"))
         fetch(user_url, { headers: header }).then(res => res.json()).then((data) => {
+            data = data.results
             const user_data = data.map((element) => {
                 return {
                     key: element.id.toString(),
@@ -188,7 +189,12 @@ class ProjectDetail extends Component {
         }
         return "anonymous"
     }
-
+    creatorClick(id) {
+        this.props.history.push({
+            pathname: '/user',
+            state: { id: id }
+        })
+    }
     async createIssue(data) {
         data.status = "P"
         data.project = this.state.id
@@ -198,7 +204,6 @@ class ProjectDetail extends Component {
         }
         let res = await axios.post(issue_url, data, { headers: header })
         if (res.status === 201) {
-            console.log(res.data)
             this.newIssueClose()
             this.setState({
                 issue_data: [res.data, ...this.state.issue_data]

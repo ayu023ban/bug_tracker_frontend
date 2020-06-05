@@ -69,7 +69,7 @@ class IssueForm extends Component {
         this.state = {
             activeDomain: "f",
             errors: {},
-            values: { name: this.initialval()[0] }
+            values: { name: this.initialval()[0] ,tags:"" }
         }
         this.handleEditorChange = this.handleEditorChange.bind(this)
         this.onChange = this.onChange.bind(this)
@@ -108,7 +108,6 @@ class IssueForm extends Component {
             tags = tags.filter(e => regex.test(e))
             tags = tags.filter(onlyUnique)
             data = { ...this.state.values, tags: tags }
-            console.log(data)
         }
         if (this.props.isDomain) {
             data.domain = this.state.activeDomain

@@ -20,7 +20,7 @@ class UserList extends Component {
             else {
                 console.log(res)
             }
-        }).then(data => this.setState({ users: data }))
+        }).then(data => this.setState({ users: data.results }))
     }
 
     listUser() {
@@ -74,9 +74,7 @@ class UserList extends Component {
             <Container className="ContainerDiv" >
                 <Header as="h2" color='red' className='projects-header'>Users</Header>
                 <Divider section />
-                {/* <Card.Group itemsPerRow="3"> */}
                 {this.listUser()}
-                {/* </Card.Group> */}
             </Container>
         )
     }

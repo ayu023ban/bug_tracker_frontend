@@ -26,7 +26,7 @@ class HomePage extends Component {
         let isLoggedIn = this.props.isLoggedIn || sessionStorage.getItem("isLoggedIn")
         let res = await fetch(issue_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
         let data = await res.json()
-        await this.setState({ data: data, isLoggedIn: isLoggedIn })
+        await this.setState({ data: data.results, isLoggedIn: isLoggedIn })
     }
     fetch_content(type) {
         let base_url = issue_url
@@ -57,7 +57,7 @@ class HomePage extends Component {
         fetch(base_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then((res => res.json()))
             .then((data) => {
-                this.setState({ data: data })
+                this.setState({ data: data.results })
             })
     }
     updateIssue = (string) => {
@@ -139,7 +139,7 @@ class HomePage extends Component {
 
         if (response.status === 200) {
             let data = await response.json()
-            this.setState({ data: data })
+            this.setState({ data: data.results })
         }
         else {
             console.log(response)
@@ -214,7 +214,7 @@ class smallHomePage extends Component {
         let response = await fetch(url, { method: "GET", headers: headers })
         if (response.status === 200) {
             let data = await response.json()
-            this.setState({ data: data })
+            this.setState({ data: data.results })
         }
         else {
             console.log(response)

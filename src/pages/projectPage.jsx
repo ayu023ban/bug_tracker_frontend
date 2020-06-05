@@ -30,7 +30,7 @@ class ProjectPage extends Component {
         Axios.get(project_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then(res => res.data)
             .then((data) => {
-                this.setState({ data: data })
+                this.setState({ data: data.results })
             });
     }
 
@@ -120,7 +120,7 @@ class ProjectPage extends Component {
         fetch(base_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then((res => res.json()))
             .then((data) => {
-                this.setState({ data: data })
+                this.setState({ data: data.results })
             })
 
     }
