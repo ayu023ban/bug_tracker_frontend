@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Segment, Button, Grid, Container, Header, Breadcrumb, Transition } from 'semantic-ui-react';
+import { Segment, Button, Grid, Container, Header, Breadcrumb, Transition} from 'semantic-ui-react';
 import './scss/homePage.scss'
 import './scss/tinymce.css'
 import { issue_url } from '../api-routes'
 import { NormalPlaceholder } from '../components/placeholders'
 import { IssueCard } from '../components/cards'
+import { PaginationContainer } from '../components/helperComponents';
 
 class HomePage extends Component {
     constructor(props) {
@@ -14,19 +15,20 @@ class HomePage extends Component {
         this.state = {
             data: null,
             visible: false,
-            tagView: { is: false, tag: { id: null, name: null } },
             isLoggedIn: false,
             activeDomain: null,
             activeStatus: null,
             important: false,
-            myIssue: false,
+            isCreatedByMeIssue: false,
+            isReportedToMeIssue: false,
+            data_pag: { count: null, url: issue_url + "?page=1" },
         }
     }
     async componentDidMount() {
         let isLoggedIn = this.props.isLoggedIn || sessionStorage.getItem("isLoggedIn")
-        let res = await fetch(issue_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
+        let res = await fetch(this.state.data_pag.url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
         let data = await res.json()
-        await this.setState({ data: data.results, isLoggedIn: isLoggedIn })
+        await this.setState({ data: data.results, data_pag: { ...this.state.data_pag, count: data.count }, isLoggedIn: isLoggedIn })
     }
     fetch_content(type) {
         let base_url = issue_url
@@ -47,7 +49,6 @@ class HomePage extends Component {
                 base_url += "?important=true"
                 break
             case "myissue":
-                // base_url += "mybugs/"
                 base_url += `?creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`
                 break
             default:
@@ -104,8 +105,12 @@ class HomePage extends Component {
         (domain === this.state.activeDomain) ? await this.setState({ activeDomain: null }) : await this.setState({ activeDomain: domain })
         this.generateUrl()
     }
-    async handlemyIssueClick() {
-        await this.setState({ myIssue: !this.state.myIssue })
+    async handleCreatedByMeIssueClick() {
+        await this.setState({ isCreatedByMeIssue: !this.state.isCreatedByMeIssue })
+        this.generateUrl()
+    }
+    async handleReportedToMeIssueClick() {
+        await this.setState({ isReportedToMeIssue: !this.state.isReportedToMeIssue })
         this.generateUrl()
     }
     async handleImportantClick() {
@@ -124,13 +129,16 @@ class HomePage extends Component {
         if (this.state.important) {
             x.push("important=true")
         }
-        if (this.state.myIssue) {
+        if (this.state.isCreatedByMeIssue) {
             x.push(`creator=${JSON.parse(sessionStorage.getItem("user_data")).id}`)
+        }
+        if (this.state.isReportedToMeIssue) {
+            x.push(`assigned_to=${JSON.parse(sessionStorage.getItem("user_data")).id}`)
         }
         let params = x.join("&")
         let q = (x.length !== 0) ? "?" : ""
-        let url = base_url + q + params
-
+        let url = base_url + q + params + ((x.length !== 0) ? "&page=1" : "?page=1")
+        console.log(url)
         this.get_content(url)
     }
     async get_content(url) {
@@ -139,82 +147,92 @@ class HomePage extends Component {
 
         if (response.status === 200) {
             let data = await response.json()
-            this.setState({ data: data.results })
+            this.setState({ data: data.results, data_pag: { count: data.count, url: url } })
         }
         else {
             console.log(response)
         }
     }
-
     render() {
-        const { visible, tagView } = this.state
+        const { visible} = this.state
         return (
             <Container className="ContainerDiv">
-
                 <Breadcrumb size='huge' className="PageTopic" >
                     <Breadcrumb.Section>
-                        <Header>{(tagView.is) ? `Issues tagged [${tagView.tag.name}]` : "Issues"}</Header>
+                        <Header>Issues</Header>
                     </Breadcrumb.Section>
                 </Breadcrumb>
                 <Header dividing />
-                {!tagView.is &&
-                    <Container>
-                        <Button icon="options" content="filter" onClick={() => { this.toggleFilter() }} />
-                        <Transition visible={visible} duration={500} animation="slide down">
-                            <Segment>
-                                <Grid style={{ justifyContent: "space-evenly" }}>
-                                    <Grid.Row textAlign='center' columns={4}>
-                                        <Grid.Column> <Header>Status</Header></Grid.Column>
-                                        <Grid.Column><Header>Domain</Header></Grid.Column>
-                                        <Grid.Column><Header>My Issues</Header></Grid.Column>
-                                        <Grid.Column><Header>Important</Header></Grid.Column>
-                                    </Grid.Row>
-                                    <Grid.Row textAlign='center' columns={4} >
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                <Container>
+                    <Button icon="options" content="filter" onClick={() => { this.toggleFilter() }} />
+                    <Transition visible={visible} duration={500} animation="slide down">
+                        <Segment>
+                            <Grid style={{ justifyContent: "space-evenly" }}>
+                                <Grid.Row textAlign='center' columns={4}>
+                                    <Grid.Column> <Header>Status</Header></Grid.Column>
+                                    <Grid.Column><Header>Domain</Header></Grid.Column>
+                                    <Grid.Column><Header>My Issues</Header></Grid.Column>
+                                    <Grid.Column><Header>Important</Header></Grid.Column>
+                                </Grid.Row>
+                                <Grid.Row textAlign='center' columns={4} >
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button.Group vertical>
                                             <Button color='red' basic={!(this.state.activeStatus === "P")} onClick={() => { this.handleStatusClick("P") }}> Pending</Button>
                                             <Button color='blue' basic={!(this.state.activeStatus === "R")} onClick={() => { this.handleStatusClick("R") }} > Resolved</Button>
                                             <Button color='green' basic={!(this.state.activeStatus === "T")} onClick={() => { this.handleStatusClick("T") }} > To Be Discussed</Button>
-                                        </Grid.Column>
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        </Button.Group>
+                                    </Grid.Column>
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button.Group vertical>
                                             <Button color='red' basic={!(this.state.activeDomain === "f")} onClick={() => { this.handleDomainClick("f") }}> Front End</Button>
                                             <Button color='blue' basic={!(this.state.activeDomain === "b")} onClick={() => { this.handleDomainClick("b") }} > Back End</Button>
                                             <Button color='green' basic={!(this.state.activeDomain === "o")} onClick={() => { this.handleDomainClick("o") }} > Other</Button>
-                                        </Grid.Column>
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                                            <Button basic={!this.state.myIssue} color='red' onClick={(event) => { this.handlemyIssueClick() }}> My Issues</Button>
-                                        </Grid.Column>
-                                        <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                                            <Button basic={!this.state.important} color='red' onClick={(event) => { this.handleImportantClick() }}> Important</Button>
-                                        </Grid.Column>
-                                    </Grid.Row>
-                                </Grid>
-                            </Segment>
-                        </Transition>
-                        <Header dividing />
-                    </Container>
-                }
-
+                                        </Button.Group>
+                                    </Grid.Column>
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button.Group vertical>
+                                            <Button basic={!this.state.isCreatedByMeIssue} color='red' onClick={(event) => { this.handleCreatedByMeIssueClick() }}> Created By Issues</Button>
+                                            <Button basic={!this.state.isReportedToMeIssue} color='blue' onClick={(event) => { this.handleReportedToMeIssueClick() }}> Reported By Issues</Button>
+                                        </Button.Group>
+                                    </Grid.Column>
+                                    <Grid.Column textAlign='center' style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+                                        <Button basic={!this.state.important} color='red' onClick={(event) => { this.handleImportantClick() }}> Important</Button>
+                                    </Grid.Column>
+                                </Grid.Row>
+                            </Grid>
+                        </Segment>
+                    </Transition>
+                    <Header dividing />
+                </Container>
+                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
                 <Container >
                     {this.ListCards()}
                 </Container>
+
+                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
             </Container>
         )
     }
 }
 
 class smallHomePage extends Component {
-    state = {
-        data:null,
-        tag:this.props.location.state.tag
+    constructor(props) {
+        super(props)
+        this.state = {
+            data: null,
+            tag: this.props.location.state.tag,
+            data_pag: { count: null, url: issue_url + `?tags=${this.props.location.state.tag.id}&page=1` },
+        }
     }
 
-    async componentDidMount(){
-        let url = issue_url+`?tags=${this.state.tag.id}`
+
+    async componentDidMount() {
+        let url = issue_url + `?tags=${this.state.tag.id}`
         const headers = JSON.parse(sessionStorage.getItem("header"))
         let response = await fetch(url, { method: "GET", headers: headers })
         if (response.status === 200) {
             let data = await response.json()
-            this.setState({ data: data.results })
+            this.setState({ data: data.results, data_pag: { ...this.state.data_pag, count: data.count } })
         }
         else {
             console.log(response)
@@ -256,12 +274,14 @@ class smallHomePage extends Component {
                     </Breadcrumb.Section>
                 </Breadcrumb>
                 <Header dividing />
+                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
                 <Container >
                     {this.ListCards()}
                 </Container>
+                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />   
             </Container>
         )
     }
 }
-export {smallHomePage}
+export { smallHomePage }
 export default HomePage 

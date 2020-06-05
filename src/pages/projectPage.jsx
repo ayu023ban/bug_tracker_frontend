@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Segment, Container, Modal, Grid, Header, Button, Card, Icon, Divider } from 'semantic-ui-react'
+import { Segment, Container, Pagination, Modal, Grid, Header, Button, Card, Icon, Divider } from 'semantic-ui-react'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import { project_url } from '../api-routes'
 import { ProjectForm } from '../components/forms'
 import { NormalPlaceholder } from '../components/placeholders'
 import { ProjectCard } from '../components/cards'
-
+import {PaginationContainer} from '../components/helperComponents'
 export function isGitUrl(str) {
     var regex = /^(?:git|ssh|https?|git@[-\w.]+):(\/\/)(github\.com)\/(\w{1,})\/(\w{1,})\/?$/;
     return regex.test(str);
@@ -21,6 +21,7 @@ class ProjectPage extends Component {
             isLoggedIn: false,
             projectNameError: false,
             projectLinkError: false,
+            data_pag:{ count: null, url: project_url + "?page=1"},
             values: { name: "" }
         }
     }
@@ -106,21 +107,21 @@ class ProjectPage extends Component {
         let userId = JSON.parse(sessionStorage.getItem("user_data")).id
         switch (type) {
             case "latest":
-                base_url += "?ordering=-created_at"
+                base_url += "?ordering=-created_at&page=1"
                 break
             case "myprojects":
-                base_url += `?creator=${userId}`
+                base_url += `?creator=${userId}&page=1`
                 break
             case "collaborated":
-                base_url += `?members=${userId}`
+                base_url += `?members=${userId}&page=1`
                 break
             default:
-                base_url += ""
+                base_url += "?page=1"
         }
         fetch(base_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then((res => res.json()))
             .then((data) => {
-                this.setState({ data: data.results })
+                this.setState({ data: data.results,data_pag:{count:data.count,url:base_url} })
             })
 
     }
@@ -131,8 +132,6 @@ class ProjectPage extends Component {
         })
         this.fetch_content(string)
     }
-
-
     render() {
         const { open } = this.state
         return (
@@ -146,7 +145,9 @@ class ProjectPage extends Component {
                     <Button basic color='violet' onClick={(event) => { this.updateIssue("collaborated") }} > Collaborated</Button>
                 </Segment>
                 <Divider section />
+                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
                 {this.listProjects()}
+                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
                 <Modal open={open} onClose={this.close} closeOnDimmerClick={false} closeOnEscape size='large' >
                     <Modal.Header>Create New Project</Modal.Header>
                     <Modal.Content scrolling size='large'>
