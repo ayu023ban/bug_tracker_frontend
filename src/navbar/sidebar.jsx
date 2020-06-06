@@ -33,12 +33,12 @@ class SideBar extends Component {
                     active={activeItem === 'Issues'}
                     onClick={this.handleItemClick}
                 />
-                <Menu.Item as={Link}
+                {/* <Menu.Item as={Link}
                     to='/MyPage'
                     name='My Page'
                     active={activeItem === 'My Page'}
                     onClick={this.handleItemClick}
-                />
+                /> */}
                 <Menu.Item as={Link}
                     className='users'
                     active={activeItem === 'Users'}
