@@ -329,118 +329,120 @@ class IssueDetail extends Component {
         const { bug, commentOpen, updateForm, isUserAMember, isuserACreator } = this.state
         if (this.state.bug !== undefined) {
             return (
-                <Container className="ContainerDiv"  >
-                    <Header>
-                        <Breadcrumb as={Header}>
-                            <Breadcrumb.Section className='previousSection' as={Link} to='/home'>Issues</Breadcrumb.Section>
-                            <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
-                            <Breadcrumb.Section>{Boolean(bug) && bug.name}</Breadcrumb.Section>
-                        </Breadcrumb>
-                    </Header>
-                    <Divider section />
-                    <div className="main-issue-box">
-                        {!(updateForm) ?
-                            Boolean(bug) ?
-                                <Card fluid color='red' className='IssueTop issue-head'>
-                                    <Card.Content>
-                                        <Card.Header as='h2'>{bug.name}
-                                            {(isUserAMember || isuserACreator) &&
-                                                <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
-                                            }
-                                        </Card.Header>
-                                        <Label ribbon='right' style={{ cursor: "pointer" }} onClick={this.goToCorrespondingProject}>{bug.project_name}</Label>
-                                        <Card.Meta>reported by <span onClick={() => { this.creatorClick(bug.creator) }} style={{ cursor: "pointer", fontWeight: "bold" }}>{bug.creator_name}</span></Card.Meta>
-                                    </Card.Content>
-                                    <Card.Content>
-                                        <Card.Description><div dangerouslySetInnerHTML={{ __html: bug.description }} /></Card.Description>
-                                    </Card.Content>
-                                    <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between", alignItems: "center" }} >
-                                        <span><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /></span>
-                                        {this.assignComponent()}
-                                        <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span>
-                                    </Card.Content>
-                                </Card>
-                                : <BigPlaceholder />
-                            :
-                            <Segment className='update-segment'>
-                                <IssueForm initialValues={filter(bug, ["name", "description"])} isDomain={false} onSubmit={this.updateIssue} isClose={true} onClose={() => { this.formToggle() }} submitName="Update" />
-
-                            </Segment>
-                        }
-                    </div>
-                    <Header as="h2" color='red' className='projects-header'>
-                        Comments
-                    {Boolean(bug) &&
-                            <Button className='add-button' onClick={this.commentToggle}><Icon name={(commentOpen) ? "minus" : "plus"} size='big' /></Button>
-                        }
-                    </Header>
-                    {commentOpen &&
-                        <Card color='red' fluid>
-                            <Card.Content>
-                                <EditorPage onEditorChange={this.handleEditorChange} placeholder="Write your comment" />
-                                <Button
-                                    positive
-                                    icon='checkmark'
-                                    content="Create"
-                                    onClick={(event) => this.onCommentSubmit()}
-                                />
-                            </Card.Content>
-                        </Card>
-                    }
-                    <Divider section />
+                <Container fluid className="ContainerDiv"  >
                     <Container>
-                        {this.listComments()}
-                    </Container>
-                    {this.state.settingsOpen && (isUserAMember || isuserACreator) &&
-                        <div className='settings' style={{ backgroundImage: `url("${Background}")` }} >
-                            <div className="close"><Icon name="times" size='large' onClick={this.settingToggle} /></div>
-                            <div className="second-box">
-                                <div className="type">
-                                    {isuserACreator &&
-                                            <Modal basic trigger={<Button color='white'><Icon size='large' name="trash"/></Button>
+                        <Header>
+                            <Breadcrumb as={Header}>
+                                <Breadcrumb.Section className='previousSection' as={Link} to='/home'>Issues</Breadcrumb.Section>
+                                <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
+                                <Breadcrumb.Section>{Boolean(bug) && bug.name}</Breadcrumb.Section>
+                            </Breadcrumb>
+                        </Header>
+                        <Divider section />
+                        <div className="main-issue-box">
+                            {!(updateForm) ?
+                                Boolean(bug) ?
+                                    <Card fluid color='red' className='IssueTop issue-head'>
+                                        <Card.Content>
+                                            <Card.Header as='h2'>{bug.name}
+                                                {(isUserAMember || isuserACreator) &&
+                                                    <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
+                                                }
+                                            </Card.Header>
+                                            <Label ribbon='right' style={{ cursor: "pointer" }} onClick={this.goToCorrespondingProject}>{bug.project_name}</Label>
+                                            <Card.Meta>reported by <span onClick={() => { this.creatorClick(bug.creator) }} style={{ cursor: "pointer", fontWeight: "bold" }}>{bug.creator_name}</span></Card.Meta>
+                                        </Card.Content>
+                                        <Card.Content>
+                                            <Card.Description><div dangerouslySetInnerHTML={{ __html: bug.description }} /></Card.Description>
+                                        </Card.Content>
+                                        <Card.Content extra style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between", alignItems: "center" }} >
+                                            <span><Icon name='comments outline' /><Pluralize singular={'comment'} count={bug.no_of_comments} /></span>
+                                            {this.assignComponent()}
+                                            <span id='issueDetailCardTime' ><Icon name='clock' />{moment(bug.issued_at).fromNow()}</span>
+                                        </Card.Content>
+                                    </Card>
+                                    : <BigPlaceholder />
+                                :
+                                <Segment className='update-segment'>
+                                    <IssueForm initialValues={filter(bug, ["name", "description"])} isDomain={false} onSubmit={this.updateIssue} isClose={true} onClose={() => { this.formToggle() }} submitName="Update" />
+
+                                </Segment>
+                            }
+                        </div>
+                        <Header as="h2" color='red' className='projects-header'>
+                            Comments
+                    {Boolean(bug) &&
+                                <Button className='add-button' onClick={this.commentToggle}><Icon name={(commentOpen) ? "minus" : "plus"} size='big' /></Button>
+                            }
+                        </Header>
+                        {commentOpen &&
+                            <Card color='red' fluid>
+                                <Card.Content>
+                                    <EditorPage onEditorChange={this.handleEditorChange} placeholder="Write your comment" />
+                                    <Button
+                                        positive
+                                        icon='checkmark'
+                                        content="Create"
+                                        onClick={(event) => this.onCommentSubmit()}
+                                    />
+                                </Card.Content>
+                            </Card>
+                        }
+                        <Divider section />
+                        <Container>
+                            {this.listComments()}
+                        </Container>
+                        {this.state.settingsOpen && (isUserAMember || isuserACreator) &&
+                            <div className='settings' style={{ backgroundImage: `url("${Background}")` }} >
+                                <div className="close"><Icon name="times" size='large' onClick={this.settingToggle} /></div>
+                                <div className="second-box">
+                                    <div className="type">
+                                        {isuserACreator &&
+                                            <Modal basic trigger={<Button color='white'><Icon size='large' name="trash" /></Button>
                                             } closeIcon>
                                                 <Header icon='archive' content='Delete This Issue' />
                                                 <Modal.Actions >
                                                     <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
                                                 </Modal.Actions>
                                             </Modal>
-                                    }
-                                    <Button color='white' onClick={(event) => this.settingToggle()} ><Icon size='large' name="edit" /></Button>
+                                        }
+                                        <Button color='white' onClick={(event) => this.settingToggle()} ><Icon size='large' name="edit" /></Button>
+                                    </div>
+                                </div>
+                                <div className="line"></div>
+                                <div className="second-box">
+                                    <div className="type">
+                                        <Button color='white' className={this.state.bug.important ? 'selected' : ''} onClick={(event) => this.setImportant()} ><Icon size='large' name="check square" /></Button>
+                                    </div>
+                                    <div className="type">
+                                        <Button color='white' className={this.state.activeDomain === 'f' ? 'selected' : ''} onClick={(event) => this.domainUpdate('f')} >Frontend</Button>
+                                        <Button color='white' className={this.state.activeDomain === 'b' ? 'selected' : ''} onClick={(event) => this.domainUpdate('b')} >Backend</Button>
+                                    </div>
+                                    <div className="type">
+                                        <Button color='white' className={this.state.activeStatus === 'P' ? 'selected' : ''} onClick={(event) => this.statusUpdate('P')} >pending</Button>
+                                        <Button color='white' className={this.state.activeStatus === 'R' ? 'selected' : ''} onClick={(event) => this.statusUpdate('R')} >resolved</Button>
+                                        <Button color='white ' className={this.state.activeStatus === 'T' ? 'selected' : ''} onClick={(event) => this.statusUpdate('T')} >to be discussed</Button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="line"></div>
-                            <div className="second-box">
-                                <div className="type">
-                                    <Button color='white' className={this.state.bug.important ? 'selected' : ''} onClick={(event) => this.setImportant()} ><Icon size='large' name="check square" /></Button>
-                                </div>
-                                <div className="type">
-                                    <Button color='white' className={this.state.activeDomain === 'f' ? 'selected' : ''} onClick={(event) => this.domainUpdate('f')} >Frontend</Button>
-                                    <Button color='white' className={this.state.activeDomain === 'b' ? 'selected' : ''} onClick={(event) => this.domainUpdate('b')} >Backend</Button>
-                                </div>
-                                <div className="type">
-                                    <Button color='white' className={this.state.activeStatus === 'P' ? 'selected' : ''} onClick={(event) => this.statusUpdate('P')} >pending</Button>
-                                    <Button color='white' className={this.state.activeStatus === 'R' ? 'selected' : ''} onClick={(event) => this.statusUpdate('R')} >resolved</Button>
-                                    <Button color='white ' className={this.state.activeStatus === 'T' ? 'selected' : ''} onClick={(event) => this.statusUpdate('T')} >to be discussed</Button>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    <Modal open={this.state.deleteCommentModalOpen} dimmer onClose={() => { this.toggleDeleteComment() }} basic size='small'>
-                        <Header icon='archive' content='Delete this Comment' />
-                        <Modal.Content>
-                            <p>
-                                Do you really want to remove this comment? This action is not reversible.
+                        }
+                        <Modal open={this.state.deleteCommentModalOpen} dimmer onClose={() => { this.toggleDeleteComment() }} basic size='small'>
+                            <Header icon='archive' content='Delete this Comment' />
+                            <Modal.Content>
+                                <p>
+                                    Do you really want to remove this comment? This action is not reversible.
                           </p>
-                        </Modal.Content>
-                        <Modal.Actions>
-                            <Button basic color='red' inverted onClick={() => { this.toggleDeleteComment() }}>
-                                <Icon name='remove' /> No
+                            </Modal.Content>
+                            <Modal.Actions>
+                                <Button basic color='red' inverted onClick={() => { this.toggleDeleteComment() }}>
+                                    <Icon name='remove' /> No
                           </Button>
-                            <Button color='green' inverted onClick={() => { this.deleteComment() }}>
-                                <Icon name='checkmark' /> Yes
+                                <Button color='green' inverted onClick={() => { this.deleteComment() }}>
+                                    <Icon name='checkmark' /> Yes
                           </Button>
-                        </Modal.Actions>
-                    </Modal>
+                            </Modal.Actions>
+                        </Modal>
+                    </Container>
                 </Container>
             )
         }

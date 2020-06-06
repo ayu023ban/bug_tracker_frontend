@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { Menu, Icon, Popup, Button } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Menu, Icon, Popup, Button, Header } from 'semantic-ui-react'
+import { Link, Redirect } from 'react-router-dom'
+import Avatar from 'react-avatar'
 import { setCookie } from '../components/helperFunctions'
 export default class NavBar extends Component {
   constructor(props) {
@@ -8,6 +9,8 @@ export default class NavBar extends Component {
     this.logout = this.logout.bind(this)
     this.state = {
       activeItem: 'home',
+      menuVisible: false,
+      redirectToProfile: false
     }
 
   }
@@ -31,10 +34,10 @@ export default class NavBar extends Component {
 
   render() {
     const { activeItem } = this.state
-
+    const user_data = JSON.parse(sessionStorage.getItem("user_data"))
     return (
       <Menu icon className="navbar">
-        {this.props.isLoggedIn &&<Menu.Item
+        {this.props.isLoggedIn && <Menu.Item
           name='projects'
           active={activeItem === 'projects'}
           onClick={(e) => {
@@ -43,7 +46,7 @@ export default class NavBar extends Component {
           }}
         ><Popup content='Click to Toggle Sidebar' trigger={<Icon name='bars' size='large' />} /></Menu.Item>
         }
-        {this.props.isLoggedIn &&<Menu.Item as={Link}
+        {this.props.isLoggedIn && <Menu.Item as={Link}
           position='left'
           name='home'
           to='/home'
@@ -53,16 +56,42 @@ export default class NavBar extends Component {
         </Menu.Item>
         }
         <Menu.Item header as='h3' id="Title">
-        Bug Reporter
+          Bug Reporter
         </Menu.Item>
         {this.props.isLoggedIn &&
-          <Menu.Item
-            position='right'
-            as={Button}
-            name='logout'
-            onClick={this.logout}
-          ><Popup content='Sign Out' position='bottom right' trigger={<Icon name='sign out' size='large' />} />
+          <Menu.Item position='right'>
+            <Popup
+              style={{ padding: 0 }}
+              onOpen={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
+              open={this.state.menuVisible}
+              onClose={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
+              on='click'
+              pinned
+              position="bottom right"
+              trigger={<div><Avatar style={{cursor:"pointer"}} round name={user_data.full_name} size={30} /></div>}
+            >
+              <div>
+                <div style={{ padding: "1rem", display: "grid", gridTemplateColumns: "auto auto", alignItems: "center" }}>
+                  <Avatar round name={user_data.full_name} size={60} />
+                  <Header style={{ marginTop: 0, marginLeft: "1rem" }}>{user_data.full_name}</Header>
+                </div>
+                <Button.Group basic fluid vertical>
+                  <Button
+                    icon="user"
+                    content="Profile"
+                    labelPosition='left'
+                    onClick={() => {
+                      this.setState({ redirectToProfile: true, menuVisible: !this.state.menuVisible })
+                      setTimeout(() => { this.setState({ redirectToProfile: false }) }, 1000)
+                    }} />
+                  <Button icon="sign out" content="Log Out" labelPosition='left' onClick={this.logout} />
+                </Button.Group>
+              </div>
+            </Popup>
           </Menu.Item>
+        }
+        {this.state.redirectToProfile &&
+          <Redirect to={{ pathname: "/user", state: { id: user_data.id } }} />
         }
       </Menu>
     )

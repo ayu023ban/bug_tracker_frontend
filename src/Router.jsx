@@ -44,7 +44,7 @@ class Router extends Component {
     return (
       <BrowserRouter forceRefresh={!supportsHistory} >
         {/* {isLoggedIn && */}
-          <NavBar isLoggedIn={isLoggedIn} onLogout={this.handleLogOut} onSideBarButton={this.handleSideBarOpen} />
+          <NavBar isLoggedIn={isLoggedIn} history={this.props.history} onLogout={this.handleLogOut} onSideBarButton={this.handleSideBarOpen} />
         {/* } */}
         {open && isLoggedIn &&
           <SideBar />

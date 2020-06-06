@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Segment, Button, Grid, Container, Header, Breadcrumb, Transition} from 'semantic-ui-react';
+import { Segment, Button, Grid, Container, Header, Breadcrumb, Transition } from 'semantic-ui-react';
 import './scss/homePage.scss'
 import './scss/tinymce.css'
 import { issue_url } from '../api-routes'
@@ -154,9 +154,10 @@ class HomePage extends Component {
         }
     }
     render() {
-        const { visible} = this.state
+        const { visible } = this.state
         return (
-            <Container className="ContainerDiv">
+            <Container fluid className="ContainerDiv">
+            <Container>
                 <Breadcrumb size='huge' className="PageTopic" >
                     <Breadcrumb.Section>
                         <Header>Issues</Header>
@@ -204,12 +205,12 @@ class HomePage extends Component {
                     </Transition>
                     <Header dividing />
                 </Container>
-                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
+                <PaginationContainer onPageChange={(data) => { this.setState({ data: data }) }} data_pag={this.state.data_pag} />
                 <Container >
                     {this.ListCards()}
                 </Container>
-
-                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
+                <PaginationContainer onPageChange={(data) => { this.setState({ data: data }) }} data_pag={this.state.data_pag} />
+                </Container>
             </Container>
         )
     }
@@ -267,18 +268,20 @@ class smallHomePage extends Component {
     render() {
         const { tag } = this.state
         return (
-            <Container className="ContainerDiv">
-                <Breadcrumb size='huge'>
-                    <Breadcrumb.Section>
-                        <Header>{`Issues tagged [${tag.name}]`}</Header>
-                    </Breadcrumb.Section>
-                </Breadcrumb>
-                <Header dividing />
-                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
-                <Container >
-                    {this.ListCards()}
+            <Container fluid className="ContainerDiv">
+                <Container>
+                    <Breadcrumb size='huge'>
+                        <Breadcrumb.Section>
+                            <Header>{`Issues tagged [${tag.name}]`}</Header>
+                        </Breadcrumb.Section>
+                    </Breadcrumb>
+                    <Header dividing />
+                    <PaginationContainer onPageChange={(data) => { this.setState({ data: data }) }} data_pag={this.state.data_pag} />
+                    <Container >
+                        {this.ListCards()}
+                    </Container>
+                    <PaginationContainer onPageChange={(data) => { this.setState({ data: data }) }} data_pag={this.state.data_pag} />
                 </Container>
-                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />   
             </Container>
         )
     }

@@ -1,23 +1,13 @@
-.project-box {
-  position: relative !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  margin-top: 40px !important;
-  .projects-header {
-    position: relative !important;
-    .add-button {
-      float: right;
-      background-color: inherit !important;
-      color: inherit !important;
-      cursor: pointer;
-      transition: transform linear 0.2s;
-      &:hover {
-        transform: scale(1.2);
-      }
-      }
-    }
-  
-  .projectDescription{
+.add-button {
+  float: right;
+  background-color: inherit !important;
+  color: inherit !important;
+  cursor: pointer;
+  transition: transform linear 0.2s;
+  &:hover {
+    transform: scale(1.2);
+  }
+  .projectDescription {
     cursor: pointer;
   }
 }

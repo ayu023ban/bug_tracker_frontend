@@ -135,7 +135,8 @@ class ProjectPage extends Component {
     render() {
         const { open } = this.state
         return (
-            <Container className='project-box ContainerDiv'>
+            <Container className='ContainerDiv'>
+            <Container>
                 <Header as="h2" color='red' className='projects-header'>Projects<Icon className='add-button' onClick={this.show('blurring')} name='plus' size='large' /></Header>
                 <Divider section />
                 <Segment horizontal textAlign='center' children={Button} >
@@ -161,6 +162,7 @@ class ProjectPage extends Component {
                     </Button>
                     </Modal.Actions>
                 </Modal>
+            </Container>
             </Container>
         )
     }

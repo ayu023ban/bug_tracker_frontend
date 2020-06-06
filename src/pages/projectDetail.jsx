@@ -276,6 +276,7 @@ class ProjectDetail extends Component {
         const { data, openModal1, openModal2, updatingForm } = this.state
         return (
             <Container className="ContainerDiv" >
+            <Container>
                 <Header>
                     <Breadcrumb as={Header}>
                         <Breadcrumb.Section className='previousSection' as={Link} to='/projects'>Projects</Breadcrumb.Section>
@@ -347,6 +348,7 @@ class ProjectDetail extends Component {
                         <Button color='black' onClick={this.newIssueClose} content='Cancel' />
                     </Modal.Actions>
                 </Modal>
+                </Container>
             </Container>
         )
     }

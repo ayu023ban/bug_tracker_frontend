@@ -178,7 +178,7 @@ class UserDetail extends Component {
             this.setState({ menuVisible: !this.state.menuVisible, userData: data })
         }
     }
-    async toggleMaster(){
+    async toggleMaster() {
         const url = user_url + this.state.id.toString() + "/master/"
         const headers = {
             'Authorization': `Token ${sessionStorage.getItem('token')}`,
@@ -200,229 +200,231 @@ class UserDetail extends Component {
         const isSocialEmail = userData != null && userData.socialEmail !== "" && userData.socialEmail !== null && userData.socialEmail !== undefined
         return (
             <Container className="ContainerDiv">
-                <Header>
-                    <Breadcrumb as={Header}>
-                        <Breadcrumb.Section className='previousSection' as={Link} to='/users'>Users</Breadcrumb.Section>
-                        <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
-                        <Breadcrumb.Section>{Boolean(userData) && userData.username}</Breadcrumb.Section>
-                    </Breadcrumb>
-                </Header>
-                <Divider section />
-                {Boolean(userData) ?
-                    <Card fluid color='red' >
-                        <Card.Content >
-                            <Grid>
-                                <Grid.Column width={5} >
-                                    <Avatar size='225' name={userData.full_name} githubHandle={this.getGithubHandle()} />
-                                </Grid.Column>
-                                <Grid.Column width={10}>
-                                    <Grid>
-                                        <Grid.Row columns={2}>
-                                            <Grid.Column >
-                                                <Segment>
-                                                    <Header>Username</Header>
-                                                    {userData.username}
-                                                </Segment>
-                                            </Grid.Column>
-                                            <Grid.Column >
-                                                <Segment>
-                                                    <Header>Institute Email</Header>
-                                                    {userData.email}
-                                                </Segment>
-                                            </Grid.Column>
-                                        </Grid.Row>
-                                        <Grid.Row columns={2}>
-                                            <Grid.Column >
-                                                <Segment>
-                                                    <Header>Enrollment No.</Header>
-                                                    {userData.enroll_no}
-                                                </Segment>
-                                            </Grid.Column>
-                                            {isSocialEmail &&
+                <Container>
+                    <Header>
+                        <Breadcrumb as={Header}>
+                            <Breadcrumb.Section className='previousSection' as={Link} to='/users'>Users</Breadcrumb.Section>
+                            <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
+                            <Breadcrumb.Section>{Boolean(userData) && userData.username}</Breadcrumb.Section>
+                        </Breadcrumb>
+                    </Header>
+                    <Divider section />
+                    {Boolean(userData) ?
+                        <Card fluid color='red' >
+                            <Card.Content >
+                                <Grid>
+                                    <Grid.Column width={5} >
+                                        <Avatar size='225' name={userData.full_name} githubHandle={this.getGithubHandle()} />
+                                    </Grid.Column>
+                                    <Grid.Column width={10}>
+                                        <Grid>
+                                            <Grid.Row columns={2}>
                                                 <Grid.Column >
                                                     <Segment>
-                                                        <Header>Email</Header>
-                                                        {userData.socialEmail}
+                                                        <Header>Username</Header>
+                                                        {userData.username}
                                                     </Segment>
-                                                </Grid.Column>}
-                                        </Grid.Row>
-                                    </Grid>
-                                </Grid.Column>
-                                {JSON.parse(sessionStorage.getItem("user_data")).isMaster && JSON.parse(sessionStorage.getItem("user_data")).id !== this.state.id &&
-                                    <Grid.Column width={1}>
-                                        <Popup
-                                            style={{ padding:0 }}
-                                            onOpen={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
-                                            open={this.state.menuVisible}
-                                            onClose={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
-                                            on='click'
-                                            pinned
-                                            position="bottom right"
-                                            trigger={<Icon name='ellipsis vertical' style={{ cursor: "pointer" }} color='grey' onClick={() => { this.setState({ menuVisible: !this.state.menuVisible }) }} />}
-                                        >
-                                            <div>
-                                            <Button.Group  basic vertical>
-                                                <Button  icon={userData.isDisabled ? "circle outline" : "ban"} content={userData.isDisabled ? "enable" : "Disable"} labelPosition='left' onClick={this.toggleDisable} />
-                                                <Button  icon={userData.isMaster ? "user cancel" : "user secret"} content={userData.isMaster ? "remove Master" : "make Master"} labelPosition='left' onClick={this.toggleMaster} />
-                                                </Button.Group>
-                                            </div>
-                                        </Popup>
+                                                </Grid.Column>
+                                                <Grid.Column >
+                                                    <Segment>
+                                                        <Header>Institute Email</Header>
+                                                        {userData.email}
+                                                    </Segment>
+                                                </Grid.Column>
+                                            </Grid.Row>
+                                            <Grid.Row columns={2}>
+                                                <Grid.Column >
+                                                    <Segment>
+                                                        <Header>Enrollment No.</Header>
+                                                        {userData.enroll_no}
+                                                    </Segment>
+                                                </Grid.Column>
+                                                {isSocialEmail &&
+                                                    <Grid.Column >
+                                                        <Segment>
+                                                            <Header>Email</Header>
+                                                            {userData.socialEmail}
+                                                        </Segment>
+                                                    </Grid.Column>}
+                                            </Grid.Row>
+                                        </Grid>
                                     </Grid.Column>
-                                }
-                            </Grid>
-                            <List floated="right" horizontal relaxed >
-                                {isGithub && <List.Item><Button onClick={() => { window.open(userData.githubLink, "_blank") }} circular color="github" icon="github" /></List.Item>}
-                                {isFacebook && <List.Item><Button onClick={() => { window.open(userData.facebookLink, "_blank") }} circular color="facebook" icon="facebook" /></List.Item>}
-                                {isLinkedin && <List.Item><Button onClick={() => { window.open(userData.instagramLink, "_blank") }} circular color="linkedin" icon="linkedin" /></List.Item>}
-                                {isInstagram && <List.Item><Button onClick={() => { window.open(userData.instagramLink, "_blank") }} circular color="instagram" icon='instagram' /></List.Item>}
-                            </List>
-                        </Card.Content>
-                    </Card>
-                    :
-                    <BigPlaceholder />
-                }
-                <Divider hidden section />
-                {isUserCreator &&
-                    <Menu attached="top" tabular>
-                        <Menu.Item
-                            name="Email"
-                            active={activeItem === "Email"}
-                            onClick={this.handleItemClick}
-                        />
-                        <Menu.Item
-                            name="Full Name"
-                            active={activeItem === "Full Name"}
-                            onClick={this.handleItemClick}
-                        />
-                        <Menu.Item
-                            name="Social Link"
-                            active={activeItem === "Social Link"}
-                            onClick={this.handleItemClick}
-                        />
-                    </Menu>
-                }
-                {Boolean(userData) ? isUserCreator &&
-                    <Segment attached="bottom" className="form-segment">
-                        {this.state.activeItem === "Email" &&
-                            <Form className="email-form">
-                                <Form.Field
-                                    control={Input}
-                                    required
-                                    error={this.state.errors.email}
-                                    label="Email"
-                                    placeholder="Email"
-                                    name="socialEmail"
-                                    value={this.state.update.socialEmail}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Field
-                                    control={Input}
-                                    required
-                                    error={this.state.errors.emailConfirm}
-                                    label="Email Confirmation"
-                                    placeholder="Email"
-                                    name="socialEmailConfirmation"
-                                    value={this.state.update.socialEmailConfirmation}
-                                    onChange={this.updateForm}
-                                />
-                                <Button
-                                    positive
-                                    type="submit"
-                                    disabled={this.state.errors.email || this.state.errors.emailConfirm || this.state.update.socialEmail == null || this.state.update.socialEmail.length === 0}
-                                    icon="checkmark"
-                                    content="Update"
-                                    onClick={this.formSubmit}
-                                    className="form-submit"
-                                />
-                            </Form>
-                        }
-                        {this.state.activeItem === "Full Name" &&
-                            <Form>
-                                <Form.Field
-                                    control={Input}
-                                    required
-                                    error={this.state.errors.username}
-                                    label="Full Name"
-                                    placeholder="Full Name"
-                                    name="username"
-                                    value={this.state.update.full_name}
-                                    onChange={this.updateForm}
-                                />
-                                <Button
-                                    positive
-                                    disabled={this.state.errors.username || this.state.update.username.length === 0}
-                                    type="submit"
-                                    icon="checkmark"
-                                    content="Update"
-                                    onClick={this.formSubmit}
-                                    className="username-submit"
-                                />
-                            </Form>
-                        }
-                        {this.state.activeItem === "Social Link" &&
-                            <Form className="social-form">
-                                <Form.Input
-                                    label="GitHub"
-                                    placeholder="put your Github profile link here"
-                                    error={this.state.errors.github}
-                                    name="githubLink"
-                                    value={this.state.update.githubLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Input
-                                    label="Facebook"
-                                    error={this.state.errors.facebook}
-                                    placeholder="put your Facebook profile link here"
-                                    name="facebookLink"
-                                    value={this.state.update.facebookLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Input
-                                    label="LinkedIn"
-                                    error={this.state.errors.linkedin}
-                                    placeholder="put your Linked profile link here"
-                                    name="linkedinLink"
-                                    value={this.state.update.linkedinLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Form.Input
-                                    label="Instagram"
-                                    error={this.state.errors.instagram}
-                                    placeholder="put your Instagram profile link here"
-                                    name="instagramLink"
-                                    value={this.state.update.instagramLink}
-                                    onChange={this.updateForm}
-                                />
-                                <Button
-                                    positive
-                                    disabled={this.state.errors.facebook || this.state.errors.linkedin || this.state.errors.instagram || this.state.errors.github}
-                                    type="submit"
-                                    icon="checkmark"
-                                    content="Update"
-                                    onClick={this.formSubmit}
-                                    className="social-submit"
-                                />
-                            </Form>
-                        }
-                    </Segment>
-                    :
-                    <BigPlaceholder />
-                }
-                <Divider hidden section />
-                <div style={{ display: "grid", gridTemplateColumns: "auto auto", justifyContent: "space-evenly" }} >
-                    <Segment circular style={{ width: 175, height: 175, margin: "0" }}>
-                        <Header as='h2'>
-                            Projects
+                                    {JSON.parse(sessionStorage.getItem("user_data")).isMaster && JSON.parse(sessionStorage.getItem("user_data")).id !== this.state.id &&
+                                        <Grid.Column width={1}>
+                                            <Popup
+                                                style={{ padding: 0 }}
+                                                onOpen={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
+                                                open={this.state.menuVisible}
+                                                onClose={() => { this.setState({ menuVisible: !this.state.menuVisible }) }}
+                                                on='click'
+                                                pinned
+                                                position="bottom right"
+                                                trigger={<Icon name='ellipsis vertical' style={{ cursor: "pointer" }} color='grey' onClick={() => { this.setState({ menuVisible: !this.state.menuVisible }) }} />}
+                                            >
+                                                <div>
+                                                    <Button.Group basic vertical>
+                                                        <Button icon={userData.isDisabled ? "circle outline" : "ban"} content={userData.isDisabled ? "enable" : "Disable"} labelPosition='left' onClick={this.toggleDisable} />
+                                                        <Button icon={userData.isMaster ? "user cancel" : "user secret"} content={userData.isMaster ? "remove Master" : "make Master"} labelPosition='left' onClick={this.toggleMaster} />
+                                                    </Button.Group>
+                                                </div>
+                                            </Popup>
+                                        </Grid.Column>
+                                    }
+                                </Grid>
+                                <List floated="right" horizontal relaxed >
+                                    {isGithub && <List.Item><Button onClick={() => { window.open(userData.githubLink, "_blank") }} circular color="github" icon="github" /></List.Item>}
+                                    {isFacebook && <List.Item><Button onClick={() => { window.open(userData.facebookLink, "_blank") }} circular color="facebook" icon="facebook" /></List.Item>}
+                                    {isLinkedin && <List.Item><Button onClick={() => { window.open(userData.instagramLink, "_blank") }} circular color="linkedin" icon="linkedin" /></List.Item>}
+                                    {isInstagram && <List.Item><Button onClick={() => { window.open(userData.instagramLink, "_blank") }} circular color="instagram" icon='instagram' /></List.Item>}
+                                </List>
+                            </Card.Content>
+                        </Card>
+                        :
+                        <BigPlaceholder />
+                    }
+                    <Divider hidden section />
+                    {isUserCreator &&
+                        <Menu attached="top" tabular>
+                            <Menu.Item
+                                name="Email"
+                                active={activeItem === "Email"}
+                                onClick={this.handleItemClick}
+                            />
+                            <Menu.Item
+                                name="Full Name"
+                                active={activeItem === "Full Name"}
+                                onClick={this.handleItemClick}
+                            />
+                            <Menu.Item
+                                name="Social Link"
+                                active={activeItem === "Social Link"}
+                                onClick={this.handleItemClick}
+                            />
+                        </Menu>
+                    }
+                    {Boolean(userData) ? isUserCreator &&
+                        <Segment attached="bottom" className="form-segment">
+                            {this.state.activeItem === "Email" &&
+                                <Form className="email-form">
+                                    <Form.Field
+                                        control={Input}
+                                        required
+                                        error={this.state.errors.email}
+                                        label="Email"
+                                        placeholder="Email"
+                                        name="socialEmail"
+                                        value={this.state.update.socialEmail}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Field
+                                        control={Input}
+                                        required
+                                        error={this.state.errors.emailConfirm}
+                                        label="Email Confirmation"
+                                        placeholder="Email"
+                                        name="socialEmailConfirmation"
+                                        value={this.state.update.socialEmailConfirmation}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Button
+                                        positive
+                                        type="submit"
+                                        disabled={this.state.errors.email || this.state.errors.emailConfirm || this.state.update.socialEmail == null || this.state.update.socialEmail.length === 0}
+                                        icon="checkmark"
+                                        content="Update"
+                                        onClick={this.formSubmit}
+                                        className="form-submit"
+                                    />
+                                </Form>
+                            }
+                            {this.state.activeItem === "Full Name" &&
+                                <Form>
+                                    <Form.Field
+                                        control={Input}
+                                        required
+                                        error={this.state.errors.username}
+                                        label="Full Name"
+                                        placeholder="Full Name"
+                                        name="username"
+                                        value={this.state.update.full_name}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Button
+                                        positive
+                                        disabled={this.state.errors.username || this.state.update.username.length === 0}
+                                        type="submit"
+                                        icon="checkmark"
+                                        content="Update"
+                                        onClick={this.formSubmit}
+                                        className="username-submit"
+                                    />
+                                </Form>
+                            }
+                            {this.state.activeItem === "Social Link" &&
+                                <Form className="social-form">
+                                    <Form.Input
+                                        label="GitHub"
+                                        placeholder="put your Github profile link here"
+                                        error={this.state.errors.github}
+                                        name="githubLink"
+                                        value={this.state.update.githubLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Input
+                                        label="Facebook"
+                                        error={this.state.errors.facebook}
+                                        placeholder="put your Facebook profile link here"
+                                        name="facebookLink"
+                                        value={this.state.update.facebookLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Input
+                                        label="LinkedIn"
+                                        error={this.state.errors.linkedin}
+                                        placeholder="put your Linked profile link here"
+                                        name="linkedinLink"
+                                        value={this.state.update.linkedinLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Form.Input
+                                        label="Instagram"
+                                        error={this.state.errors.instagram}
+                                        placeholder="put your Instagram profile link here"
+                                        name="instagramLink"
+                                        value={this.state.update.instagramLink}
+                                        onChange={this.updateForm}
+                                    />
+                                    <Button
+                                        positive
+                                        disabled={this.state.errors.facebook || this.state.errors.linkedin || this.state.errors.instagram || this.state.errors.github}
+                                        type="submit"
+                                        icon="checkmark"
+                                        content="Update"
+                                        onClick={this.formSubmit}
+                                        className="social-submit"
+                                    />
+                                </Form>
+                            }
+                        </Segment>
+                        :
+                        <BigPlaceholder />
+                    }
+                    <Divider hidden section />
+                    <div style={{ display: "grid", gridTemplateColumns: "auto auto", justifyContent: "space-evenly" }} >
+                        <Segment circular style={{ width: 175, height: 175, margin: "0" }}>
+                            <Header as='h2'>
+                                Projects
                                 <Header.Subheader>{Boolean(userData) && userData.no_of_projects}</Header.Subheader>
-                        </Header>
-                    </Segment>
-                    <Segment circular inverted style={{ width: 175, height: 175, margin: "0" }}>
-                        <Header inverted as='h2'>
-                            Issues
+                            </Header>
+                        </Segment>
+                        <Segment circular inverted style={{ width: 175, height: 175, margin: "0" }}>
+                            <Header inverted as='h2'>
+                                Issues
                             <Header.Subheader>{Boolean(userData) && userData.no_of_issues}</Header.Subheader>
-                        </Header>
-                    </Segment>
-                </div>
+                            </Header>
+                        </Segment>
+                    </div>
+                </Container>
             </Container>
         )
     }

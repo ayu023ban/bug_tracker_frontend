@@ -1,10 +1,20 @@
 .App {
   height: 100vh;
-  display:grid;
+  display: grid;
   grid-template-columns: max-content auto;
   grid-template-rows: max-content auto;
 }
-.ContainerDiv{
+.ContainerDiv {
   grid-column: 2/3;
-  margin-top: 40px;
+  padding-top: 40px;
+  padding-left: 2px;
+  padding-right: 2px;
+  overflow: scroll;
+}
+.ContainerDiv::-webkit-scrollbar,body::-webkit-scrollbar {
+  display: none;
+}
+
+.ContainerDiv {
+  -ms-overflow-style: none;
 }
