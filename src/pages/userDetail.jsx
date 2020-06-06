@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Card, Header, Menu, Form, Button, Input, Breadcrumb, Icon, Divider, Grid, Segment, List, Placeholder, Popup, Transition } from "semantic-ui-react";
+import { Container, Card, Header, Menu, Form, Button, Input, Breadcrumb, Icon, Divider, Grid, Segment, List, Popup } from "semantic-ui-react";
 import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import { user_url } from '../api-routes'

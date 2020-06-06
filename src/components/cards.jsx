@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { Card, Icon, Label, Transition, Image, Grid, List } from 'semantic-ui-react'
+import { Card, Icon, Label, Transition } from 'semantic-ui-react'
 import moment from 'moment'
-import {Redirect} from 'react-router-dom'
 import Pluralize from 'react-pluralize'
 
 class IssueCard extends Component {

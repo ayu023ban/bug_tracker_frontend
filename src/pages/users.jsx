@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Card, Segment, Header, Divider, Placeholder } from 'semantic-ui-react'
+import { Container, Card, Segment, Header, Divider } from 'semantic-ui-react'
 import Avatar from 'react-avatar'
 import { user_url } from '../api-routes'
 import './scss/users.scss'

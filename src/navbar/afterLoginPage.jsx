@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
-import { Segment, Loader, Dimmer, Container } from 'semantic-ui-react'
-import axios from 'axios'
+import { Loader, Dimmer, Container } from 'semantic-ui-react'
 import { Redirect } from 'react-router'
 import { setCookie } from '../components/helperFunctions'
-import { issue_url } from '../api-routes'
 class LoginComp extends Component {
     constructor(props) {
         super(props)
