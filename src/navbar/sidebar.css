@@ -52,6 +52,9 @@ a:hover {
 .ui.menu.navbar .search input::placeholder {
   color: #fff;
 }
+#Title::before{
+  background:none;
+}
 .ui.menu.navbar .item {
   color: #fff !important;
 }

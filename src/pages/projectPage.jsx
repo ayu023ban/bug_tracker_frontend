@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Segment, Container, Pagination, Modal, Grid, Header, Button, Card, Icon, Divider } from 'semantic-ui-react'
+import { Segment, Container,Modal, Grid, Header, Button, Card, Icon, Divider } from 'semantic-ui-react'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import { project_url } from '../api-routes'

@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
+import {Container,Image} from 'semantic-ui-react'
+import image from '../images/404.png'
 class PageNotFound extends Component{
     render(){
         return(
-            <h1>pageNotFound</h1>
+            <Container className="ContainerDiv" style={{marginTop:0}}>
+                <Image src={image} />
+            </Container>
         )
     }
 }

@@ -13,7 +13,7 @@ import ProjectDetail from './pages/projectDetail'
 import IssueDetail from './pages/issueDetail'
 import LoginPage from './pages/beforeLoginPage';
 import { PublicRoute, PrivateRoute } from './routeComp'
-import {login} from './components/helperFunctions'
+import { login } from './components/helperFunctions'
 class Router extends Component {
   constructor(props) {
     super(props)
@@ -22,14 +22,14 @@ class Router extends Component {
     let login = Boolean(sessionStorage.getItem("isLoggedIn"))
     this.state = { isLoggedIn: login, open: true }
   }
-  async componentDidMount(){
-    if(await login()){
+  async componentDidMount() {
+    if (await login()) {
       console.log("test")
       this.handleLogIn()
     }
   }
   handleLogIn() {
-    
+
     this.setState({ isLoggedIn: true })
   }
   handleLogOut() {
@@ -43,15 +43,18 @@ class Router extends Component {
     const supportsHistory = 'pushState' in window.history
     return (
       <BrowserRouter forceRefresh={!supportsHistory} >
-        <NavBar isLoggedIn={isLoggedIn} onLogout={this.handleLogOut} onSideBarButton={this.handleSideBarOpen} />
-        {open &&
+        {/* {isLoggedIn && */}
+          <NavBar isLoggedIn={isLoggedIn} onLogout={this.handleLogOut} onSideBarButton={this.handleSideBarOpen} />
+        {/* } */}
+        {open && isLoggedIn &&
           <SideBar />
         }
+
         <Switch>
           <PrivateRoute exact path="/" isLogin={isLoggedIn} component={HomePage} />
           <Route exact path='/login' render={(props) => <LoginComp {...props} onLogin={this.handleLogIn} />} />
           <PrivateRoute exact path='/project' isLogin={isLoggedIn} component={ProjectDetail} />
-          <PrivateRoute  exact path="/home" isLogin={isLoggedIn} component={HomePage} />
+          <PrivateRoute exact path="/home" isLogin={isLoggedIn} component={HomePage} />
           <PrivateRoute exact path="/home/tagged" isLogin={isLoggedIn} component={smallHomePage} />
           <PrivateRoute isLogin={isLoggedIn} exact path='/projects' component={ProjectPage} />
           <PrivateRoute isLogin={isLoggedIn} exact path='/issue' component={IssueDetail} />

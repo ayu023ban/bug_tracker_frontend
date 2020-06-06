@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Container, Header, Breadcrumb, Segment, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed, Placeholder } from 'semantic-ui-react'
 import moment from 'moment'
-import { Link, Redirect } from 'react-router-dom'
+import { Link} from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
 import { project_url, user_url, issue_url } from '../api-routes'
@@ -47,14 +47,14 @@ class ProjectDetail extends Component {
 
     async componentDidMount() {
         const project_detail_url = project_url + this.state.id.toString() + "/"
-        const get_issues_url = project_detail_url + "bugs/"
+        const get_issues_url = issue_url +`?project=${this.state.id}`
         const headers = JSON.parse(sessionStorage.getItem("header"))
         let project_res = await fetch(project_detail_url, { headers: headers })
         let data = await project_res.json()
         await this.setState({ data: data, member_names: data.member_names, member_ids: data.members })
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
-        await this.setState({ issue_data: issue_data})
+        await this.setState({ issue_data: issue_data.results})
         this.setPermissions()
         this.stateOptions()
 
