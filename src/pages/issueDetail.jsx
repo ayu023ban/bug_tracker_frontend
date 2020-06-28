@@ -7,7 +7,6 @@ import WebSocketInstance from './websocket'
 import moment from 'moment'
 import Pluralize from 'react-pluralize'
 import EditorPage from './editor'
-import Background from '../images/options.jpg'
 import './scss/issueDetail.scss'
 import { IssueForm } from '../components/forms'
 import { filter } from '../components/helperFunctions'
@@ -109,7 +108,7 @@ class IssueDetail extends Component {
         if (Boolean(comments)) {
             if (comments.length !== 0) {
                 list = comments.map(comment =>
-                    <CommentCard history={this.props.history} comment={comment} userId={userId} onCommentTrashClick={(id) => { this.DeleteClickHandler(id) }} />
+                    <CommentCard key={comment.id} history={this.props.history} comment={comment} userId={userId} onCommentTrashClick={(id) => { this.DeleteClickHandler(id) }} />
                 )
             }
             else {

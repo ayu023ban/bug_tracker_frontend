@@ -130,7 +130,7 @@ class ProjectDetail extends Component {
         if (member_names) {
             if (member_names.length !== 0) {
                 const list = member_names.map(element =>
-                    <Feed.Event>
+                    <Feed.Event key={element.key} >
                         <Feed.Label>
                             <Avatar name={element} size='40' />
                         </Feed.Label>
@@ -162,7 +162,7 @@ class ProjectDetail extends Component {
             if (issue_data.length !== 0) {
                 listCards = issue_data.map((bug) => {
                     return (
-                        <IssueCard bug={bug} history={this.props.history} />
+                        <IssueCard key={bug.id} bug={bug} history={this.props.history} />
                     )
                 })
             }

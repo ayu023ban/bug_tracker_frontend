@@ -47,7 +47,7 @@ class ProjectPage extends Component {
         if (Boolean(data)) {
             if (data.length !== 0) {
                 listCards = data.map(element =>
-                    <ProjectCard history={this.props.history} project={element} />
+                    <ProjectCard key={element.id} history={this.props.history} project={element} />
                 )
                 listCards = <Card.Group itemsPerRow='2'>{listCards}</Card.Group>
             }

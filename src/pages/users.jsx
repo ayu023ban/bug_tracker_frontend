@@ -29,7 +29,7 @@ class UserList extends Component {
         if (users !== null) {
             if (users.length !== 0) {
                 list = users.map(user =>
-                    <Card raised color='red' onClick={() => {
+                    <Card key={user.id} raised color='red' onClick={() => {
                         this.props.history.push({
                             pathname: '/user',
                             state: { id: user.id }

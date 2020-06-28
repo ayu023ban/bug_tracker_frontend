@@ -75,7 +75,7 @@ class HomePage extends Component {
             if (data.length !== 0) {
                 listCards = data.map((bug) => {
                     return (
-                        <IssueCard bug={bug} history={this.props.history} />
+                        <IssueCard key={bug.id} bug={bug} history={this.props.history} />
                     )
                 })
             }
