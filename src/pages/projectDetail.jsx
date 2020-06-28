@@ -275,7 +275,7 @@ class ProjectDetail extends Component {
     render() {
         const { data, openModal1, openModal2, updatingForm } = this.state
         return (
-            <Container className="ContainerDiv" >
+            <Container fluid className="ContainerDiv" >
             <Container>
                 <Header>
                     <Breadcrumb as={Header}>

@@ -71,10 +71,12 @@ class UserList extends Component {
 
     render() {
         return (
-            <Container className="ContainerDiv" >
-                <Header as="h2" color='red' className='projects-header'>Users</Header>
-                <Divider section />
-                {this.listUser()}
+            <Container fluid className="ContainerDiv" >
+                <Container>
+                    <Header as="h2" color='red' className='projects-header'>Users</Header>
+                    <Divider section />
+                    {this.listUser()}
+                </Container>
             </Container>
         )
     }

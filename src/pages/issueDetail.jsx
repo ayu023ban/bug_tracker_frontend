@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Label, Card, Header, Breadcrumb, Segment, Button, Icon, Divider, Modal, Dropdown } from 'semantic-ui-react'
+import { Container, Label, Card, Header, Breadcrumb, Segment, Button, Icon, Divider, Modal, Dropdown, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import './scss/tinymce.css'
 import { issue_url, comment_url, project_url } from "../api-routes"
@@ -35,6 +35,7 @@ class IssueDetail extends Component {
             members_data_for_search: [],
             updateFormDescription: null,
             deleteCommentModalOpen: false,
+            deleteIssueModalOpen: false,
             editAssign: false
         }
     }
@@ -65,7 +66,6 @@ class IssueDetail extends Component {
     }
 
     newCommentFromWebsocket(data) {
-        console.log("test2")
         const comment = data.data
         this.setState({ comments: [comment, ...this.state.comments] })
     }
@@ -150,7 +150,6 @@ class IssueDetail extends Component {
         this.setState({ commentDescription: content })
     }
     onCommentSubmit() {
-        console.log(WebSocketInstance)
         WebSocketInstance.newComment(this.state.commentDescription)
     }
 
@@ -314,7 +313,7 @@ class IssueDetail extends Component {
             this.setState({ bug: data })
         }
     }
-
+    toggleDeleteIssue = () => this.setState({ deleteIssueModalOpen: !this.state.deleteIssueModalOpen })
     commentToggle = () => this.setState({ commentOpen: !this.state.commentOpen })
     settingToggle = () => this.setState({ settingsOpen: !this.state.settingsOpen })
     formToggle = () => this.setState({ updateForm: !this.state.updateForm })
@@ -346,7 +345,36 @@ class IssueDetail extends Component {
                                         <Card.Content>
                                             <Card.Header as='h2'>{bug.name}
                                                 {(isUserAMember || isuserACreator) &&
-                                                    <Icon name='setting' className='add-button' size='large' color='red' onClick={this.settingToggle} />
+                                                    <Popup
+                                                        onOpen={this.settingToggle}
+                                                        open={this.state.settingsOpen}
+                                                        onClose={this.settingToggle}
+                                                        on='click'
+                                                        pinned
+                                                        position="bottom right"
+                                                        trigger={<Icon name='ellipsis vertical' style={{ cursor: "pointer", float: "right" }} color='grey' onClick={this.settingToggle} />}
+                                                    >
+                                                        <div>
+                                                            <Button.Group vertical>
+                                                                <Button.Group basic vertical>
+                                                                    <Button icon="trash" content="delete" name="trash" onClick={() => { this.toggleDeleteIssue(); this.settingToggle() }} labelPosition='left' />
+                                                                    <Button icon="edit" content="edit" labelPosition='left' onClick={(event) => { this.formToggle(); this.settingToggle() }} />
+                                                                    <Button active={bug.important} icon="check square" content="important" labelPosition='left' onClick={(event) => this.setImportant()} />
+                                                                </Button.Group>
+                                                                <Divider hidden />
+                                                                <Button.Group basic vertical>
+                                                                    <Button active={this.state.activeDomain === 'f'} content="frontend" onClick={(event) => this.domainUpdate('f')} />
+                                                                    <Button active={this.state.activeDomain === 'b'} content="backend" onClick={(event) => this.domainUpdate('b')} />
+                                                                </Button.Group>
+                                                                <Divider hidden />
+                                                                <Button.Group basic vertical>
+                                                                    <Button active={this.state.activeStatus === 'P'} onClick={(event) => this.statusUpdate('P')} content="pending" />
+                                                                    <Button active={this.state.activeStatus === 'R'} onClick={(event) => this.statusUpdate('R')} content="resolved" />
+                                                                    <Button active={this.state.activeStatus === 'T'} onClick={(event) => this.statusUpdate('T')} content="to be discussed" />
+                                                                </Button.Group>
+                                                            </Button.Group>
+                                                        </div>
+                                                    </Popup>
                                                 }
                                             </Card.Header>
                                             <Label ribbon='right' style={{ cursor: "pointer" }} onClick={this.goToCorrespondingProject}>{bug.project_name}</Label>
@@ -365,7 +393,6 @@ class IssueDetail extends Component {
                                 :
                                 <Segment className='update-segment'>
                                     <IssueForm initialValues={filter(bug, ["name", "description"])} isDomain={false} onSubmit={this.updateIssue} isClose={true} onClose={() => { this.formToggle() }} submitName="Update" />
-
                                 </Segment>
                             }
                         </div>
@@ -392,40 +419,6 @@ class IssueDetail extends Component {
                         <Container>
                             {this.listComments()}
                         </Container>
-                        {this.state.settingsOpen && (isUserAMember || isuserACreator) &&
-                            <div className='settings' style={{ backgroundImage: `url("${Background}")` }} >
-                                <div className="close"><Icon name="times" size='large' onClick={this.settingToggle} /></div>
-                                <div className="second-box">
-                                    <div className="type">
-                                        {isuserACreator &&
-                                            <Modal basic trigger={<Button color='white'><Icon size='large' name="trash" /></Button>
-                                            } closeIcon>
-                                                <Header icon='archive' content='Delete This Issue' />
-                                                <Modal.Actions >
-                                                    <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
-                                                </Modal.Actions>
-                                            </Modal>
-                                        }
-                                        <Button color='white' onClick={(event) => this.settingToggle()} ><Icon size='large' name="edit" /></Button>
-                                    </div>
-                                </div>
-                                <div className="line"></div>
-                                <div className="second-box">
-                                    <div className="type">
-                                        <Button color='white' className={this.state.bug.important ? 'selected' : ''} onClick={(event) => this.setImportant()} ><Icon size='large' name="check square" /></Button>
-                                    </div>
-                                    <div className="type">
-                                        <Button color='white' className={this.state.activeDomain === 'f' ? 'selected' : ''} onClick={(event) => this.domainUpdate('f')} >Frontend</Button>
-                                        <Button color='white' className={this.state.activeDomain === 'b' ? 'selected' : ''} onClick={(event) => this.domainUpdate('b')} >Backend</Button>
-                                    </div>
-                                    <div className="type">
-                                        <Button color='white' className={this.state.activeStatus === 'P' ? 'selected' : ''} onClick={(event) => this.statusUpdate('P')} >pending</Button>
-                                        <Button color='white' className={this.state.activeStatus === 'R' ? 'selected' : ''} onClick={(event) => this.statusUpdate('R')} >resolved</Button>
-                                        <Button color='white ' className={this.state.activeStatus === 'T' ? 'selected' : ''} onClick={(event) => this.statusUpdate('T')} >to be discussed</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        }
                         <Modal open={this.state.deleteCommentModalOpen} dimmer onClose={() => { this.toggleDeleteComment() }} basic size='small'>
                             <Header icon='archive' content='Delete this Comment' />
                             <Modal.Content>
@@ -442,6 +435,14 @@ class IssueDetail extends Component {
                           </Button>
                             </Modal.Actions>
                         </Modal>
+
+                        <Modal basic open={this.state.deleteIssueModalOpen} onOpen={() => { this.toggleDeleteIssue()}} onClose={()=>{this.toggleDeleteIssue()}} closeIcon>
+                            <Header icon='archive' content='Delete This Issue' />
+                            <Modal.Actions >
+                                <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />
+                            </Modal.Actions>
+                        </Modal>
+
                     </Container>
                 </Container>
             )
@@ -453,9 +454,6 @@ class IssueDetail extends Component {
                 </div>
             )
         }
-
     }
-
 }
-
 export default IssueDetail

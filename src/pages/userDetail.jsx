@@ -199,7 +199,7 @@ class UserDetail extends Component {
         const isLinkedin = userData != null && userData.linkedinLink !== "" && userData.linkedinLink !== null && userData.linkedinLink !== undefined
         const isSocialEmail = userData != null && userData.socialEmail !== "" && userData.socialEmail !== null && userData.socialEmail !== undefined
         return (
-            <Container className="ContainerDiv">
+            <Container fluid className="ContainerDiv">
                 <Container>
                     <Header>
                         <Breadcrumb as={Header}>

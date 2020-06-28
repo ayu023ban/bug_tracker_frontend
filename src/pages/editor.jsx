@@ -24,8 +24,8 @@ class EditorPage extends React.Component {
           initialValue={this.props.initialValue}
           init={{
             placeholder: placeholder,
-            plugins: ' emoticons placeholder  linkchecker link image imagetools autolink lists checklist quicklink powerpaste quickbars blockquote codesample hr autoresize',
-            toolbar: ' emoticons blockquote quickimage codesample | link hr | bold italic underline | formatselect | bullist numlist checklist | undo redo ',
+            plugins: ' emoticons placeholder  link image imagetools autolink lists quicklink  quickbars  codesample hr autoresize',
+            toolbar: ' emoticons quickimage codesample | link hr | bold italic underline | formatselect | bullist numlist | undo redo ',
             toolbar_mode: 'floating',
             images_upload_handler: async function (blobInfo, success, failure) {
               let formData = new FormData()
@@ -43,16 +43,14 @@ class EditorPage extends React.Component {
                   'Accept-Language': 'en-US,en;q=0.8',
                 }
               })
-              // let data = await res
               success(res.data.image)
-              // console.log(res)
             },
             autoresize_bottom_margin: 0,
             autoresize_overflow_padding: 0,
             menubar: false,
             default_link_target: "_blank",
             quickbars_insert_toolbar: 'emoticons quickimage hr pagebreak codesample',
-            quickbars_selection_toolbar: 'bold italic underline | formatselect | quicklink blockquote',
+            quickbars_selection_toolbar: 'bold italic underline | formatselect | quicklink ',
             contextmenu: 'undo redo ',
             powerpaste_word_import: 'clean',
             powerpaste_html_import: 'clean',

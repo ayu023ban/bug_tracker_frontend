@@ -87,7 +87,6 @@ class ProjectPage extends Component {
         })
         if (res.status === 201) {
             res = await res.json()
-            console.log(res)
             this.setState({
                 data: [res, ...this.state.data]
             })
@@ -135,7 +134,7 @@ class ProjectPage extends Component {
     render() {
         const { open } = this.state
         return (
-            <Container className='ContainerDiv'>
+            <Container fluid className='ContainerDiv'>
             <Container>
                 <Header as="h2" color='red' className='projects-header'>Projects<Icon className='add-button' onClick={this.show('blurring')} name='plus' size='large' /></Header>
                 <Divider section />
