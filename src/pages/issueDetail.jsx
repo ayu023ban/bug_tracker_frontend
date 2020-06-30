@@ -356,9 +356,9 @@ class IssueDetail extends Component {
                                                         <div>
                                                             <Button.Group vertical>
                                                                 <Button.Group basic vertical>
-                                                                    <Button icon="trash" content="delete" name="trash" onClick={() => { this.toggleDeleteIssue(); this.settingToggle() }} labelPosition='left' />
+                                                                    {isuserACreator && <Button icon="trash" content="delete" name="trash" onClick={() => { this.toggleDeleteIssue(); this.settingToggle() }} labelPosition='left' />}
                                                                     <Button icon="edit" content="edit" labelPosition='left' onClick={(event) => { this.formToggle(); this.settingToggle() }} />
-                                                                    <Button active={bug.important} icon="check square" content="important" labelPosition='left' onClick={(event) => this.setImportant()} />
+                                                                    {isUserAMember && <Button active={bug.important} icon={ bug.important?"check square":"check square outline" }content="important" labelPosition='left' onClick={(event) => this.setImportant()} /> }
                                                                 </Button.Group>
                                                                 <Divider hidden />
                                                                 <Button.Group basic vertical>

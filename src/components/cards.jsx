@@ -64,11 +64,11 @@ class IssueCard extends Component {
             <Card fluid color={backgroundColor} raised  >
                 <Card.Content  >
                     <Card.Header style={{ marginTop: 10, display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "space-between" }}>
-                        <span><Icon name={(large) ? ("minus") : ("plus")} size='large' onClick={this.toggle} color='red' />
+                        <span><Icon name={(large) ? ("minus") : ("plus")} size='large' style={{cursor:"pointer"}} onClick={this.toggle} color={backgroundColor} />
                             {bug.name}
                         </span>
                         {this.listTags(bug)}
-                        <Icon name='reply' className='add-button' color='red' size='large' onClick={() => { this.handleClickCardDescription(bug) }} />
+                        <Icon name='reply' className='add-button' color={backgroundColor} size='large' onClick={() => { this.handleClickCardDescription(bug) }} />
                     </Card.Header>
                 </Card.Content>
                 {large &&

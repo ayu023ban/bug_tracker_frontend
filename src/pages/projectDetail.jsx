@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Container, Header, Breadcrumb, Segment, Icon, Divider, Card, Modal, Grid, Button, Dropdown, Feed, Placeholder } from 'semantic-ui-react'
 import moment from 'moment'
-import { Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Avatar from 'react-avatar'
 import './scss/projectDetail.scss'
 import { project_url, user_url, issue_url } from '../api-routes'
@@ -10,6 +10,7 @@ import { IssueCard } from '../components/cards'
 import { ProjectForm, IssueForm } from '../components/forms'
 import { filter } from '../components/helperFunctions'
 import { NormalPlaceholder, BigPlaceholder } from '../components/placeholders'
+import { IssueFilter, PaginationContainer } from '../components/helperComponents'
 
 
 
@@ -22,6 +23,7 @@ class ProjectDetail extends Component {
             id: this.props.location.state.id,
             data: null,
             issue_data: null,
+            issue_data_pag: { count: null, url: issue_url + `?project=${this.props.location.state.id}&page=1` },
             member_names: null,
             member_ids: [],
             openModal1: false,
@@ -36,6 +38,7 @@ class ProjectDetail extends Component {
         this.onChange = this.onChange.bind(this)
         this.createIssue = this.createIssue.bind(this)
         this.updateFormToggle = this.updateFormToggle.bind(this)
+        this.get_issue_content = this.get_issue_content.bind(this)
     }
 
     deleteProjectModalShow = () => this.setState({ openModal1: true })
@@ -45,16 +48,16 @@ class ProjectDetail extends Component {
     updateFormToggle = () => this.setState({ updatingForm: !this.state.updatingForm })
 
 
-    async componentDidMount() {
+    async componentDidMount() { 
         const project_detail_url = project_url + this.state.id.toString() + "/"
-        const get_issues_url = issue_url +`?project=${this.state.id}`
+        const get_issues_url = issue_url + `?project=${this.state.id}&page=1`
         const headers = JSON.parse(sessionStorage.getItem("header"))
         let project_res = await fetch(project_detail_url, { headers: headers })
         let data = await project_res.json()
         await this.setState({ data: data, member_names: data.member_names, member_ids: data.members })
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
-        await this.setState({ issue_data: issue_data.results})
+        await this.setState({ issue_data: issue_data.results, issue_data_pag: { ...this.state.issue_data_pag, count: issue_data.count}, })
         this.setPermissions()
         this.stateOptions()
 
@@ -88,6 +91,19 @@ class ProjectDetail extends Component {
             })
             this.setState({ user_data_for_search: user_data })
         })
+    }
+
+    async get_issue_content(url) {
+        const headers = JSON.parse(sessionStorage.getItem("header"))
+        let response = await fetch(url, { method: "GET", headers: headers })
+
+        if (response.status === 200) {
+            let data = await response.json()
+            this.setState({ issue_data: data.results, issue_data_pag: { count: data.count, url: url } })
+        }
+        else {
+            console.log(response)
+        }
     }
 
     onChange(event, data) {
@@ -130,7 +146,7 @@ class ProjectDetail extends Component {
         if (member_names) {
             if (member_names.length !== 0) {
                 const list = member_names.map(element =>
-                    <Feed.Event key={element.key} >
+                    <Feed.Event >
                         <Feed.Label>
                             <Avatar name={element} size='40' />
                         </Feed.Label>
@@ -276,78 +292,79 @@ class ProjectDetail extends Component {
         const { data, openModal1, openModal2, updatingForm } = this.state
         return (
             <Container fluid className="ContainerDiv" >
-            <Container>
-                <Header>
-                    <Breadcrumb as={Header}>
-                        <Breadcrumb.Section className='previousSection' as={Link} to='/projects'>Projects</Breadcrumb.Section>
-                        <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
-                        <Breadcrumb.Section>{Boolean(data) ? data.name : <Placeholder><Placeholder.Line /></Placeholder>}</Breadcrumb.Section>
-                    </Breadcrumb>
-                </Header>
-                <Divider section />
-                {!updatingForm &&
-                    this.renderProjectCard()
-                }
-                {updatingForm &&
-                    <Card fluid color='red'>
-                        <Card.Content>
-                            <ProjectForm onClose={this.updateFormToggle} isClose initialValues={filter(this.state.data, ["name", "wiki", "githublink"])} submitName="Update" onSubmit={(data) => { this.updateProject(data) }} />
-                        </Card.Content>
-                    </Card>
+                <Container>
+                    <Header>
+                        <Breadcrumb as={Header}>
+                            <Breadcrumb.Section className='previousSection' as={Link} to='/projects'>Projects</Breadcrumb.Section>
+                            <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
+                            <Breadcrumb.Section>{Boolean(data) ? data.name : <Placeholder><Placeholder.Line /></Placeholder>}</Breadcrumb.Section>
+                        </Breadcrumb>
+                    </Header>
+                    <Divider section />
+                    {!updatingForm &&
+                        this.renderProjectCard()
+                    }
+                    {updatingForm &&
+                        <Card fluid color='red'>
+                            <Card.Content>
+                                <ProjectForm onClose={this.updateFormToggle} isClose initialValues={filter(this.state.data, ["name", "wiki", "githublink"])} submitName="Update" onSubmit={(data) => { this.updateProject(data) }} />
+                            </Card.Content>
+                        </Card>
 
-                }
+                    }
 
-                <Container fluid className="memberContainer">
-                    <Card color='red' className="members">
-                        <Card.Content textAlign='center' >
-                            <Card.Header>Members</Card.Header>
-                        </Card.Content>
-                        <Card.Content>
-                            {this.DisPlayMembers()}
-                        </Card.Content>
-                    </Card>
-                </Container>
+                    <Container fluid className="memberContainer">
+                        <Card color='red' className="members">
+                            <Card.Content textAlign='center' >
+                                <Card.Header>Members</Card.Header>
+                            </Card.Content>
+                            <Card.Content>
+                                {this.DisPlayMembers()}
+                            </Card.Content>
+                        </Card>
+                    </Container>
 
-                <Header size='large' color='red'>
-                    Issues
+                    <Header size='large' color='red'>
+                        Issues
                 {Boolean(data) ? <Button className='addIssueButton' onClick={this.newIssueShow} icon='plus' size='large' /> : null}
-                </Header>
-                <Divider section />
-
-                <Container className="issueCardGroup" >
-                    {this.ListCards()}
-                </Container>
-
-                <Modal open={openModal1} basic onClose={this.deleteProjectModalClose} size='small'>
-                    <Header icon='archive' content='Delete the Current Project' />
-                    <Modal.Content>
-                        <p>
-                            {this.state.warning_text.split('\n').map((item, key) => {
-                                return <span key={key}>{item}<br /></span>
-                            })}
-                        </p>
-                    </Modal.Content>
-                    <Modal.Actions>
-                        <Button basic color='red' onClick={this.deleteProjectModalClose} inverted>
-                            <Icon name='remove' /> No
+                    </Header>
+                    <Divider section />
+                    <IssueFilter url={issue_url + `?project=${this.state.id}`} get_content={this.get_issue_content} />
+                    <PaginationContainer onPageChange={(data) => { this.setState({ issue_data: data }) }} data_pag={this.state.issue_data_pag} />
+                    <Container className="issueCardGroup" get_content={this.get_issue_content} >
+                        {this.ListCards()}
+                    </Container>
+                    <PaginationContainer onPageChange={(data) => { this.setState({ issue_data: data }) }} data_pag={this.state.issue_data_pag} />
+                    <Modal open={openModal1} basic onClose={this.deleteProjectModalClose} size='small'>
+                        <Header icon='archive' content='Delete the Current Project' />
+                        <Modal.Content>
+                            <p>
+                                {this.state.warning_text.split('\n').map((item, key) => {
+                                    return <span key={key}>{item}<br /></span>
+                                })}
+                            </p>
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button basic color='red' onClick={this.deleteProjectModalClose} inverted>
+                                <Icon name='remove' /> No
                                             </Button>
-                        <Button color='green' onClick={this.deleteCurrentProject} inverted>
-                            <Icon name='checkmark' /> Yes
+                            <Button color='green' onClick={this.deleteCurrentProject} inverted>
+                                <Icon name='checkmark' /> Yes
                                             </Button>
-                    </Modal.Actions>
-                </Modal>
+                        </Modal.Actions>
+                    </Modal>
 
-                <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnEscape size='large' >
-                    <Modal.Header>Create New Issue</Modal.Header>
-                    <Modal.Content scrolling>
-                        <Modal.Description>
-                            <IssueForm tags={true} onSubmit={this.createIssue} submitName="Create" isDomain={true} />
-                        </Modal.Description>
-                    </Modal.Content>
-                    <Modal.Actions>
-                        <Button color='black' onClick={this.newIssueClose} content='Cancel' />
-                    </Modal.Actions>
-                </Modal>
+                    <Modal dimmer open={openModal2} onClose={this.newIssueClose} closeOnEscape size='large' >
+                        <Modal.Header>Create New Issue</Modal.Header>
+                        <Modal.Content scrolling>
+                            <Modal.Description>
+                                <IssueForm tags={true} onSubmit={this.createIssue} submitName="Create" isDomain={true} />
+                            </Modal.Description>
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button color='black' onClick={this.newIssueClose} content='Cancel' />
+                        </Modal.Actions>
+                    </Modal>
                 </Container>
             </Container>
         )
