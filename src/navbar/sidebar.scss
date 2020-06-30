@@ -20,17 +20,20 @@ a,a:hover{
   .item:first-child {
     margin-top: 1em;
   }
-  .workspace,
-  .users {
-    border: 0 !important;
+  .workspace,.users {
     font-size: 18px;
     border-top: 1px solid #dddddd !important;
     border-bottom: 1px solid #dddddd !important;
     margin-top: 1rem;
     margin-bottom: 1rem;
   }
+  .workspace{
+    border-right: 0 !important;
+    border-left: 0 !important;
+  }
   .users {
     font-size: initial;
+    border-bottom: 0 !important;
   }
 }
 .ui.menu.navbar {

@@ -1,9 +1,53 @@
 import React, { Component } from 'react'
+import PropTypes from "prop-types";
+import { withRouter } from "react-router";
 import { Menu } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import './sidebar.css'
+import './sidebar.scss'
 class SideBar extends Component {
+    static propTypes = {
+        match: PropTypes.object.isRequired,
+        location: PropTypes.object.isRequired,
+        history: PropTypes.object.isRequired
+    };
     state = { activeItem: 'home' }
+    componentDidMount(){
+        this.setActiveItem(this.props.location.pathname)
+    }
+    setActiveItem(pathname){
+        let temp;
+        switch (pathname) {
+            case "/projects":
+                temp = "Projects"
+                break;
+            case "/project":
+                temp = "Projects"
+                break;
+            case "/issues":
+                temp = "Issues"
+                break;
+            case "/issue":
+                temp = "Issues"
+                break;
+            case "/home":
+                temp = "home"
+                break;
+            case "/users":
+                temp = "Users"
+                break;
+            case "/user":
+                temp = "Users"
+                break;
+            default:
+                temp = this.state.activeItem
+        }
+        this.setState({activeItem:temp})
+    }
+    componentDidUpdate(prevprops) {
+        if (this.props.location !== prevprops.location) {
+            this.setActiveItem(this.props.location.pathname)
+        }
+    }
     handleItemClick = (e, { name }) => this.setState({ activeItem: name })
     render() {
         const { activeItem } = this.state
@@ -16,7 +60,7 @@ class SideBar extends Component {
                     onClick={this.handleItemClick}
                 />
                 <Menu.Item
-                className="workspace"
+                    className="workspace"
                     name='Work Space'
                     header
                     active
@@ -28,17 +72,11 @@ class SideBar extends Component {
                     onClick={this.handleItemClick}
                 />
                 <Menu.Item as={Link}
-                    to='/home'
+                    to='/issues'
                     name='Issues'
                     active={activeItem === 'Issues'}
                     onClick={this.handleItemClick}
                 />
-                {/* <Menu.Item as={Link}
-                    to='/MyPage'
-                    name='My Page'
-                    active={activeItem === 'My Page'}
-                    onClick={this.handleItemClick}
-                /> */}
                 <Menu.Item as={Link}
                     className='users'
                     active={activeItem === 'Users'}
@@ -51,4 +89,4 @@ class SideBar extends Component {
         )
     }
 }
-export default SideBar
+export default withRouter(SideBar)

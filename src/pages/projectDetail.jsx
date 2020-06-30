@@ -19,6 +19,10 @@ class ProjectDetail extends Component {
     constructor(props) {
         super(props)
         const warning_text = "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?"
+        if(this.props.location.state === undefined){
+            this.props.location.state ={id:1} //giving temporary id
+            this.props.history.push({pathname:"/projects"})
+        }
         this.state = {
             id: this.props.location.state.id,
             data: null,
@@ -58,8 +62,10 @@ class ProjectDetail extends Component {
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
         await this.setState({ issue_data: issue_data.results, issue_data_pag: { ...this.state.issue_data_pag, count: issue_data.count}, })
-        this.setPermissions()
-        this.stateOptions()
+        if(project_res === 200 && issues_res===200){
+            this.setPermissions()
+            this.stateOptions()
+        }
     }
 
     deleteCurrentProject() {

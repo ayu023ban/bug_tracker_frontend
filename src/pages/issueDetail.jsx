@@ -24,6 +24,10 @@ class IssueDetail extends Component {
         this.updateIssue = this.updateIssue.bind(this)
         this.newCommentFromWebsocket = this.newCommentFromWebsocket.bind(this)
         this.fetchCommentFromWebSocket = this.fetchCommentFromWebSocket.bind(this)
+        if (this.props.location.state === undefined) {
+            this.props.location.state = { bug: 1 } //giving temporary id
+            this.props.history.push({ pathname: "/home" })
+        }
         this.state = {
             id: this.props.location.state.bug,
             comments: null,
@@ -46,10 +50,12 @@ class IssueDetail extends Component {
         this.ma = setInterval(this.fetchCommentFromWebSocket, 500)
         const issueurl = issue_url + this.state.id.toString() + "/"
         const res = await fetch(issueurl, { headers: header })
-        const data = await res.json()
-        this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
-        this.setPermissions()
-
+        if (res.status === 200) {
+            const data = await res.json()
+            await this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
+            this.setPermissions()
+        }
+        else console.log(res)
     }
 
     fetchCommentFromWebSocket() {
@@ -358,7 +364,7 @@ class IssueDetail extends Component {
                                                                 <Button.Group basic vertical>
                                                                     {isuserACreator && <Button icon="trash" content="delete" name="trash" onClick={() => { this.toggleDeleteIssue(); this.settingToggle() }} labelPosition='left' />}
                                                                     <Button icon="edit" content="edit" labelPosition='left' onClick={(event) => { this.formToggle(); this.settingToggle() }} />
-                                                                    {isUserAMember && <Button active={bug.important} icon={ bug.important?"check square":"check square outline" }content="important" labelPosition='left' onClick={(event) => this.setImportant()} /> }
+                                                                    {isUserAMember && <Button active={bug.important} icon={bug.important ? "check square" : "check square outline"} content="important" labelPosition='left' onClick={(event) => this.setImportant()} />}
                                                                 </Button.Group>
                                                                 <Divider hidden />
                                                                 <Button.Group basic vertical>
@@ -435,7 +441,7 @@ class IssueDetail extends Component {
                             </Modal.Actions>
                         </Modal>
 
-                        <Modal basic open={this.state.deleteIssueModalOpen} onOpen={() => { this.toggleDeleteIssue()}} onClose={()=>{this.toggleDeleteIssue()}} closeIcon>
+                        <Modal basic open={this.state.deleteIssueModalOpen} onOpen={() => { this.toggleDeleteIssue() }} onClose={() => { this.toggleDeleteIssue() }} closeIcon>
                             <Header icon='archive' content='Delete This Issue' />
                             <Modal.Actions >
                                 <Button color='green' icon='checkmark' content='Yes' onClick={(event) => this.deleteIssue()} />

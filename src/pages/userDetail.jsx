@@ -18,6 +18,10 @@ class UserDetail extends Component {
         this.formSubmit = this.formSubmit.bind(this)
         this.toggleDisable = this.toggleDisable.bind(this)
         this.toggleMaster = this.toggleMaster.bind(this)
+        if(this.props.location.state === undefined){
+            this.props.location.state ={id:1} //giving temporary id
+            this.props.history.push({pathname:"/users"})
+        }
         this.state = {
             id: this.props.location.state.id,
             userData: null,
