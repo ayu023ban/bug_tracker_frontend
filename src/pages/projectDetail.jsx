@@ -60,9 +60,7 @@ class ProjectDetail extends Component {
         await this.setState({ issue_data: issue_data.results, issue_data_pag: { ...this.state.issue_data_pag, count: issue_data.count}, })
         this.setPermissions()
         this.stateOptions()
-
     }
-
 
     deleteCurrentProject() {
         console.log(this.state.id)

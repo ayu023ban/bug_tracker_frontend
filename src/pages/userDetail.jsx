@@ -24,12 +24,12 @@ class UserDetail extends Component {
             menuVisible: false,
             update: {
                 socialEmail: "",
-                username: ""
+                full_name: ""
             },
             errors: {
                 email: false,
                 emailConfirm: false,
-                username: false,
+                full_name: false,
                 github: false,
                 instagram: false,
                 facebook: false,
@@ -73,17 +73,17 @@ class UserDetail extends Component {
                 break
             case "socialEmailConfirmation":
                 errorname = "emailConfirm"
-                this.state.update.socialEmail !== value ?
+                this.state.update.socialEmail !== value && value.length!==0 ?
                     error = {
                         content: "email does not match with the above",
                         pointing: "below"
                     } : error = false
                 break
-            case "username":
-                errorname = "username"
+            case "full_name":
+                errorname = "full_name"
                 regex = /^[\w ]+$/
                 !regex.test(value) ? error = {
-                    content: "write username in correct format",
+                    content: "write name in correct format",
                     pointing: "below"
                 } : error = false
                 break
@@ -135,7 +135,7 @@ class UserDetail extends Component {
                 break
             case "Full Name":
                 array = ["username", "first_name", "last_name", "full_name"]
-                let name = this.state.update.username.split(" ")
+                let name = this.state.update.full_name.split(" ")
                 let first_name = name[0]
                 let last_name = (name[1]) ? name[1] : ""
                 let full_name = first_name + ((name[1]) ? " " : "") + last_name
@@ -166,6 +166,10 @@ class UserDetail extends Component {
                 userData: updated_user_data
             })
         }
+    }
+    copy(e){
+        e.preventDefault()
+        alert("email copying is not allowed")
     }
     async toggleDisable() {
         const url = user_url + this.state.id.toString() + "/disable/"
@@ -205,7 +209,7 @@ class UserDetail extends Component {
                         <Breadcrumb as={Header}>
                             <Breadcrumb.Section className='previousSection' as={Link} to='/users'>Users</Breadcrumb.Section>
                             <Breadcrumb.Divider><Icon name='angle right' /></Breadcrumb.Divider>
-                            <Breadcrumb.Section>{Boolean(userData) && userData.username}</Breadcrumb.Section>
+                            <Breadcrumb.Section>{Boolean(userData) && userData.full_name}</Breadcrumb.Section>
                         </Breadcrumb>
                     </Header>
                     <Divider section />
@@ -307,6 +311,8 @@ class UserDetail extends Component {
                             {this.state.activeItem === "Email" &&
                                 <Form className="email-form">
                                     <Form.Field
+                                    onCopy={this.copy}
+                                        style={{user_select:"null"}}
                                         control={Input}
                                         required
                                         error={this.state.errors.email}
@@ -329,7 +335,7 @@ class UserDetail extends Component {
                                     <Button
                                         positive
                                         type="submit"
-                                        disabled={this.state.errors.email || this.state.errors.emailConfirm || this.state.update.socialEmail == null || this.state.update.socialEmail.length === 0}
+                                        disabled={this.state.errors.email || this.state.errors.emailConfirm || this.state.update.socialEmail == null || this.state.update.socialEmail.length === 0 || this.state.update.socialEmailConfirmation === undefined || this.state.update.socialEmailConfirmation.length === 0 }
                                         icon="checkmark"
                                         content="Update"
                                         onClick={this.formSubmit}
@@ -342,16 +348,16 @@ class UserDetail extends Component {
                                     <Form.Field
                                         control={Input}
                                         required
-                                        error={this.state.errors.username}
+                                        error={this.state.errors.full_name}
                                         label="Full Name"
                                         placeholder="Full Name"
-                                        name="username"
+                                        name="full_name"
                                         value={this.state.update.full_name}
                                         onChange={this.updateForm}
                                     />
                                     <Button
                                         positive
-                                        disabled={this.state.errors.username || this.state.update.username.length === 0}
+                                        disabled={this.state.errors.full_name || this.state.update.full_name.length === 0}
                                         type="submit"
                                         icon="checkmark"
                                         content="Update"
