@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import NavBar from './navbar/navbar'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import HomePage, { smallHomePage } from './pages/homePage'
+import HomePage from './pages/homePage'
 import ProjectPage from './pages/projectPage'
 import PageNotFound from './pages/pageNotFound'
 import SideBar from './navbar/sidebar'
@@ -42,7 +42,7 @@ class Router extends Component {
     const supportsHistory = 'pushState' in window.history
     return (
       <BrowserRouter forceRefresh={!supportsHistory} >
-          <NavBar isLoggedIn={isLoggedIn} history={this.props.history} onLogout={this.handleLogOut} onSideBarButton={this.handleSideBarOpen} />
+        <NavBar isLoggedIn={isLoggedIn} history={this.props.history} onLogout={this.handleLogOut} onSideBarButton={this.handleSideBarOpen} />
         {open && isLoggedIn &&
           <SideBar />
         }
@@ -52,7 +52,7 @@ class Router extends Component {
           <PrivateRoute exact path='/project' isLogin={isLoggedIn} component={ProjectDetail} />
           <PrivateRoute exact path="/home" isLogin={isLoggedIn} component={HomePage} />
           <PrivateRoute exact path="/issues" isLogin={isLoggedIn} component={HomePage} />
-          <PrivateRoute exact path="/home/tagged" isLogin={isLoggedIn} component={smallHomePage} />
+          <PrivateRoute exact path="/home/tagged" isLogin={isLoggedIn} component={HomePage} />
           <PrivateRoute isLogin={isLoggedIn} exact path='/projects' component={ProjectPage} />
           <PrivateRoute isLogin={isLoggedIn} exact path='/issue' component={IssueDetail} />
           <PrivateRoute exact path='/editor' isLogin={isLoggedIn} component={EditorPage} />

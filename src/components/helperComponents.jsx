@@ -25,7 +25,7 @@ class PaginationContainer extends Component {
         let res = await fetch(url, { method: "Get", headers: header })
         let data = await res.json()
         await this.setState({ data_pag: { count: data.count, url: url } })
-        this.props.onPageChange(data.results)
+        this.props.onPageChange(data.results , url)
     }
     render() {
         const { data_pag } = this.state
@@ -105,7 +105,8 @@ class IssueFilter extends Component {
         let params = x.join("&")
         let regex = /.*\?.*/
         let q =(x.length !== 0)?(regex.test(base_url))?"&": "?" : ""
-        let url = base_url + q + params + ((x.length !== 0 || regex.test(base_url)) ? "&page=1" : "?page=1")
+        let url = base_url + q + params 
+        if(!base_url.includes("page"))url +=((x.length !== 0 || regex.test(base_url)) ? "&page=1" : "?page=1")
         this.props.get_content(url)
     }
     render() {

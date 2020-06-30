@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Segment, Container,Modal, Grid, Header, Button, Card, Icon, Divider } from 'semantic-ui-react'
+import { Segment, Container, Modal, Grid, Header, Button, Card, Icon, Divider } from 'semantic-ui-react'
 import "./scss/projectPage.scss"
 import Axios from 'axios'
 import { project_url } from '../api-routes'
 import { ProjectForm } from '../components/forms'
 import { NormalPlaceholder } from '../components/placeholders'
 import { ProjectCard } from '../components/cards'
-import {PaginationContainer} from '../components/helperComponents'
+import { PaginationContainer } from '../components/helperComponents'
 export function isGitUrl(str) {
     var regex = /^(?:git|ssh|https?|git@[-\w.]+):(\/\/)(github\.com)\/(\w{1,})\/(\w{1,})\/?$/;
     return regex.test(str);
@@ -21,7 +21,7 @@ class ProjectPage extends Component {
             isLoggedIn: false,
             projectNameError: false,
             projectLinkError: false,
-            data_pag:{ count: null, url: project_url + "?page=1"},
+            data_pag: { count: null, url: project_url + "?page=1" },
             values: { name: "" }
         }
     }
@@ -120,7 +120,7 @@ class ProjectPage extends Component {
         fetch(base_url, { headers: { Authorization: `Token ${sessionStorage.getItem("token")}` } })
             .then((res => res.json()))
             .then((data) => {
-                this.setState({ data: data.results,data_pag:{count:data.count,url:base_url} })
+                this.setState({ data: data.results, data_pag: { count: data.count, url: base_url } })
             })
 
     }
@@ -135,33 +135,33 @@ class ProjectPage extends Component {
         const { open } = this.state
         return (
             <Container fluid className='ContainerDiv'>
-            <Container>
-                <Header as="h2" color='red' className='projects-header'>Projects<Icon className='add-button' onClick={this.show('blurring')} name='plus' size='large' /></Header>
-                <Divider section />
-                <Segment horizontal textAlign='center' children={Button} >
-                    <Button basic color='teal' onClick={(event) => { this.updateIssue("latest") }} > Latest</Button>
-                    <Button basic color='blue' onClick={(event) => { this.updateIssue("myprojects") }} > My Projects</Button>
-                    {/* <Button basic color='green' onClick={(event) => { this.updateIssue("tag") }} > Tags</Button> */}
-                    <Button basic color='violet' onClick={(event) => { this.updateIssue("collaborated") }} > Collaborated</Button>
-                </Segment>
-                <Divider section />
-                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
-                {this.listProjects()}
-                <PaginationContainer onPageChange={(data)=>{this.setState({data:data})}} data_pag={this.state.data_pag} />
-                <Modal open={open} onClose={this.close} closeOnDimmerClick={false} closeOnEscape size='large' >
-                    <Modal.Header>Create New Project</Modal.Header>
-                    <Modal.Content scrolling size='large'>
-                        <Modal.Description>
-                            <ProjectForm submitName="create" onSubmit={(data) => { this.createProject(data) }} />
-                        </Modal.Description>
-                    </Modal.Content>
-                    <Modal.Actions>
-                        <Button color='black' onClick={this.close}>
-                            Cancel
+                <Container>
+                    <Header as="h2" color='red' className='projects-header'>Projects<Icon className='add-button' onClick={this.show('blurring')} name='plus' size='large' /></Header>
+                    <Divider section />
+                    <Segment horizontal textAlign='center' children={Button} >
+                        <Button basic color='teal' onClick={(event) => { this.updateIssue("latest") }} > Latest</Button>
+                        <Button basic color='blue' onClick={(event) => { this.updateIssue("myprojects") }} > My Projects</Button>
+                        {/* <Button basic color='green' onClick={(event) => { this.updateIssue("tag") }} > Tags</Button> */}
+                        <Button basic color='violet' onClick={(event) => { this.updateIssue("collaborated") }} > Collaborated</Button>
+                    </Segment>
+                    <Divider section />
+                    <PaginationContainer onPageChange={(data, url) => { this.setState({ data: data, data_pag: { ...this.state.data_pag, url: url } }) }} data_pag={this.state.data_pag} />
+                    {this.listProjects()}
+                    <PaginationContainer onPageChange={(data, url) => { this.setState({ data: data, data_pag: { ...this.state.data_pag, url: url } }) }} data_pag={this.state.data_pag} />
+                    <Modal open={open} onClose={this.close} closeOnDimmerClick={false} closeOnEscape size='large' >
+                        <Modal.Header>Create New Project</Modal.Header>
+                        <Modal.Content scrolling size='large'>
+                            <Modal.Description>
+                                <ProjectForm submitName="create" onSubmit={(data) => { this.createProject(data) }} />
+                            </Modal.Description>
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button color='black' onClick={this.close}>
+                                Cancel
                     </Button>
-                    </Modal.Actions>
-                </Modal>
-            </Container>
+                        </Modal.Actions>
+                    </Modal>
+                </Container>
             </Container>
         )
     }

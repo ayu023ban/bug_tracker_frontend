@@ -19,9 +19,9 @@ class ProjectDetail extends Component {
     constructor(props) {
         super(props)
         const warning_text = "Your are trying to delete the whole project,all issues and comments related to this will also be deleted. \n Are you sure?"
-        if(this.props.location.state === undefined){
-            this.props.location.state ={id:1} //giving temporary id
-            this.props.history.push({pathname:"/projects"})
+        if (this.props.location.state === undefined) {
+            this.props.location.state = { id: 1 } //giving temporary id
+            this.props.history.push({ pathname: "/projects" })
         }
         this.state = {
             id: this.props.location.state.id,
@@ -52,7 +52,7 @@ class ProjectDetail extends Component {
     updateFormToggle = () => this.setState({ updatingForm: !this.state.updatingForm })
 
 
-    async componentDidMount() { 
+    async componentDidMount() {
         const project_detail_url = project_url + this.state.id.toString() + "/"
         const get_issues_url = issue_url + `?project=${this.state.id}&page=1`
         const headers = JSON.parse(sessionStorage.getItem("header"))
@@ -61,8 +61,8 @@ class ProjectDetail extends Component {
         await this.setState({ data: data, member_names: data.member_names, member_ids: data.members })
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
-        await this.setState({ issue_data: issue_data.results, issue_data_pag: { ...this.state.issue_data_pag, count: issue_data.count}, })
-        if(project_res === 200 && issues_res===200){
+        await this.setState({ issue_data: issue_data.results, issue_data_pag: { ...this.state.issue_data_pag, count: issue_data.count }, })
+        if (project_res === 200 && issues_res === 200) {
             this.setPermissions()
             this.stateOptions()
         }
@@ -334,11 +334,11 @@ class ProjectDetail extends Component {
                     </Header>
                     <Divider section />
                     <IssueFilter url={issue_url + `?project=${this.state.id}`} get_content={this.get_issue_content} />
-                    <PaginationContainer onPageChange={(data) => { this.setState({ issue_data: data }) }} data_pag={this.state.issue_data_pag} />
+                    <PaginationContainer onPageChange={(data,url) => { this.setState({ issue_data: data,issue_data_pag:{...this.state.issue_data_pag,url:url} }) }} data_pag={this.state.issue_data_pag} />
                     <Container className="issueCardGroup" get_content={this.get_issue_content} >
                         {this.ListCards()}
                     </Container>
-                    <PaginationContainer onPageChange={(data) => { this.setState({ issue_data: data }) }} data_pag={this.state.issue_data_pag} />
+                    <PaginationContainer onPageChange={(data,url) => { this.setState({ issue_data: data ,issue_data_pag:{...this.state.issue_data_pag,url:url}}) }} data_pag={this.state.issue_data_pag} />
                     <Modal open={openModal1} basic onClose={this.deleteProjectModalClose} size='small'>
                         <Header icon='archive' content='Delete the Current Project' />
                         <Modal.Content>
