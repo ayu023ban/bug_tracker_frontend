@@ -55,7 +55,7 @@ class IssueDetail extends Component {
             await this.setState({ bug: data, activeStatus: data.status, activeDomain: data.domain })
             this.setPermissions()
         }
-        else console.log(res)
+        else this.props.history.replace("/issues")
     }
 
     fetchCommentFromWebSocket() {

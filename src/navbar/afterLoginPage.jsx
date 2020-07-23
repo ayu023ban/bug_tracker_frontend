@@ -30,7 +30,8 @@ class LoginComp extends Component {
                 }
             }
             else {
-                this.setState({ isRequestNotSuccessful: true,res:await res.text() })
+                console.log(res)
+                // this.setState({ isRequestNotSuccessful: true,res:await res.text() })
             }
         }
     }

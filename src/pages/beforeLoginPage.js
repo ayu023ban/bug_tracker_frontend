@@ -18,7 +18,7 @@ class LoginPage extends Component {
             <Header as="h1">User Login</Header>
             <Button 
             primary 
-            href="https://internet.channeli.in/oauth/authorise/?client_id=l1Wb17BXy5ZoQeJ1fzOtZutOObUrzSi9fW1xxLGR&redirect_url=http://localhost:8000/bug_reporter/login/&state=RANDOM_STATE_STRING&scope=Person" 
+            href="https://internet.channeli.in/oauth/authorise/?client_id=l1Wb17BXy5ZoQeJ1fzOtZutOObUrzSi9fW1xxLGR&redirect_uri=http://localhost:3000/login/&state=RANDOM_STATE_STRING&scope=Person" 
             fluid content="Login With Omniport" />
             {this.props.location.state &&
               <Message style={{marginTop:"5rem"}} negative content={this.props.location.state.error} header="Login Failed" />

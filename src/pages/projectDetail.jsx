@@ -62,7 +62,7 @@ class ProjectDetail extends Component {
         let issues_res = await fetch(get_issues_url, { headers: headers })
         let issue_data = await issues_res.json()
         await this.setState({ issue_data: issue_data.results, issue_data_pag: { ...this.state.issue_data_pag, count: issue_data.count }, })
-        if (project_res === 200 && issues_res === 200) {
+        if (project_res.status === 200 && issues_res.status === 200) {
             this.setPermissions()
             this.stateOptions()
         }
@@ -132,6 +132,7 @@ class ProjectDetail extends Component {
             fluid
             multiple
             onChange={this.onChange}
+            defaultValue={this.state.member_names}
             search
             selection
             options={this.state.user_data_for_search}
@@ -140,6 +141,7 @@ class ProjectDetail extends Component {
 
     }
     setPermissions() {
+        console.log("test")
         const user_id = JSON.parse(sessionStorage.getItem("user_data")).id
         const isCreator = this.state.data.creator === user_id
         const isMember = this.state.member_ids.includes(user_id)
@@ -305,10 +307,9 @@ class ProjectDetail extends Component {
                         </Breadcrumb>
                     </Header>
                     <Divider section />
-                    {!updatingForm &&
+                    {!updatingForm? 
                         this.renderProjectCard()
-                    }
-                    {updatingForm &&
+                    :updatingForm &&
                         <Card fluid color='red'>
                             <Card.Content>
                                 <ProjectForm onClose={this.updateFormToggle} isClose initialValues={filter(this.state.data, ["name", "wiki", "githublink"])} submitName="Update" onSubmit={(data) => { this.updateProject(data) }} />
